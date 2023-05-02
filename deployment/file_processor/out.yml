@@ -6,8 +6,8 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: lambda_function.lambda_handler
-      Runtime: python3.8
-      CodeUri: s3://lambda-artifacts-08b8fcfe8c36c618/dcddbcd8bd9c6a0d43ac36252803d6bc
+      Runtime: python3.10
+      CodeUri: s3://lambda-artifacts-08b8fcfe8c36c618/372662d219e98531f879ed1eb7699758
       Description: Call the AWS Lambda API
       Timeout: 10
       Policies:
@@ -22,6 +22,6 @@ Resources:
     Properties:
       LayerName: blank-python-lib
       Description: Dependencies for the blank-python sample app.
-      ContentUri: s3://lambda-artifacts-08b8fcfe8c36c618/0b06b75e2acb22f9df9a25c2287c4528
+      ContentUri: s3://lambda-artifacts-08b8fcfe8c36c618/cc5eff14a753681ceedc51d6ebf7a1cd
       CompatibleRuntimes:
       - python3.8
