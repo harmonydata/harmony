@@ -1,8 +1,0 @@
-#!/media/thomas/642d0db5-2c98-4156-b591-1a3572c5868c/anaconda3/envs/py310/bin/python
-# -*- coding: utf-8 -*-
-import re
-import sys
-from libfuturize.main import main
-if __name__ == '__main__':
-    sys.argv[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', sys.argv[0])
-    sys.exit(main())
