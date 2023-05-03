@@ -30,7 +30,10 @@ jobs:
       - name: Install Tox and any other packages
         run: pip install tox
       - name: Setup Java
-        uses: actions/setup-java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '11'
       - name: Run Tox
         # Run tox using the version of Python in `PATH`
         run: |
