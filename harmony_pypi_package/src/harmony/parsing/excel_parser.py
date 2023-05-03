@@ -1,12 +1,3 @@
-from typing import List
-
-from harmony.schemas.enums.file_types import FileType
-from harmony.schemas.requests.text import RawFile, Instrument, Question
-from langdetect import detect
-import re
-import uuid
-
-
 import traceback
 import uuid
 from typing import List
@@ -15,9 +6,9 @@ import numpy as np
 import pandas as pd
 from langdetect import detect
 
+from harmony.parsing.util.excel_to_pandas import parse_excel_to_pandas
 from harmony.schemas.requests.text import Question
 from harmony.schemas.requests.text import RawFile, Instrument
-from harmony.parsing.util.excel_to_pandas import parse_excel_to_pandas
 
 
 def clean_option_no(option_could_be_int):

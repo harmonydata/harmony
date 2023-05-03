@@ -1,14 +1,18 @@
+import re
+import uuid
 from typing import List
+
+from langdetect import detect
 
 from harmony.schemas.enums.file_types import FileType
 from harmony.schemas.requests.text import RawFile, Instrument, Question
-from langdetect import detect
-import re
-import uuid
 
 
 def convert_text_to_instruments(file: RawFile) -> List[Instrument]:
-    page_text = file.text_content
+    if file.file_type == FileType.txt:
+        page_text = file.content
+    else:
+        page_text = file.text_content
 
     language = detect(page_text)
 
