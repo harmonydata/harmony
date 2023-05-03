@@ -40,7 +40,7 @@ setuptools.setup(
         'Operating System :: OS Independent',
     ],
     python_requires='>=3.6',
-    install_requires=['pydantic==1.10.7'],
+    install_requires=['pydantic==1.10.7','pandas==2.0.0','tika==2.6.0','lxml==4.9.2','langdetect==1.0.9','XlsxWriter==3.0.9','openpyxl==3.1.2'],
     extras_require={
         'dev': ['check-manifest'],
         # 'test': ['coverage'],
