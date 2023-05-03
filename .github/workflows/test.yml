@@ -1,4 +1,4 @@
-name: Test
+name: Test Pypi package
 
 on:
   push:
