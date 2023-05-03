@@ -29,6 +29,8 @@ jobs:
           python-version: ${{ matrix.python }}
       - name: Install Tox and any other packages
         run: pip install tox
+      - name: Setup Java
+        uses: actions/setup-java
       - name: Run Tox
         # Run tox using the version of Python in `PATH`
         run: |
