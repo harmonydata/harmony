@@ -1,6 +1,6 @@
 import unittest
 
-from harmony.harmony import Number
+from harmony import Number
 
 
 class TestSimple(unittest.TestCase):
