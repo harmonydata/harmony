@@ -1,15 +1,15 @@
-import os
+import json
 import logging
-import jsonpickle
+import os
+
 import boto3
-from aws_xray_sdk.core import xray_recorder
+import jsonpickle
 from aws_xray_sdk.core import patch_all
+from pydantic import parse_obj_as
+
+from harmony import convert_text_to_instruments
 from harmony.schemas.requests.text import RawFile
 from harmony.schemas.responses.text import InstrumentList
-from harmony import convert_text_to_instruments
-from pydantic import parse_obj_as
-from typing import List
-import json
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
