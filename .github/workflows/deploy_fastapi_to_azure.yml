@@ -4,11 +4,11 @@ on:
   push:
     branches: [ "main" ]
     paths:
-      - deployment/file_processor/**
+      - harmony_fastapi/**
   pull_request:
     branches: [ "main" ]
     paths:
-      - deployment/file_processor/**
+      - harmony_fastapi/**
     
 env:
   IMAGE_NAME: harmonyapi
