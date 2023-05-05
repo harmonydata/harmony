@@ -79,7 +79,7 @@ Choose a node in the main function graph. Then choose **View traces** to see a l
 
 # Configure Handler Class
 
-By default, the function uses a handler class named `Handler` that takes a map as input and returns a string. The project also includes handlers that use other input and output types. These are defined in the following files under src/main/java/example:
+By default, the function uses a handler class named `HandlerString` that takes a map as input and returns a map.
 
 - `Handler.java` – Takes a `Map<String,String>` as input.
 - `HandlerInteger.java` – Takes an `Integer` as input.

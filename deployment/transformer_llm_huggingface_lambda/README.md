@@ -149,30 +149,6 @@ function = lambda_.DockerImageFunction(
     )
 ```
 
-## Adding a translator 
-Optionally, you can add more models by adding Python scripts in the
-inference directory. For example, add the following code in a file
-called ```translate-en2fr.py```:
-```python
-import json
-from transformers
-import pipeline
-
-en_fr_translator = pipeline('translation_en_to_fr')
-
-def handler(event, context):
-    response = {
-        "statusCode": 200,
-        "body": en_fr_translator(event['text'])[0]
-    }
-    return response
-```
-Then run:
-```bash
-$ cdk synth
-$ cdk deploy
-```
-This creates a new endpoint to perform English to French translation.
 
 ## Cleaning up
 After you are finished experimenting with this project, run ```cdk destroy``` to remove all of the associated infrastructure.
