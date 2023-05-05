@@ -245,3 +245,4 @@ $RECYCLE.BIN/
 /.aws-sam/
 /app/harmony/
 /samconfig.toml
+/harmony/

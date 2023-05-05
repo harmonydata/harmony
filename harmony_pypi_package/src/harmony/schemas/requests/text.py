@@ -57,6 +57,8 @@ class Instrument(BaseModel):
     file_name: str = Field("Untitled file", description="The name of the input file")
     file_type: FileType = Field(None, description="The file type (pdf, xlsx, txt)")
     file_section: str = Field(None, description="The sub-section of the file, e.g. Excel tab")
+    study: str = Field(None, description="The study")
+    sweep: str = Field(None, description="The sweep")
     metadata: dict = Field(None,
                            description="Optional metadata about the instrument (URL, citation, DOI, copyright holder)")
     language: Language = Field(Language.English,
@@ -73,6 +75,8 @@ class Instrument(BaseModel):
                 "file_type": "pdf",
                 "file_section": "GAD-7 English",
                 "language": "en",
+                "study": "MCS",
+                "sweep": "Sweep 1",
                 "questions": [{"question_no": "1",
                                "question_intro": "Over the last two weeks, how often have you been bothered by the following problems?",
                                "question_text": "Feeling nervous, anxious, or on edge",

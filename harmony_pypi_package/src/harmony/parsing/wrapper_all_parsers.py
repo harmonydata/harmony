@@ -11,9 +11,9 @@ def convert_file_to_instruments(file: RawFile) -> List[Instrument]:
     instruments = []
 
     if file.file_type == FileType.pdf:
-        instruments.append(convert_pdf_to_instruments(file))
+        instruments.extend(convert_pdf_to_instruments(file))
     elif file.file_type == FileType.txt:
-        instruments.append(convert_text_to_instruments(file))
+        instruments.extend(convert_text_to_instruments(file))
     elif file.file_type == FileType.xlsx:
         instruments.extend(convert_excel_to_instruments(file))
 
