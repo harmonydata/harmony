@@ -1,4 +1,4 @@
-package example;
+package harmony;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.LambdaLogger;

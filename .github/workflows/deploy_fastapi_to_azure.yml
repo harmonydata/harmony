@@ -1,0 +1,62 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - deployment/file_processor/**
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - deployment/file_processor/**
+    
+env:
+  IMAGE_NAME: harmonyapi
+
+jobs:
+
+  build:
+    name: Build container image
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+    - name: Log into registry
+      uses: docker/login-action@v1
+      with:
+          registry: ${{ secrets.ACR_ENDPOINT }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+    - name: change into fastapi folder
+      run:  cd harmony_fastapi
+    - name: Build & Push
+      uses: docker/build-push-action@v2
+      with:
+          push: true
+          build-args: |
+            version=${{ steps.tag.outputs.tag }}
+          tags: regprotocolsfds.azurecr.io/harmonyapi:${{ github.sha }}
+
+
+  deploy:
+    runs-on: ubuntu-latest
+
+    needs: build
+
+    environment:
+      name: 'production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+
+    steps:
+      - name: change into fastapi folder
+        run:  cd harmony_fastapi
+      - name: Lowercase the repo name
+        run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
+
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@0b651ed7546ecfc75024011f76944cb9b381ef1e
+        with:
+          app-name: wellcomeharmonyapi
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          images: regprotocolsfds.azurecr.io/harmonyapi:${{ github.sha }}
