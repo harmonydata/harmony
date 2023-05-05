@@ -27,7 +27,7 @@ def convert_text_to_instruments(file: RawFile) -> List[Instrument]:
 
     instrument = Instrument(
         file_id=file.file_id,
-        instrument_id=uuid.uuid4().hex,
+        instrument_id=file.file_id + "_0",
         instrument_name=file.file_name,
         file_name=file.file_name,
         file_type=file.file_type,

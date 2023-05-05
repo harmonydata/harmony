@@ -14,9 +14,9 @@ try:
 except ImportError:
     print ("Could not import Excel parser")
 try:
-    from .parsing.wrapper_all_parsers import convert_file_to_instruments
+    from .parsing.wrapper_all_parsers import convert_files_to_instruments
 except ImportError:
-    print ("Could not import Excel parser")
+    print ("Could not import all parsers wrapper function")
 try:
     from .parsing import *
 except ImportError:

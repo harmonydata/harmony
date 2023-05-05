@@ -1,3 +1,3 @@
 rm -rf app/harmony
-cp -r ../../harmony_pypi_package/build/lib/harmony ./app/
+cp -r ../../harmony_pypi_package/src/harmony/ ./app/
 sam build

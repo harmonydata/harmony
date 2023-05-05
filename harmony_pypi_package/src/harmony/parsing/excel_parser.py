@@ -28,7 +28,7 @@ def convert_excel_to_instruments(file: RawFile) -> List[Instrument]:
     sheet_name_to_dataframe = parse_excel_to_pandas(file.content)
 
     instruments = []
-    for sheet_name, df_questions in sheet_name_to_dataframe.items():
+    for sheet_idx, (sheet_name, df_questions) in sheet_name_to_dataframe.items():
 
         # check we have 3 columns. If more or less, adjust it by deleting or inserting.
         if len(df_questions.columns) > 3:
@@ -99,7 +99,7 @@ def convert_excel_to_instruments(file: RawFile) -> List[Instrument]:
 
         instrument = Instrument(
             file_id=file.file_id,
-            instrument_id=uuid.uuid4().hex,
+            instrument_id=file.file_id + "_" + str(sheet_idx),
             file_name=file.file_name,
             instrument_name=file.file_name + " / " + sheet_name,
             file_type=file.file_type,
