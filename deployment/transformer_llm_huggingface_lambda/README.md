@@ -1,17 +1,8 @@
 # Entry point for Harmony calling Hugging Face to vectorise a text
 
-```
-import requests
+Based on Zero administration inference with AWS Lambda for HuggingFace https://github.com/aws-samples/zero-administration-inference-with-aws-lambda-for-hugging-face
 
-headers = {
-    'Content-Type': 'application/json'
-}
-response = requests.post("https://uroe37564sqhuuczvqitupuv440zcdgf.lambda-url.eu-west-2.on.aws", 
-                         headers=headers,
-                         json={"texts":["hi", "bye"]})
-```
-
-
+Original README below:
 
 # Zero administration inference with AWS Lambda for :hugs:
 

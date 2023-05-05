@@ -1,4 +1,8 @@
-## Serverless scikit-learn Model Serving
+## Serverless file processing endpoint (Excel, PDF, etc)
+
+Based on SAM Template for scikit-learn-inference-docker-lambda, https://github.com/aws-samples/aws-lambda-docker-serverless-inference
+
+# Original README
 
 This examples illustrates how to serve scikit-learn model on Lambda Function to predict based on iris dataset.
 

@@ -1,9 +1,9 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  scikit-learn-inference-docker-lambda
-
-  SAM Template for scikit-learn-inference-docker-lambda
+  Harmony file processor
+  
+  Lambda function for converting files to instruments
 
 Resources:
   ScikitLearnInferenceFunction:
