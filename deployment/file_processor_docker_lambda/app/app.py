@@ -51,7 +51,7 @@ def handler(event, context):
                 'Content-Type': 'application/pdf'
             }
             pdf_bytes = base64.b64decode(file.content)
-            response = requests.post("https://vewj7t7cpafppz6jf75im4lfwm0vrgkb.lambda-url.eu-west-2.on.aws",
+            response = requests.post("https://iopazkwjg2hgu4eyqtfpkbfwje0liklm.lambda-url.eu-west-2.on.aws/",
                                      headers=headers,
                                      data=pdf_bytes
                                      )

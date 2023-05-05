@@ -49,4 +49,4 @@ ENV SENTENCE_TRANSFORMERS_HOME=/mnt/hf_models_cache
 ENTRYPOINT [ "python3", "-m", "awslambdaric" ]
 
 # This will get replaced by the proper handler by the CDK script
-CMD [ "sentiment.handler" ]
+CMD [ "vectorisation.handler" ]

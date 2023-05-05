@@ -1,5 +1,12 @@
 ## Serverless file processing endpoint (Excel, PDF, etc)
 
+How to deploy:
+
+```
+./build.sh 
+./deploy.sh 
+```
+
 Based on SAM Template for scikit-learn-inference-docker-lambda, https://github.com/aws-samples/aws-lambda-docker-serverless-inference
 
 # Original README

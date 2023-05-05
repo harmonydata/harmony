@@ -6,7 +6,7 @@ Description: >
   Lambda function for converting files to instruments
 
 Resources:
-  ScikitLearnInferenceFunction:
+  HarmonyFileProcessor:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       PackageType: Image
@@ -18,9 +18,9 @@ Resources:
       Dockerfile: Dockerfile
 
 Outputs:
-  ScikitLearnInferenceFunction:
+  HarmonyFileProcessor:
     Description: "ScikitLearnInference Lambda Function ARN"
-    Value: !GetAtt ScikitLearnInferenceFunction.Arn
-  ScikitLearnInferenceFunctionIamRole:
+    Value: !GetAtt HarmonyFileProcessor.Arn
+  HarmonyFileProcessorIamRole:
     Description: "Implicit IAM Role created for ScikitLearnInference function"
-    Value: !GetAtt ScikitLearnInferenceFunction.Arn
+    Value: !GetAtt HarmonyFileProcessor.Arn
