@@ -8,10 +8,6 @@ from numpy.linalg import norm
 
 from harmony.schemas.requests.text import Instrument
 
-mhc_questions = []
-mhc_all_metadatas = []
-mhc_embeddings = np.zeros((0, 0))
-
 
 def cosine_similarity(vec1: ndarray, vec2: ndarray) -> ndarray:
     dp = dot(vec1, vec2.T)
@@ -21,7 +17,8 @@ def cosine_similarity(vec1: ndarray, vec2: ndarray) -> ndarray:
 
 
 def match_instruments_with_function(instruments: List[Instrument], query: str,
-                                    vectorisation_function: types.FunctionType) -> tuple:
+                                    vectorisation_function: types.FunctionType, mhc_questions=[], mhc_all_metadatas=[],
+                                    mhc_embeddings=np.zeros((0, 0))) -> tuple:
     texts = []
     negated_texts = []
     instrument_ids = []

@@ -1,3 +1,10 @@
+# Harmony  Tika wrapper
+
+Based on Java function from AWS Lambda Developer Guide  (https://github.com/awsdocs/aws-lambda-developer-guide).
+
+
+
+
 # Basic function with minimal dependencies (Java)
 
 ![Architecture](/sample-apps/java-basic/images/sample-java-basic.png)

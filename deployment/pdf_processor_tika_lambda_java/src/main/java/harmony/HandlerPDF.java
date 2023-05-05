@@ -15,7 +15,7 @@ import org.apache.tika.parser.pdf.PDFParser;
 import org.apache.tika.sax.BodyContentHandler;
 
 // Handler value: example.HandlerString
-public class HandlerString implements RequestHandler<Map<String, Object>, String>{
+public class HandlerPDF implements RequestHandler<Map<String, Object>, String>{
 
   @Override
   /*

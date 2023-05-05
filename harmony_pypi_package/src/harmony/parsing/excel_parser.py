@@ -28,7 +28,7 @@ def convert_excel_to_instruments(file: RawFile) -> List[Instrument]:
     sheet_name_to_dataframe = parse_excel_to_pandas(file.content)
 
     instruments = []
-    for sheet_idx, (sheet_name, df_questions) in sheet_name_to_dataframe.items():
+    for sheet_idx, (sheet_name, df_questions) in enumerate(sheet_name_to_dataframe.items()):
 
         # check we have 3 columns. If more or less, adjust it by deleting or inserting.
         if len(df_questions.columns) > 3:

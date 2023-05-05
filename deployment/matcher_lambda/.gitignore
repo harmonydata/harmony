@@ -7,3 +7,5 @@ bucket-name.txt
 /deps/
 out.yml
 
+# Exclude all MHC data
+/function/mhc*

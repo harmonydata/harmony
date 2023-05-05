@@ -12,11 +12,21 @@ from harmony import convert_files_to_instruments
 from harmony.schemas.enums.file_types import FileType
 from harmony.schemas.requests.text import RawFile
 from harmony.schemas.responses.text import InstrumentList
+import pickle as pkl
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+CACHE_FILE = "/tmp/harmony_instruments_cache.pkl"
+
 file_to_instruments_cache = {}
+
+if os.path.isfile(CACHE_FILE):
+    try:
+        with open(CACHE_FILE, "rb") as f:
+            file_to_instruments_cache = pkl.load(f)
+    except:
+        print ("Could not load cache")
 
 
 def handler(event, context):
@@ -53,6 +63,12 @@ def handler(event, context):
     # Store in cache
     for instrument in instruments:
         file_to_instruments_cache[instrument.file_id] = instrument
+        if len(file_to_instruments_cache) % 5 == 0:
+            try:
+                with open(CACHE_FILE, "wb") as f:
+                    pkl.dump(file_to_instruments_cache, f)
+            except:
+                print("Could not save cache")
 
     instruments_list = InstrumentList(__root__=instruments)
 

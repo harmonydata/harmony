@@ -1,12 +1,12 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
-Description: An AWS Lambda application that calls the Lambda API.
+Description: Java wrapper for Tika for Harmony
 Resources:
   function:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: target/java-basic-1.0-SNAPSHOT.jar
-      Handler: example.HandlerString
+      Handler: harmony.HandlerPDF
       Runtime: java11
       Description: Java function
       MemorySize: 2048
