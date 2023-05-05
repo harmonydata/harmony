@@ -5,3 +5,5 @@ bucket-name.txt
 /rootkey.csv
 /function/pydantic/
 /deps/
+out.yml
+

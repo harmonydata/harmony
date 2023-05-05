@@ -9,7 +9,7 @@ Resources:
       Runtime: python3.9
       CodeUri: function/.
       Description: Call the AWS Lambda API
-      Timeout: 10
+      Timeout: 20
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
