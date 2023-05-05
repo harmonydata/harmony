@@ -1,16 +1,42 @@
+import json
+import os
 import uuid
 from typing import Annotated
 from typing import List
 
+import numpy as np
 from fastapi import APIRouter
 from fastapi import Body
 
-from harmony.schemas.requests.text import RawFile, Instrument, MatchBody
-from harmony.schemas.responses.text import MatchResponse
-from harmony.matching.matcher import match_instruments_with_function
 from harmony import convert_files_to_instruments
+from harmony.matching.default_matcher import match_instruments
+from harmony.schemas.requests.text import RawFile, Instrument, MatchBody, Question
+from harmony.schemas.responses.text import MatchResponse
 
 router = APIRouter(prefix="/text")
+
+mhc_questions = []
+mhc_all_metadatas = []
+mhc_embeddings = np.zeros((0, 0))
+
+try:
+    data_path = os.getenv("DATA_PATH")
+    with open(data_path + "/mhc_questions.json",
+              "r", encoding="utf-8") as f:
+        for l in f:
+            mhc_question = Question.parse_raw(l)
+            mhc_questions.append(mhc_question)
+    with open(
+            data_path + "/mhc_all_metadatas.json",
+            "r", encoding="utf-8") as f:
+        for l in f:
+            mhc_meta = json.loads(l)
+            mhc_all_metadatas.append(mhc_meta)
+    with open(data_path + "/mhc_embeddings.npy",
+              "rb") as f:
+        mhc_embeddings = np.load(f)
+except:
+    print("Could not load MHC embeddings ", str(os.getcwd()))
 
 
 @router.post(
@@ -100,7 +126,9 @@ def match(match_body: MatchBody) -> MatchResponse:
     if query == "":
         query = None
 
-    questions, matches, query_similarity = match_instruments_with_function(match_body.instruments, query, match_body.parameters)
+    questions, matches, query_similarity = match_instruments(match_body.instruments, query,
+                                                             mhc_questions, mhc_all_metadatas,
+                                                             mhc_embeddings)
 
     matches_jsonifiable = matches.tolist()
 
