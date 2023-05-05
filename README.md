@@ -56,8 +56,20 @@ Please contact us at  https://harmonydata.org/contact or write to thomas@fastdat
 
 # License
 
-License: The MIT License
+License: MIT License
 
 # Contact
 
 thomas@fastdatascience.com
+
+
+## Built With
+
+- [Docker](https://docs.docker.com/) - Used for deployment to the web
+- [Apache Tika](https://tika.apache.org/) - Used for parsing PDFs to text
+- [HuggingFace](https://huggingface.co/) - Used for machine learning
+- [sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2](https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2) - SentenceBERT model
+
+## Licences of Third Party Software
+
+- Apache Tika: [Apache 2.0 License](https://tika.apache.org/license.html)
