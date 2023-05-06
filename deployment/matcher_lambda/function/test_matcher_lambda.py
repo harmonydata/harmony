@@ -97,6 +97,13 @@ class TestMatcherLambda(unittest.TestCase):
         self.assertLess(0.999, result_json["matches"][0][0], "Check ones on diagonal")
         self.assertLess(0.999, result_json["matches"][1][1], "Check ones on diagonal")
 
+        # Try again and check cache is working
+        result = handler(event, context)
+        result_json = json.loads(result)
+        print(result_json)
+        self.assertEqual(4, len(result_json["questions"]), "Check number of questions")
+        self.assertLess(0.999, result_json["matches"][0][0], "Check ones on diagonal")
+        self.assertLess(0.999, result_json["matches"][1][1], "Check ones on diagonal")
 
 if __name__ == '__main__':
     unittest.main()

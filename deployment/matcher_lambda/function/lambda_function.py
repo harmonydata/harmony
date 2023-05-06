@@ -71,7 +71,7 @@ def vectorisation_function(all_texts: np.ndarray) -> np.ndarray:
         else:
             texts_to_send_to_neural_network = all_texts[indices_to_calculate, :]
 
-        response = requests.post("https://uroe37564sqhuuczvqitupuv440zcdgf.lambda-url.eu-west-2.on.aws",
+        response = requests.post("https://u63wn2cb2h4diqrgy76kwxlqqi0plmta.lambda-url.eu-west-2.on.aws/",
                                  headers=headers,
                                  json={"texts": texts_to_send_to_neural_network})
 
@@ -99,7 +99,7 @@ def vectorisation_function(all_texts: np.ndarray) -> np.ndarray:
             else:
                 items.append(item_to_vectors_cache[text])
 
-        return np.asarray(items, dtype=np.float)
+        return np.asarray(items, dtype=np.float32)
 
     else:
         # all items came from cache
@@ -107,7 +107,7 @@ def vectorisation_function(all_texts: np.ndarray) -> np.ndarray:
         for text in all_texts:
             items.append(item_to_vectors_cache[text])
 
-        return np.asarray(items, dtype=np.float)
+        return np.asarray(items, dtype=np.float32)
 
 
 def lambda_handler(event, context):

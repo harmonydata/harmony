@@ -42,7 +42,7 @@ def handler(event, context):
     for file in files:
         file.file_id = str(hash(file.content))
         if file.file_id in file_to_instruments_cache:
-            return InstrumentList(__root__=[file_to_instruments_cache[file.file_id]])
+            return InstrumentList(__root__=[file_to_instruments_cache[file.file_id]]).json()
 
     for file in files:
         if file.file_type == FileType.pdf:
@@ -50,8 +50,9 @@ def handler(event, context):
             headers = {
                 'Content-Type': 'application/pdf'
             }
-            pdf_bytes = base64.b64decode(file.content)
-            response = requests.post("https://iopazkwjg2hgu4eyqtfpkbfwje0liklm.lambda-url.eu-west-2.on.aws/",
+            header, pdf_in_base64 = file.content.split(",")
+            pdf_bytes = base64.b64decode(pdf_in_base64)
+            response = requests.post("https://vybiddjwcan4sn3xhlhpo3xehi0gpqst.lambda-url.eu-west-2.on.aws/",
                                      headers=headers,
                                      data=pdf_bytes
                                      )

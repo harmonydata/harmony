@@ -15,7 +15,7 @@ If you get an error and need to start again, you can do
 cdk destroy
 ```
 
-If you still get stuck, you may have to delete some resources e.g. buckets from AWS using the CLI.
+If you still get stuck, you may have to delete some resources e.g. buckets from AWS using the CLI. A useful tool is AWS Nuke https://github.com/rebuy-de/aws-nuke.
 
 Based on "Zero administration inference with AWS Lambda for HuggingFace" https://github.com/aws-samples/zero-administration-inference-with-aws-lambda-for-hugging-face
 
@@ -42,8 +42,7 @@ The code is organized using the following structure:
 ```bash
 ├── inference
 │   ├── Dockerfile
-│   ├── sentiment.py
-│   └── summarization.py
+│   └── vectorisation.py
 ├── app.py
 └── ...
 ```
