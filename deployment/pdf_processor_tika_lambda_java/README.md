@@ -1,13 +1,13 @@
-# Harmony  Tika wrapper
+# Harmony Tika wrapper
 
 Based on Java function from AWS Lambda Developer Guide  (https://github.com/awsdocs/aws-lambda-developer-guide).
 
+This is a Java wrapper around Apache Tika.
 
-
-
+An alternative to this is to use the Python Tika bindings, but for deployment it is more convenient and cost-effective to have Python and Java in separate Lambda functions.
 # Basic function with minimal dependencies (Java)
 
-![Architecture](/sample-apps/java-basic/images/sample-java-basic.png)
+![Architecture](images/sample-java-basic.png)
 
 The project source includes function code and supporting resources:
 - `src/main` - A Java function.
@@ -16,8 +16,6 @@ The project source includes function code and supporting resources:
 - `build.gradle` - A Gradle build file.
 - `pom.xml` - A Maven build file.
 - `1-create-bucket.sh`, `2-deploy.sh`, etc. - Shell scripts that use the AWS CLI to deploy and manage the application.
-
-Use the following instructions to deploy the sample application.
 
 # Requirements
 - [Java 8 runtime environment (SE JRE)](https://www.oracle.com/java/technologies/javase-downloads.html)
