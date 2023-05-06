@@ -14,7 +14,7 @@ from aws_cdk import App, Stack, Duration, RemovalPolicy, Tags
 
 from constructs import Construct
 
-class ServerlessHuggingFaceStack(Stack):
+class HarmonyVectorisationStack(Stack):
     def __init__(self, scope: Construct, id: str, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
@@ -54,7 +54,7 @@ class ServerlessHuggingFaceStack(Stack):
 
 app = App()
 
-stack = ServerlessHuggingFaceStack(app, "ServerlessHuggingFaceStack")
-Tags.of(stack).add("AwsSample", "ServerlessHuggingFace")
+stack = HarmonyVectorisationStack(app, "HarmonyVectorisationStack")
+Tags.of(stack).add("Harmony", "HarmonyVectorisation")
 
 app.synth()
