@@ -5,10 +5,14 @@ on:
     branches: [ "main" ]
     paths:
       - harmony_fastapi/**
+    paths-ignore:
+      - '**/README.md'
   pull_request:
     branches: [ "main" ]
     paths:
       - harmony_fastapi/**
+    paths-ignore:
+      - '**/README.md'
     
 env:
   IMAGE_NAME: harmonyapi
