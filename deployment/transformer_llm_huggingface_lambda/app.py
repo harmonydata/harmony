@@ -45,8 +45,8 @@ class HarmonyVectorisationStack(Stack):
                                                               cmd=[
                                                                   filename+".handler"]
                                                               ),
-                memory_size=8096,
-                timeout=Duration.seconds(600),
+                memory_size=2048,
+                timeout=Duration.seconds(15),
                 vpc=vpc,
                 filesystem=lambda_.FileSystem.from_efs_access_point(access_point, '/mnt/hf_models_cache'),
                 environment={"TRANSFORMERS_CACHE": "/mnt/hf_models_cache"},
