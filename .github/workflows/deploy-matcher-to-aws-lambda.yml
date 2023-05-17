@@ -31,7 +31,6 @@ jobs:
         working-directory: ./deployment/matcher_lambda
         run: cp -r deps/pydantic function/
       - name: default deploy
-        working-directory: ./deployment/matcher_lambda
         uses: appleboy/lambda-action@master
         with:
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
