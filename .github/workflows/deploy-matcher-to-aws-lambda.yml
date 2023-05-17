@@ -51,8 +51,6 @@ jobs:
 
       - name: Upload file to bucket
         uses: zdurham/s3-upload-github-action@master
-        with:
-         args: --acl public-read
         env:
           FILE: ./deployment/matcher_lambda/deployment.zip
           AWS_REGION: ${{ secrets.AWS_REGION }}
