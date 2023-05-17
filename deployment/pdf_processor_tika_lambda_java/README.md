@@ -113,4 +113,3 @@ Deploy the change, and then use the invoke script to test the new configuration.
 To delete the application, run `4-cleanup.sh`.
 
     java-basic$ ./4-cleanup.sh
- 

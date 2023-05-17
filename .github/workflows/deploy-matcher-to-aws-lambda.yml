@@ -53,7 +53,7 @@ jobs:
 
       - name: Create template pointing to correct S3 bucket
         working-directory: ./deployment/matcher_lambda
-        run: 'sed s_CodeUri:.function.._CodeUri:${{ secrets.S3_BUCKET }}/deployment.zip_ template.yml template2.yml'
+        run: 'sed s_CodeUri:.function.._CodeUri:${{ secrets.S3_BUCKET }}/deployment.zip_ template.yml > template2.yml'
 
       - name: Deploy with AWS Cloudformation
         id: deploy-cloudformation
