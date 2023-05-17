@@ -30,6 +30,13 @@ jobs:
       - name: copy pip dependencies in
         working-directory: ./deployment/matcher_lambda
         run: cp -r deps/pydantic function/
+      - name: Configure AWS credentials
+        id: creds
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
       - name: Deploy with AWS Cloudformation
         id: deploy-cloudformation
         uses: aws-actions/aws-cloudformation-github-deploy@master
