@@ -37,17 +37,10 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
-#      - name: Package with AWS Cloudformation
-#        id: package-cloudformation
-#        uses: aws-actions/aws-cloudformation-github-package@master
-#        with:
-#         name: harmony-matcher
-#         template: deployment/matcher_lambda/template.yml
 
       - name: create zip
         working-directory: ./deployment/matcher_lambda/function
         run: zip -r ../deployment.zip .
-
 
       - name: Upload file to bucket
         uses: zdurham/s3-upload-github-action@master
@@ -58,27 +51,14 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
+      - name: Create template pointing to correct S3 bucket
+        working-directory: ./deployment/matcher_lambda
+        run: 'sed s_CodeUri:.function.._CodeUri:${{ secrets.S3_BUCKET }}/deployment.zip_ template.yml template2.yml'
+
       - name: Deploy with AWS Cloudformation
         id: deploy-cloudformation
         uses: aws-actions/aws-cloudformation-github-deploy@master
         with:
          name: harmony-matcher
-         template: deployment/matcher_lambda/template.yml
+         template: deployment/matcher_lambda/template2.yml
 
-
-
-
-#      - name: default deploy
-#        uses: appleboy/lambda-action@master
-#        with:
-#          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#          aws_region: ${{ secrets.AWS_REGION }}
-#          function_name: harmony-matcher
-#          source: deployment/matcher_lambda/deployment.zip
-#          memory_size: 128
-#          timeout: 20
-#          handler: 'lambda_function.lambda_handler'
-#          runtime: python3.9
-#          layers: 'arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python39:6'
-#          environment: VECTOR_API_KEY=${{ secrets.HUGGING_FACE_API_KEY }}

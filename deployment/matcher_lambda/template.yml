@@ -7,7 +7,7 @@ Resources:
     Properties:
       Handler: lambda_function.lambda_handler
       Runtime: python3.9
-      CodeUri:  s3://lambda-artifacts-b34e4f78e985120b/deployment.zip
+      CodeUri: function/.
       Description: Call the Harmony matcher
       Timeout: 20
       # Function's execution role
