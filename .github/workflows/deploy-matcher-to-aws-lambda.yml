@@ -51,16 +51,18 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      - name: Create template pointing to correct S3 bucket
+      - name: Create template pointing to correct S3 bucket by using Sed to replace generic local path with bucket, taken from Github secrets
         working-directory: ./deployment/matcher_lambda
-        run: 'sed s_CodeUri:.function.._CodeUri:\ ${{ secrets.S3_BUCKET }}/deployment.zip_ template.yml > template2.yml'
-      - name: Show new template
+        run: 'sed s_CodeUri:.function.._CodeUri:\ s3://${{ secrets.S3_BUCKET }}/deployment.zip_ template.yml > template_s3.yml'
+
+      - name: Show new template - print the content of the template to screen for debug purpose
         working-directory: ./deployment/matcher_lambda
-        run: cat template2.yml
+        run: cat template_s3.yml
+
       - name: Deploy with AWS Cloudformation
         id: deploy-cloudformation
         uses: aws-actions/aws-cloudformation-github-deploy@master
         with:
          name: harmony-matcher
-         template: deployment/matcher_lambda/template2.yml
+         template: deployment/matcher_lambda/template_s3.yml
 
