@@ -175,4 +175,4 @@ Choose a node in the main function graph. Then choose **View traces** to see a l
 # Cleanup
 To delete the application, run `5-cleanup.sh`.
 
-    $ ./5-cleanup.sh   
+    $ ./5-cleanup.sh    
