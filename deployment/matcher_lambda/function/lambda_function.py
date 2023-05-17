@@ -21,24 +21,24 @@ mhc_embeddings = np.zeros((0, 0))
 
 print("Folder is", str(os.getcwd()))
 
-try:
-    data_path = "."
-    with open(data_path + "/mhc_questions.json",
-              "r", encoding="utf-8") as f:
-        for l in f:
-            mhc_question = Question.parse_raw(l)
-            mhc_questions.append(mhc_question)
-    with open(
-            data_path + "/mhc_all_metadatas.json",
-            "r", encoding="utf-8") as f:
-        for l in f:
-            mhc_meta = json.loads(l)
-            mhc_all_metadatas.append(mhc_meta)
-    with open(data_path + "/mhc_embeddings.npy",
-              "rb") as f:
-        mhc_embeddings = np.load(f)
-except:
-    print("Could not load MHC embeddings ", str(os.getcwd()))
+# try:
+#     data_path = "."
+#     with open(data_path + "/mhc_questions.json",
+#               "r", encoding="utf-8") as f:
+#         for l in f:
+#             mhc_question = Question.parse_raw(l)
+#             mhc_questions.append(mhc_question)
+#     with open(
+#             data_path + "/mhc_all_metadatas.json",
+#             "r", encoding="utf-8") as f:
+#         for l in f:
+#             mhc_meta = json.loads(l)
+#             mhc_all_metadatas.append(mhc_meta)
+#     with open(data_path + "/mhc_embeddings.npy",
+#               "rb") as f:
+#         mhc_embeddings = np.load(f)
+# except:
+#     print("Could not load MHC embeddings ", str(os.getcwd()))
 
 print("Loaded embeddings", len(mhc_embeddings))
 
