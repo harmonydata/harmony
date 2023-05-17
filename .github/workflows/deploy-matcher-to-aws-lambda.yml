@@ -48,12 +48,15 @@ jobs:
         working-directory: ./deployment/matcher_lambda/function
         run: zip -r ../deployment.zip .
 
-      - name: Push Zip to S3
-        uses: jakejarvis/s3-sync-action@v0.3.1
+
+      - name: Upload file to bucket
+        uses: zdurham/s3-upload-github-action@master
+        with:
+         args: --acl public-read
         env:
-          SOURCE_DIR:  ./deployment/matcher_lambda/deployment.zip
+          FILE: ./deployment/matcher_lambda/deployment.zip
           AWS_REGION: ${{ secrets.AWS_REGION }}
-          AWS_S3_BUCKET: ${{ secrets.S3_BUCKET }}
+          S3_BUCKET: ${{ secrets.S3_BUCKET }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
