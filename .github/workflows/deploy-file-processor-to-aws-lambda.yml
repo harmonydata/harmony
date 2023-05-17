@@ -1,4 +1,4 @@
-name: Deploy Matcher to AWS Lambda (Python)
+name: Deploy File Processor to AWS Lambda (Python)
 
 on:
   push:
@@ -22,7 +22,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ##region##
+          aws-region: ${{ secrets.AWS_REGION }}
       # sam build
       - run: 'cp -r ../../harmony_pypi_package/src/harmony/ ./app/'
         working-directory: ./deployment/file_processor_docker_lambda
