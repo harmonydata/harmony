@@ -37,12 +37,26 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
-      - name: Package with AWS Cloudformation
-        id: package-cloudformation
-        uses: aws-actions/aws-cloudformation-github-package@master
-        with:
-         name: harmony-matcher
-         template: deployment/matcher_lambda/template.yml
+#      - name: Package with AWS Cloudformation
+#        id: package-cloudformation
+#        uses: aws-actions/aws-cloudformation-github-package@master
+#        with:
+#         name: harmony-matcher
+#         template: deployment/matcher_lambda/template.yml
+
+      - name: create zip
+        working-directory: ./deployment/matcher_lambda/function
+        run: zip -r ../deployment.zip .
+
+      - name: Push Zip to S3
+        uses: jakejarvis/s3-sync-action@v0.3.1
+        env:
+          SOURCE_DIR:  ./deployment/matcher_lambda/function
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_S3_BUCKET: ${{ secrets.S3_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
       - name: Deploy with AWS Cloudformation
         id: deploy-cloudformation
         uses: aws-actions/aws-cloudformation-github-deploy@master
@@ -51,10 +65,6 @@ jobs:
          template: deployment/matcher_lambda/template.yml
 
 
-#      - name: create zip
-#        working-directory: ./deployment/matcher_lambda/function
-#        run: zip -r ../deployment.zip .
-#
 
 
 #      - name: default deploy
