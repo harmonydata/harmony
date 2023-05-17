@@ -18,17 +18,20 @@ jobs:
     steps:
       - name: checkout source code
         uses: actions/checkout@v1
-      - name: change into folder
-        run: cd deployment/matcher_lambda
       - name: copy Harmony dependencies
+        working-directory: ./deployment/matcher_lambda
         run: cp -r ../../harmony_pypi_package/src/harmony/ function/
       - name: make folder for third party (pip) dependencies
+        working-directory: ./deployment/matcher_lambda
         run: mkdir -p deps
       - name: install pip dependencies
+        working-directory: ./deployment/matcher_lambda
         run: pip3 install --no-dependencies --target deps/ -r function/requirements.txt
       - name: copy pip dependencies in
+        working-directory: ./deployment/matcher_lambda
         run: cp -r deps/pydantic function/
       - name: default deploy
+        working-directory: ./deployment/matcher_lambda
         uses: appleboy/lambda-action@master
         with:
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
