@@ -1,0 +1,34 @@
+name: Deploy Matcher to AWS Lambda (Python)
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - deployment/file_processor_docker_lambda/**
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - deployment/file_processor_docker_lambda/**
+
+jobs:
+
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+      - uses: aws-actions/setup-sam@v1
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ##region##
+      # sam build
+      - run: 'cp -r ../../harmony_pypi_package/src/harmony/ ./app/'
+        working-directory: ./deployment/file_processor_docker_lambda
+
+      - run: sam build
+        working-directory: ./deployment/file_processor_docker_lambda
+
+      - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name harmony-file-processor --resolve_s3 true --capabilities CAPABILITY_IAM --region  ${{ secrets.AWS_REGION }}
+        working-directory: ./deployment/file_processor_docker_lambda
