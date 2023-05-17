@@ -35,7 +35,7 @@ jobs:
         uses: aws-actions/aws-cloudformation-github-deploy@master
         with:
          name: harmony-matcher
-         template: template.yml
+         template: deployment/matcher_lambda/template.yml
 
 
 #      - name: create zip
