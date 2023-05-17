@@ -4,6 +4,10 @@ The matcher component calculates the similarity between items.
 
 This AWS Lambda wrapper is smart, as it caches texts so that we don't need to call the vectoriser so often.
 
+# Environment variables needed
+
+You need to create a variable `HUGGINGFACE_API_KEY` containing an API key for the Hugging Face Hub. It is cheaper to use a HuggingFace deployment than an AWS deployment.
+
 Based on Python function from AWS Lambda Developer Guide  (https://github.com/awsdocs/aws-lambda-developer-guide).
 
 ![Architecture](images/sample-blank-python.png)

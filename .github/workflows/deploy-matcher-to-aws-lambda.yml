@@ -1,0 +1,42 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - deployment/matcher_lambda/**
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - deployment/matcher_lambda/**
+
+jobs:
+
+  deploy_source:
+    name: deploy lambda from source
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout source code
+        uses: actions/checkout@v1
+      - name: change into folder
+        run: cd deployment/matcher_lambda
+      - name: copy Harmony dependencies
+        run: cp -r ../../harmony_pypi_package/src/harmony/ function/
+      - name: make folder for third party (pip) dependencies
+        run: mkdir -p deps
+      - name: install pip dependencies
+        run: pip3 install --no-dependencies --target deps/ -r function/requirements.txt
+      - name: copy pip dependencies in
+        run: cp -r deps/pydantic function/
+      - name: default deploy
+        uses: appleboy/lambda-action@master
+        with:
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws_region: ${{ secrets.AWS_REGION }}
+          function_name: harmony-matcher
+          source: function/lambda_function.py
+          memory_size: 128
+          timeout: 20
+          handler: lambda_function.lambda_handler
+          runtime: python3.9

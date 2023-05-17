@@ -1,5 +1,10 @@
 # Entry point for Harmony calling Hugging Face to vectorise a text
 
+This is an option to deploy the transformer neural network to Lambda. However it is expensive - it had a base cost of $2.43 per day with zero usage.
+
+Instead, we are using HuggingFace API.
+
+
 How to deploy to AWS Lambda:
 
 ```
