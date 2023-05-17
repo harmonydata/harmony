@@ -37,7 +37,7 @@ jobs:
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: ${{ secrets.AWS_REGION }}
           function_name: harmony-matcher
-          source: function/lambda_function.py
+          #source: function/lambda_function.py
           memory_size: 128
           timeout: 20
           handler: lambda_function.lambda_handler

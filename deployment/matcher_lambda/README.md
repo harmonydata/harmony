@@ -4,6 +4,10 @@ The matcher component calculates the similarity between items.
 
 This AWS Lambda wrapper is smart, as it caches texts so that we don't need to call the vectoriser so often.
 
+# Deployment via Github Actions (CI/CD)
+
+You should not need to manually deploy this function, as a Github action is configured to deploy to AWS Lambda when a push is made to `main`. However, manual deployment instructions via bash scripts are also provided at the bottom of this README.
+
 # Environment variables needed
 
 You need to create a variable `VECTOR_API_KEY` containing an API key for the Hugging Face Hub. It is cheaper to use a HuggingFace deployment than an AWS deployment.
@@ -14,7 +18,7 @@ Based on Python function from AWS Lambda Developer Guide  (https://github.com/aw
 
 # Alternative to HuggingFace API
 
-You can alternatively deploy the HuggingFace transformer model directly to AWS Lambda, however this works out more expensive to host.
+You can alternatively deploy the HuggingFace transformer model directly to AWS Lambda, however this works out more expensive to host. The alternative deployment script is in the folder `optional_transformer_llm_huggingface_lambda`.
 
 # Architecture
 
