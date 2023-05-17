@@ -5,10 +5,12 @@ on:
     branches: [ "main" ]
     paths:
       - deployment/matcher_lambda/**
+      - .github/workflows/deploy-matcher-to-aws-lambda.yml
   pull_request:
     branches: [ "main" ]
     paths:
       - deployment/matcher_lambda/**
+      - .github/workflows/deploy-matcher-to-aws-lambda.yml
 
 jobs:
 
