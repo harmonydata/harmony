@@ -4,6 +4,8 @@ The matcher component calculates the similarity between items.
 
 This AWS Lambda wrapper is smart, as it caches texts so that we don't need to call the vectoriser so often.
 
+It's built on top of an AWS Lambda Pandas layer arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python39:6.
+
 # Deployment via Github Actions (CI/CD)
 
 You should not need to manually deploy this function, as a Github action is configured to deploy to AWS Lambda when a push is made to `main`. However, manual deployment instructions via bash scripts are also provided at the bottom of this README.
