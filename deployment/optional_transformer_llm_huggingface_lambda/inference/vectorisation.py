@@ -13,7 +13,7 @@ model = SentenceTransformer('sentence-transformers/paraphrase-multilingual-MiniL
 def handler(event, context):
     body = json.loads(event["body"])
     print ("body is", body)
-    texts = np.asarray(body["texts"])
+    texts = np.asarray(body["inputs"])
     embeddings = model.encode(texts)
     embeddings_jsonifiable = embeddings.tolist()
     response = {

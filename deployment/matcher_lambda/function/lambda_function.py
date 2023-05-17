@@ -71,8 +71,8 @@ def vectorisation_function(all_texts: np.ndarray) -> np.ndarray:
         else:
             texts_to_send_to_neural_network = all_texts[indices_to_calculate, :]
 
-        API_URL = "https://api-inference.huggingface.co/pipeline/feature-extraction/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
-        headers = {"Authorization": "Bearer " + os.environ.get("HUGGINGFACE_API_KEY", "")}
+        API_URL = os.environ.get("VECTOR_API_URL", "https://api-inference.huggingface.co/pipeline/feature-extraction/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
+        headers = {"Authorization": "Bearer " + os.environ.get("VECTOR_API_KEY", "")}
 
         response = requests.post(API_URL, headers=headers, json={"inputs": texts_to_send_to_neural_network, "options": {"wait_for_model": True}})
 

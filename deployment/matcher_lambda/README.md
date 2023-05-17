@@ -6,7 +6,9 @@ This AWS Lambda wrapper is smart, as it caches texts so that we don't need to ca
 
 # Environment variables needed
 
-You need to create a variable `HUGGINGFACE_API_KEY` containing an API key for the Hugging Face Hub. It is cheaper to use a HuggingFace deployment than an AWS deployment.
+You need to create a variable `VECTOR_API_KEY` containing an API key for the Hugging Face Hub. It is cheaper to use a HuggingFace deployment than an AWS deployment.
+
+You can also optionally create a variable `VECTOR_API_URL` pointing to the URL of the vectorisation API.
 
 Based on Python function from AWS Lambda Developer Guide  (https://github.com/awsdocs/aws-lambda-developer-guide).
 

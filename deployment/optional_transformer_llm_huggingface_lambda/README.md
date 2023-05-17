@@ -4,6 +4,21 @@ This is an option to deploy the transformer neural network to Lambda. However it
 
 Instead, we are using HuggingFace API.
 
+## Calling this Docker container
+
+The call format is the same as for the HuggingFace API:
+
+```
+import requests
+headers = {
+    'Content-Type': 'application/json'
+}
+response = requests.post("https://[FUNCTION URL]/",
+                                 headers=headers,
+                                 json={"texts": texts_to_send_to_neural_network})
+```
+
+## Deployment
 
 How to deploy to AWS Lambda:
 
