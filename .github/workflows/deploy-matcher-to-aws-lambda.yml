@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: Deploy Matcher to AWS Lambda (Python)
 
 on:
   push:
