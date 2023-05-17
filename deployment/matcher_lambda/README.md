@@ -10,6 +10,12 @@ You need to create a variable `HUGGINGFACE_API_KEY` containing an API key for th
 
 Based on Python function from AWS Lambda Developer Guide  (https://github.com/awsdocs/aws-lambda-developer-guide).
 
+# Alternative to HuggingFace API
+
+You can alternatively deploy the HuggingFace transformer model directly to AWS Lambda, however this works out more expensive to host.
+
+# Architecture
+
 ![Architecture](images/sample-blank-python.png)
 
 The project source includes function code and supporting resources:
