@@ -43,6 +43,10 @@ jobs:
       - run: 'cp -r deps/typing_extensions.py function/'
         working-directory: ./deployment/matcher_lambda
 
+      - name: Create template pointing to correct HF API key
+        working-directory: ./deployment/matcher_lambda
+        run: 'sed -i s/hfkey/${{ secrets.HUGGING_FACE_API_KEY }}/ template.yml'
+
       - run: sam build
         working-directory: ./deployment/matcher_lambda
 
