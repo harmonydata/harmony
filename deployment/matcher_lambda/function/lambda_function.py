@@ -76,6 +76,8 @@ def vectorisation_function(all_texts: np.ndarray) -> np.ndarray:
 
         response = requests.post(API_URL, headers=headers, json={"inputs": texts_to_send_to_neural_network, "options": {"wait_for_model": True}})
 
+        print ("RESPONSE IS ", response, response.text)
+
         response_vectors = np.asarray(response.json())
 
         for idx, text in enumerate(texts_to_send_to_neural_network):
