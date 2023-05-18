@@ -5,7 +5,7 @@ Resources:
   function:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: target/java-basic-1.0-SNAPSHOT.jar
+      CodeUri: ./deployment/pdf_processor_tika_lambda_java
       Handler: harmony.HandlerPDF
       Runtime: java11
       Description: Java function
