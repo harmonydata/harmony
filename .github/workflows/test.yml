@@ -4,13 +4,11 @@ on:
   push:
     branches:
       - main
-      - master
     paths:
       - harmony_pypi_package/**
   pull_request:
     branches:
       - main
-      - master
     paths:
       - harmony_pypi_package/**
 
@@ -36,6 +34,5 @@ jobs:
           java-version: '11'
       - name: Run Tox
         # Run tox using the version of Python in `PATH`
-        run: |
-           cd harmony_pypi_package
-           tox -e py
+        run: tox -e py
+        working-directory: ./harmony_pypi_package

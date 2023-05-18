@@ -15,14 +15,14 @@ jobs:
           python-version: "3.x"
       - name: Install dependencies
         run: |
-          cd harmony_pypi_package
           python -m pip install --upgrade pip
           pip install setuptools wheel twine
+          working-directory: ./harmony_pypi_package
       - name: Build and publish
         env:
           TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
         run: |
-          cd harmony_pypi_package
           python setup.py sdist bdist_wheel
           twine upload --repository pypi dist/*
+          working-directory: ./harmony_pypi_package
