@@ -7,16 +7,12 @@ on:
       - master
     paths:
       - harmony_pypi_package/**
-    paths-ignore:
-      - '**/README.md'
   pull_request:
     branches:
       - main
       - master
     paths:
       - harmony_pypi_package/**
-    paths-ignore:
-      - '**/README.md'
 
 jobs:
   build:
