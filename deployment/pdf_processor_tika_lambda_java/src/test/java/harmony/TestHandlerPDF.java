@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.List;
 
 class TestHandlerPDF {
-  private static final Logger logger = LoggerFactory.getLogger(InvokeTest.class);
+  private static final Logger logger = LoggerFactory.getLogger(TestHandlerPDF.class);
 
   @Test
   void testHandlerString() {
