@@ -18,3 +18,8 @@ Resources:
       Tracing: Active
       Layers:
         - 'arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python39:6'
+Globals:
+  Function:
+    Environment:
+      Variables:
+        VECTOR_API_KEY: hfkey
