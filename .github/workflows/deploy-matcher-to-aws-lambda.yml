@@ -14,57 +14,36 @@ on:
 
 jobs:
 
-  deploy_source:
-    name: deploy lambda from source
+  build-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: checkout source code
-        uses: actions/checkout@v1
-      - name: copy Harmony dependencies
-        working-directory: ./deployment/matcher_lambda
-        run: cp -r ../../harmony_pypi_package/src/harmony/ function/
-      - name: make folder for third party (pip) dependencies
-        working-directory: ./deployment/matcher_lambda
-        run: mkdir -p deps
-      - name: install pip dependencies
-        working-directory: ./deployment/matcher_lambda
-        run: pip3 install --no-dependencies --target deps/ -r function/requirements.txt
-      - name: copy pip dependencies in
-        working-directory: ./deployment/matcher_lambda
-        run: cp -r deps/pydantic function/
-      - name: Configure AWS credentials
-        id: creds
-        uses: aws-actions/configure-aws-credentials@v1
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+      - uses: aws-actions/setup-sam@v1
+      - uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: create zip
-        working-directory: ./deployment/matcher_lambda/function
-        run: zip -r ../deployment.zip .
-
-      - name: Upload file to bucket
-        uses: zdurham/s3-upload-github-action@master
-        env:
-          FILE: ./deployment/matcher_lambda/deployment.zip
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          S3_BUCKET: ${{ secrets.S3_BUCKET }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-      - name: Create template pointing to correct S3 bucket by using Sed to replace generic local path with bucket, taken from Github secrets
+      # sam build
+      - run: 'cp -r ../../harmony_pypi_package/src/harmony/ ./function/'
         working-directory: ./deployment/matcher_lambda
-        run: 'sed s_CodeUri:.function.._CodeUri:\ s3://${{ secrets.S3_BUCKET }}/deployment.zip_ template.yml > template_s3.yml'
 
-      - name: Show new template - print the content of the template to screen for debug purpose
+      - run: 'mkdir -p deps'
         working-directory: ./deployment/matcher_lambda
-        run: cat template_s3.yml
 
-      - name: Deploy with AWS Cloudformation
-        id: deploy-cloudformation
-        uses: aws-actions/aws-cloudformation-github-deploy@master
-        with:
-         name: harmony-matcher
-         template: deployment/matcher_lambda/template_s3.yml
+      - run: 'pip3 install --no-dependencies --target deps/ -r function/requirements.txt'
+        working-directory: ./deployment/matcher_lambda
+
+      - run: 'cp -r deps/pydantic function/t'
+        working-directory: ./deployment/matcher_lambda
+
+      - run: 'cp -r deps/typing_extensions.py function/'
+        working-directory: ./deployment/matcher_lambda
+
+      - run: sam build
+        working-directory: ./deployment/matcher_lambda
+
+      - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name harmony-matcher --resolve-s3 --resolve-image-repos --capabilities CAPABILITY_IAM --region  ${{ secrets.AWS_REGION }}
+        working-directory: ./deployment/matcher_lambda
 
