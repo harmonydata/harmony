@@ -37,7 +37,7 @@ jobs:
       - run: 'pip3 install --no-dependencies --target deps/ -r function/requirements.txt'
         working-directory: ./deployment/matcher_lambda
 
-      - run: 'cp -r deps/pydantic function/t'
+      - run: 'cp -r deps/pydantic function/'
         working-directory: ./deployment/matcher_lambda
 
       - run: 'cp -r deps/typing_extensions.py function/'
