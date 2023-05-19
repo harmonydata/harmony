@@ -17,7 +17,8 @@ import pickle as pkl
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-CACHE_FILE = "/tmp/harmony_instruments_cache.pkl"
+DATA_PATH = "/mnt/efs"
+CACHE_FILE = DATA_PATH +  "/harmony_instruments_cache.pkl"
 
 file_to_instruments_cache = {}
 

@@ -35,3 +35,4 @@ jobs:
       - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name harmony-tika --resolve-s3 --resolve-image-repos --capabilities CAPABILITY_IAM --region  ${{ secrets.AWS_REGION }} --force-upload
         working-directory: ./deployment/pdf_processor_tika_lambda_java
 
+
