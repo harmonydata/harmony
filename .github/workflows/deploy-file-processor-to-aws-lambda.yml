@@ -32,5 +32,5 @@ jobs:
       - run: sam build
         working-directory: ./deployment/file_processor_docker_lambda
 
-      - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name harmony-file-processor --resolve-s3 --resolve-image-repos --capabilities CAPABILITY_IAM --region  ${{ secrets.AWS_REGION }}
+      - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name harmony-file-processor --resolve-s3 --resolve-image-repos --capabilities CAPABILITY_IAM --region  ${{ secrets.AWS_REGION }} --force-upload
         working-directory: ./deployment/file_processor_docker_lambda
