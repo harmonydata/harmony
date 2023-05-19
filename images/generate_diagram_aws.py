@@ -8,15 +8,20 @@ from diagrams.generic.device import Tablet
 from diagrams.programming.language import Python, Java
 from diagrams.onprem.container import Docker
 from diagrams.aws.compute import Lambda
+from diagrams.generic.compute import Rack
+from diagrams.aws.integration import StepFunctions
+from diagrams.aws.network import APIGateway
 
+with Diagram("Deployed Harmony architecture", show=False):
 
-with Diagram("Harmony architecture (deployed)", show=False):
-
-    browser = Tablet("User browser")
-    dash = Lambda("File processor")
+    browser = Tablet("Front end (React)")
+    api = APIGateway("AWS API Gateway")
+    step = StepFunctions("Step function\nExpress state machine")
     tika = Lambda("Tika app service\nfor processing PDFs\n(Java)")
+    fileproc = Lambda("File processor")
     matcher = Lambda("Matcher")
-    vectoriser = Lambda("Vectoriser (HuggingFace)")
+    vectoriser = Rack("Vectoriser\n(HuggingFace API)")
 
-    browser >> dash >> tika
-    browser >> matcher >> vectoriser
+    browser >> api >> step >> tika
+    step >> fileproc
+    api >> matcher >> vectoriser
