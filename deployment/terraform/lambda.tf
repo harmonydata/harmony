@@ -46,7 +46,9 @@ resource "aws_iam_policy" "iam_policy_for_lambda" {
    },
    {
             "Action": [
-                "lambda:InvokeFunction"
+                "lambda:InvokeFunction",
+                "elasticfilesystem:ClientMount",
+		"elasticfilesystem:ClientWrite"
             ],
             "Resource": "*",
             "Effect": "Allow"
@@ -81,6 +83,13 @@ resource "aws_iam_role_policy_attachment" "AWSLambdaVPCAccessExecutionRole" {
   role       = aws_iam_role.lambda_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
+
+
+resource "aws_iam_role_policy_attachment" "add_efs_access" {
+  role       = aws_iam_role.lambda_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonElasticFileSystemClientFullAccess"
+}
+
 
 resource "aws_iam_role_policy_attachment" "StateMachineToLambdaRole" {
   role       = aws_iam_role.lambda_role.name
