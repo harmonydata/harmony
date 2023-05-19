@@ -33,7 +33,7 @@ def handler(event, context):
     logger.info('## ENVIRONMENT VARIABLES\r' + jsonpickle.encode(dict(**os.environ)))
     logger.info('## EVENT\r' + jsonpickle.encode(event))
     logger.info('## CONTEXT\r' + jsonpickle.encode(context))
-    files = parse_obj_as(List[RawFile], json.loads(event))
+    files = parse_obj_as(List[RawFile], event)
 
     if len(files) > 1:
         return ''''{"Error":"Please send only one file to Lambda function."}'''
