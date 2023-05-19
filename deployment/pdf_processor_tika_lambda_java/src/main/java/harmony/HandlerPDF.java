@@ -17,13 +17,13 @@ import org.apache.tika.parser.pdf.PDFParser;
 import org.apache.tika.sax.BodyContentHandler;
 
 // Handler value: example.HandlerString
-public class HandlerPDF implements RequestHandler<Map<String, Object>, String>{
+public class HandlerPDF implements RequestHandler<List<Map<String, Object>>, List<Map<String, Object>>>{
 
   @Override
   /*
    * Takes a String as input, and converts all characters to lowercase.
    */
-  public List handleRequest(List<Map> event, Context context)
+  public List<Map<String, Object>> handleRequest(List<Map<String, Object>> event, Context context)
   {
     LambdaLogger logger = context.getLogger();
     logger.log("EVENT TYPE: " + event.getClass().toString());
