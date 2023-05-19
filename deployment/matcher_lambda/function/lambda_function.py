@@ -115,7 +115,7 @@ def vectorisation_function(all_texts: np.ndarray) -> np.ndarray:
 def lambda_handler(event, context):
     print(json.dumps(event))
 
-    match_body = parse_obj_as(MatchBody, json.loads(event["body"]))
+    match_body = parse_obj_as(MatchBody, json.loads(event))
 
     instruments = match_body.instruments
     query = match_body.query
