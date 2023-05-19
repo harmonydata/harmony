@@ -18,3 +18,4 @@ Resources:
         - AWSXrayWriteOnlyAccess
         - AWSLambdaVPCAccessExecutionRole
       Tracing: Active
+      FunctionName: harmony-pdf-parser

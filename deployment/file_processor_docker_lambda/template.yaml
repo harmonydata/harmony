@@ -16,6 +16,7 @@ Resources:
       DockerTag: python3.10-v1
       DockerContext: .
       Dockerfile: Dockerfile
+    FunctionName: harmony-file-processor
 
 Outputs:
   HarmonyFileProcessor:
