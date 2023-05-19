@@ -19,22 +19,21 @@ mhc_questions = []
 mhc_all_metadatas = []
 mhc_embeddings = np.zeros((0, 0))
 
-print("Folder is", str(os.getcwd()))
+DATA_PATH = "/mnt/efs"
 
 try:
-    data_path = "."
-    with open(data_path + "/mhc_questions.json",
+    with open(DATA_PATH + "/mhc_questions.json",
               "r", encoding="utf-8") as f:
         for l in f:
             mhc_question = Question.parse_raw(l)
             mhc_questions.append(mhc_question)
     with open(
-            data_path + "/mhc_all_metadatas.json",
+            DATA_PATH + "/mhc_all_metadatas.json",
             "r", encoding="utf-8") as f:
         for l in f:
             mhc_meta = json.loads(l)
             mhc_all_metadatas.append(mhc_meta)
-    with open(data_path + "/mhc_embeddings.npy",
+    with open(DATA_PATH + "/mhc_embeddings.npy",
               "rb") as f:
         mhc_embeddings = np.load(f)
 except:
@@ -42,7 +41,7 @@ except:
 
 print("Loaded embeddings", len(mhc_embeddings))
 
-CACHE_FILE = "/tmp/harmony_vectors_cache.pkl"
+CACHE_FILE = DATA_PATH + "/harmony_vectors_cache.pkl"
 
 item_to_vectors_cache = {}
 invocation_counter = Counter()
