@@ -6,6 +6,7 @@ import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import java.util.Map;
 import java.util.List;
+import java.util.ArrayList;
 import org.apache.tika.Tika;
 import java.io.ByteArrayInputStream;
 import java.util.Base64;
