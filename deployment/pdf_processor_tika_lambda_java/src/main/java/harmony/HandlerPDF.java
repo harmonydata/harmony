@@ -1,9 +1,11 @@
 package harmony;
 
+
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import java.util.Map;
+import java.util.List;
 import org.apache.tika.Tika;
 import java.io.ByteArrayInputStream;
 import java.util.Base64;
@@ -21,15 +23,15 @@ public class HandlerPDF implements RequestHandler<Map<String, Object>, String>{
   /*
    * Takes a String as input, and converts all characters to lowercase.
    */
-  public String handleRequest(Map<String, Object> event, Context context)
+  public List handleRequest(List<Map> event, Context context)
   {
     LambdaLogger logger = context.getLogger();
     logger.log("EVENT TYPE: " + event.getClass().toString());
-    logger.log("EVENT BODY: " + event.get("body").toString());
-    logger.log("EVENT BODY TYPE: " + event.get("body").getClass().toString());
+    logger.log("EVENT BODY: " + event.get(0).get("content").toString());
+    logger.log("EVENT BODY TYPE: " + event.get(0).get("content").getClass().toString());
 
     try {
-      byte[] decodedString = Base64.getDecoder().decode(event.get("body").toString().getBytes("UTF-8"));
+      byte[] decodedString = Base64.getDecoder().decode(event.get(0).get("content").toString().getBytes("UTF-8"));
       InputStream stream = new ByteArrayInputStream(decodedString);
 
       BodyContentHandler handler = new BodyContentHandler();
@@ -37,8 +39,10 @@ public class HandlerPDF implements RequestHandler<Map<String, Object>, String>{
       ParseContext parseContext = new ParseContext();
       PDFParser pdfparser = new PDFParser();
       pdfparser.parse(stream,handler,metadata,parseContext);
-      return handler.toString();
 
+      event.get(0).put("text_content", handler.toString());
+
+      return event;
 
     } catch (Exception exception) {
       logger.log("Something went wrong.");
