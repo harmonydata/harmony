@@ -16,8 +16,7 @@ I feel scared"""
         }]
 
         context = {'requestid': '1234'}
-        result = handler(event, context)
-        result_json = json.loads(result)
+        result_json = handler(event, context)
         self.assertEqual(1, len(result_json), "Check 1 instrument")
 
     def test_pdf(self):
@@ -29,8 +28,7 @@ I feel scared"""
   }]
 
         context = {'requestid': '1234'}
-        result = handler(event, context)
-        result_json = json.loads(result)
+        result_json = handler(event, context)
         self.assertEqual(1, len(result_json), "Check 1 instrument")
 
 if __name__ == '__main__':

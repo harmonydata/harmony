@@ -73,4 +73,4 @@ def handler(event, context):
 
     instruments_list = InstrumentList(__root__=instruments)
 
-    return instruments_list.json()
+    return instruments_list.dict()
