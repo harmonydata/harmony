@@ -47,7 +47,10 @@ public class HandlerPDF implements RequestHandler<List<Map<String, Object>>, Lis
     } catch (Exception exception) {
       logger.log("Something went wrong.");
       logger.log("Your description here " + exception.toString());
-      return exception.toString();
+      List errorResponse = new ArrayList();
+      errorResponse.add(new HashMap<String, Object>());
+      errorResponse.get(0).put("Error", exception.toString());
+      return errorResponse;
     }
 
   }
