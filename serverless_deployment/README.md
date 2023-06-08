@@ -4,6 +4,8 @@ Here are the scripts for deploying various parts of Harmony to AWS.
 
 The deployment is also set up as Github Actions.
 
+Provisioning of AWS resources is done via Terraform.
+
 If deploying manually, you should run them in this order:
 
 1. `pdf_processor_tika_lambda_java`
@@ -11,6 +13,8 @@ If deploying manually, you should run them in this order:
 2. `file_processor_docker_lambda`
 
 3. `matcher_lambda`
+
+Then run the Terraform scripts (`terraform apply`).
 
 By default we use the HuggingFace models API to run the transformer model, for cost effectiveness. However, an optional AWS Lambda function is also in this folder.
 

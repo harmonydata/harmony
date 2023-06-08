@@ -4,12 +4,12 @@ on:
   push:
     branches: [ "main" ]
     paths:
-      - deployment/pdf_processor_tika_lambda_java/**
+      - serverless_deployment/pdf_processor_tika_lambda_java/**
       - .github/workflows/deploy-pdf-tika-parser-to-aws-lambda.yml
   pull_request:
     branches: [ "main" ]
     paths:
-      - deployment/pdf_processor_tika_lambda_java/**
+      - serverless_deployment/pdf_processor_tika_lambda_java/**
       - .github/workflows/deploy-pdf-tika-parser-to-aws-lambda.yml
 
 jobs:
@@ -33,7 +33,7 @@ jobs:
         working-directory: ./deployment/pdf_processor_tika_lambda_java
 
       - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name harmony-tika --resolve-s3 --resolve-image-repos --capabilities CAPABILITY_IAM --region  ${{ secrets.AWS_REGION }} --force-upload
-        working-directory: ./deployment/pdf_processor_tika_lambda_java
+        working-directory: ./serverless_deployment/pdf_processor_tika_lambda_java
 
 
 
