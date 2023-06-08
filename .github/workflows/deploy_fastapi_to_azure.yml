@@ -27,11 +27,13 @@ jobs:
           registry: ${{ secrets.ACR_ENDPOINT }}
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
-    - name: change into fastapi folder
-      run:  cd harmony_fastapi
+    - name: Copy the library in
+      run: 'cp -r ../harmony_pypi_package/src/harmony/ ./'
+      working-directory: ./harmony_fastapi
     - name: Build & Push
       uses: docker/build-push-action@v2
       with:
+          context: ./harmony_fastapi
           push: true
           build-args: |
             version=${{ steps.tag.outputs.tag }}
@@ -48,14 +50,13 @@ jobs:
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
-      - name: change into fastapi folder
-        run:  cd harmony_fastapi
       - name: Lowercase the repo name
         run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
+        working-directory: ./harmony_fastapi
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
-        uses: azure/webapps-deploy@0b651ed7546ecfc75024011f76944cb9b381ef1e
+        uses: azure/webapps-deploy@v2
         with:
           app-name: wellcomeharmonyapi
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
