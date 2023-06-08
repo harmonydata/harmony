@@ -5,10 +5,12 @@ on:
     branches: [ "main" ]
     paths:
       - harmony_fastapi/**
+      - .github/workflows/deploy_fastapi_to_azure.yml
   pull_request:
     branches: [ "main" ]
     paths:
       - harmony_fastapi/**
+      - .github/workflows/deploy_fastapi_to_azure.yml
     
 env:
   IMAGE_NAME: harmonyapi
