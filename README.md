@@ -31,6 +31,10 @@ There is a live demo at: https://app.harmonydata.org/
 
 ![Screenshot](images/screenshot1.png)
 
+# How does Harmony work in layman's terms?
+
+Harmony compares questions from different instruments by converting them to a vector representation and calculating their similarity. You can read more at https://harmonydata.org/how-does-harmony-work/ 
+
 # Getting started
 
 ## Installing Python library
@@ -188,18 +192,23 @@ License: MIT License
 
 thomas@fastdatascience.com
 
-
 ## Built With
 
 - [Docker](https://docs.docker.com/) - Used for deployment to the web
 - [Apache Tika](https://tika.apache.org/) - Used for parsing PDFs to text
 - [HuggingFace](https://huggingface.co/) - Used for machine learning
 - [sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2](https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2) - SentenceBERT model
+- [spaCy](https://spacy.io/) - Used for NLP analysis
+- [NLTK](https://www.nltk.org/) - Used for NLP analysis
+- [Scikit-Learn](https://scikit-learn.org/) - Used for machine learning
 
 ## Licences of Third Party Software
 
 - Apache Tika: [Apache 2.0 License](https://tika.apache.org/license.html)
-
+- spaCy: [MIT License](https://github.com/explosion/spaCy/blob/master/LICENSE)
+- NLTK: [Apache 2.0 License](https://github.com/nltk/nltk/blob/develop/LICENSE.txt)
+- Scikit-Learn: [BSD 3-Clause](https://github.com/scikit-learn/scikit-learn/blob/main/COPYING)
+- 
 ## How do I cite Harmony?
 
 If you would like to cite the tool alone, you can cite:
