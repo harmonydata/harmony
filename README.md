@@ -3,7 +3,7 @@
 <!-- badges: start -->
 ![my badge](https://badgen.net/badge/Status/In%20Development/orange)
 
-[[![PyPI package](https://img.shields.io/badge/pip%20install-example--pypi--package-brightgreen)](https://pypi.org/project/example-pypi-package/) [![version number](https://img.shields.io/pypi/v/example-pypi-package?color=green&label=version)](https://github.com/tomchen/example_pypi_package/releases) [![Actions Status](https://github.com/tomchen/example_pypi_package/workflows/Test/badge.svg)](https://github.com/tomchen/example_pypi_package/actions) [![License](https://img.shields.io/github/license/tomchen/example_pypi_package)](https://github.com/tomchen/example_pypi_package/blob/main/LICENSE)
+[![PyPI package](https://img.shields.io/badge/pip%20install-harmonydata-brightgreen)](https://pypi.org/project/harmonydata/) [![version number](https://img.shields.io/pypi/v/harmonydata?color=green&label=version)](https://github.com/harmonydata/harmonyapi/releases) [![License](https://img.shields.io/github/license/harmonydata/harmonyapi)](https://github.com/harmonydata/harmonyapi/blob/main/LICENSE)
 
 
 <!-- badges: end -->
