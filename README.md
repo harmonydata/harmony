@@ -17,7 +17,7 @@ Please visit https://github.com/harmonydata/harmony_original
 
 ## About Harmony
 
-Harmony is a data harmonisation project that uses Natural Language Processing to help researchers make better use of existing data from different studies by supporting them with the harmonisation of various measures and items used in different studies. Harmony is a collaboration project between the University of Ulster, University College London, the Universidade Federal de Santa Maria in Brazil, and Fast Data Science Ltd.
+Harmony is a data harmonisation project that uses Natural Language Processing to help researchers make better use of existing data from different studies by supporting them with the harmonisation of various measures and items used in different studies. Harmony is a collaboration project between the [University of Ulster](https://www.ulster.ac.uk/), [University College London](https://ucl.ac.uk/), the [Universidade Federal de Santa Maria](https://www.ufsm.br/) in Brazil, and [Fast Data Science Ltd](https://fastdatascience.com/how-does-harmony-work/) in London.
 
 You can read more at https://harmonydata.org.
 
@@ -220,6 +220,38 @@ thomas@fastdatascience.com
 
 - Apache Tika: [Apache 2.0 License](https://tika.apache.org/license.html)
 
+## How do I cite Harmony?
+
+If you would like to cite the tool alone, you can cite:
+
+Wood, T.A., McElroy, E., Moltrecht, B., Ploubidis, G.B., Scopel Hoffmann, M., Harmony [Computer software], Version 1.0, accessed at https://app.harmonydata.org. Ulster University (2022)
+
+A BibTeX entry for LaTeX users is
+
+```
+@unpublished{harmony,
+    AUTHOR = {Wood, T.A., McElroy, E., Moltrecht, B., Ploubidis, G.B., Scopel Hoffman, M.},
+    TITLE  = {Harmony (Computer software), Version 1.0},
+    YEAR   = {2022},
+    Note   = {To appear},
+    url = {https://app.harmonydata.org}
+}
+```
+
+You can also cite the wider Harmony project which is registered with the Open Science Foundation:
+
+McElroy, E., Moltrecht, B., Scopel Hoffmann, M., Wood, T. A., & Ploubidis, G. (2023, January 6). Harmony – A global platform for contextual harmonisation, translation and cooperation in mental health research. Retrieved from osf.io/bct6k
+
+```
+@misc{McElroy_Moltrecht_Scopel Hoffmann_Wood_Ploubidis_2023,
+  title={Harmony - A global platform for contextual harmonisation, translation and cooperation in mental health research},
+  url={osf.io/bct6k},
+  publisher={OSF},
+  author={McElroy, Eoin and Moltrecht, Bettina and Scopel Hoffmann, Mauricio and Wood, Thomas A and Ploubidis, George},
+  year={2023},
+  month={Jan}
+}
+```
 
 ## API Reference
 
