@@ -11,6 +11,12 @@
 
 You can contact Harmony team at https://harmonydata.org/, or Thomas Wood at http://fastdatascience.com/.
 
+# How to contribute
+
+You can raise an issue in the [issue tracker](https://github.com/harmonydata/harmony/issues), and you can open a [pull request](https://github.com/harmonydata/harmony/pulls).
+
+Please contact us at  https://harmonydata.org/contact or write to thomas@fastdatascience.com if you would like to be involved in the project.
+
 ## Looking for the original (Plotly Dash-based) Harmony?
 
 Please visit https://github.com/harmonydata/harmony_original
@@ -173,12 +179,6 @@ Please see README [here](harmony_fastapi/README.md).
 For economy, the deployment has been divided into four AWS Lambda functions.
 
 ![Screenshot](images/deployed_harmony_architecture.png)
-
-# How to contribute
-
-You can raise an issue in the issue tracker, and you can open a pull request.
-
-Please contact us at  https://harmonydata.org/contact or write to thomas@fastdatascience.com
 
 # License
 
