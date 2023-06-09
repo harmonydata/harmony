@@ -5,18 +5,18 @@ with open('README.md', 'r', encoding='utf-8') as fh:
 
 setuptools.setup(
     name='harmonydata',
-    author='Tom Chen',
-    author_email='tomchen.org@gmail.com',
-    description='Example PyPI (Python Package Index) Package',
-    keywords='example, pypi, package',
+    author='Thomas Wood',
+    author_email='thomas@fastdatascience.com',
+    description='Harmony Tool for Retrospective Data Harmonisation',
+    keywords='harmony, harmonisation, harmonization, harmonise, harmonize',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url='https://github.com/tomchen/example_pypi_package',
+    url='https://github.com/harmonydata/harmony',
     project_urls={
-        'Documentation': 'https://github.com/tomchen/example_pypi_package',
+        'Documentation': 'https://harmonydata.org/',
         'Bug Reports':
-        'https://github.com/tomchen/example_pypi_package/issues',
-        'Source Code': 'https://github.com/tomchen/example_pypi_package',
+        'https://github.com/harmonydata/harmony/issues',
+        'Source Code': 'https://github.com/harmonydata/harmony',
         # 'Funding': '',
         # 'Say Thanks!': '',
     },
