@@ -42,7 +42,7 @@ all_questions, similarity, query_similarity = match_instruments(instruments)
 
 ## Contributing to Harmony
 
-If you'd like to contribute to this project, you can contact us at https://harmonydata.org/ or make a pull request on our [Github repository](https://github.com/harmonydata/harmonyapi). You can also [raise an issue](https://github.com/harmonydata/harmony/issues). 
+If you'd like to contribute to this project, you can contact us at https://harmonydata.org/ or make a pull request on our [Github repository](https://github.com/harmonydata/harmonyapi). You can also [raise an issue](https://github.com/harmony/harmony/issues). 
 
 ## Developing Harmony
 

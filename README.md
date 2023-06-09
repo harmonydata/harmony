@@ -1,16 +1,21 @@
-# Harmony API version 2.0
+# Harmony API and Python library
 
 <!-- badges: start -->
 ![my badge](https://badgen.net/badge/Status/In%20Development/orange)
 
 [![PyPI package](https://img.shields.io/badge/pip%20install-harmonydata-brightgreen)](https://pypi.org/project/harmonydata/) [![version number](https://img.shields.io/pypi/v/harmonydata?color=green&label=version)](https://github.com/harmonydata/harmony/releases) [![License](https://img.shields.io/github/license/harmonydata/harmony)](https://github.com/harmonydata/harmony/blob/main/LICENSE)
 
-
 <!-- badges: end -->
 
+## Who to contact?
 
+You can contact Harmony team at https://harmonydata.org/, or Thomas Wood at http://fastdatascience.com/.
 
+## Looking for the original (Plotly Dash-based) Harmony?
 
+Please visit https://github.com/harmonydata/harmony_original
+
+## About Harmony
 
 Harmony is a data harmonisation project that uses Natural Language Processing to help researchers make better use of existing data from different studies by supporting them with the harmonisation of various measures and items used in different studies. Harmony is a collaboration project between the University of Ulster, University College London, the Universidade Federal de Santa Maria in Brazil, and Fast Data Science Ltd.
 
@@ -20,7 +25,17 @@ There is a live demo at: https://app.harmonydata.org/
 
 ![Screenshot](images/screenshot1.png)
 
-# Sample API calls (AWS Lambda)
+## Installing Python library
+
+You can install from [PyPI](https://pypi.org/project/harmonydata/0.1.0/).
+
+```
+pip install harmonydata
+```
+
+You can read the user guide at [./harmony_pypi_package/README.md](harmony_pypi_package/README.md).
+
+## Calling the Harmony API
 
 To process a file
 
