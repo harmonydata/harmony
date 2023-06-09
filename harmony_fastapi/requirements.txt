@@ -9,4 +9,4 @@ langdetect==1.0.9
 XlsxWriter==3.0.9
 openpyxl==3.1.2
 sentence_transformers==2.2.2
-spacy==3.4.1
+spacy==3.5.3
