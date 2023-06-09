@@ -10,7 +10,15 @@ Visit: https://app.harmonydata.org/
 
 You can also visit our blog at https://harmonydata.org/
 
-## Installation
+## You need Tika if you want to extract instruments from PDFs
+
+Download and install Java if you don't have it already. Download and install Apache Tika and run it on your computer https://tika.apache.org/download.html
+
+```
+java -jar tika-server-standard-2.3.0.jar
+```
+
+## Installing Harmony Python package
 
 You can install from [PyPI](https://pypi.org/project/harmonydata/0.1.0/).
 
