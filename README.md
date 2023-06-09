@@ -25,6 +25,8 @@ There is a live demo at: https://app.harmonydata.org/
 
 ![Screenshot](images/screenshot1.png)
 
+# Getting started
+
 ## Installing Python library
 
 You can install from [PyPI](https://pypi.org/project/harmonydata/0.1.0/).
@@ -157,28 +159,6 @@ curl -X 'POST' \
   }
 }'
 ```
-
-# Getting started
-
-## Python bindings
-
-You can install Harmony using:
-
-```
-pip install harmonydata
-```
-
-To process a file, do
-
-TODO
-
-
-To match, do
-
-
-TODO: copy all relevant info from other repos (API and Harmony original)
-
-
 
 ## Fast API and Docker
 
