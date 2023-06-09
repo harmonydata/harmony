@@ -14,6 +14,8 @@ def convert_texts_to_vector(texts: np.ndarray):
     return embeddings
 
 
-def match_instruments(instruments: List[Instrument], query: str, mhc_questions=[], mhc_all_metadatas=[],
-                      mhc_embeddings=np.zeros((0, 0))) -> tuple:
-    return match_instruments_with_function(instruments, query, convert_texts_to_vector, mhc_questions, mhc_all_metadatas, mhc_embeddings)
+def match_instruments(instruments: List[Instrument], query: str = None, mhc_questions: List = [],
+                      mhc_all_metadatas: List = [],
+                      mhc_embeddings: np.ndarray = np.zeros((0, 0))) -> tuple:
+    return match_instruments_with_function(instruments, query, convert_texts_to_vector, mhc_questions,
+                                           mhc_all_metadatas, mhc_embeddings)

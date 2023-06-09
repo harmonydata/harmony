@@ -7,7 +7,7 @@ from harmony.schemas.enums.file_types import FileType
 from harmony.schemas.requests.text import RawFile, Instrument
 
 
-def convert_files_to_instruments(files: List[RawFile]) -> List[Instrument]:
+def har(files: List[RawFile]) -> List[Instrument]:
     instruments = []
 
     for file in files:

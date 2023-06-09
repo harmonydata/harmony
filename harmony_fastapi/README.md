@@ -46,5 +46,3 @@ If you have Mental Health Catalogue data, put it in a data folder e.g. `/data` a
 A deployment script for Microsoft Azure is provided in `build_deploy.sh`.
 
 There is also a Github Action script to deploy to Azure in `../.github/workflows/`.
-
-In practice, for economy reasons, we have chosen to deploy Harmony using AWS Lambda, and split up the functionality for FastAPI. The scripts are available in `/deployment`.

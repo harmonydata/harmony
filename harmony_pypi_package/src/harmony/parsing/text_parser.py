@@ -1,4 +1,5 @@
 import re
+import traceback
 from typing import List
 
 from langdetect import detect
@@ -14,7 +15,16 @@ def convert_text_to_instruments(file: RawFile) -> List[Instrument]:
     else:
         page_text = file.text_content
 
-    language = detect(page_text)
+    if file.file_id is None:
+        file.file_id = str(hash(page_text))
+
+    try:
+        language = detect(page_text)
+    except:
+        language = "en"
+        print(f"Error identifying language in {file.file_type} file")
+        traceback.print_exc()
+        traceback.print_stack()
 
     # TODO: replace this with smarter logic
     if file.file_type == FileType.txt:
