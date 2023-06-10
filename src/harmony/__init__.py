@@ -9,6 +9,9 @@ from .parsing.wrapper_all_parsers import convert_files_to_instruments
 from .parsing import *
 from .schemas import *
 from .matching.matcher import match_instruments_with_function
-if "no_transformers" not in os.environ.get("HARMONY_LITE", ""):
+try:
     from .matching.default_matcher import match_instruments
+except:
+    print ("Warning: transformers not available. To use transformers, run pip install sentence-transformers"
+
 from .util.file_helper import load_instruments_from_local_file
