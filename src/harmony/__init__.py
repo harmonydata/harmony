@@ -12,6 +12,6 @@ from .matching.matcher import match_instruments_with_function
 try:
     from .matching.default_matcher import match_instruments
 except:
-    print ("Warning: transformers not available. To use transformers, run pip install sentence-transformers"
+    print ("Warning: transformers not available. To use transformers, run pip install sentence-transformers")
 
 from .util.file_helper import load_instruments_from_local_file
