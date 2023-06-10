@@ -17,6 +17,10 @@ Visit: https://app.harmonydata.org/
 
 You can also visit our blog at https://harmonydata.org/
 
+## Looking for the Harmony API?
+
+Visit: https://github.com/harmonydata/harmonyapi
+
 ## You need Tika if you want to extract instruments from PDFs
 
 Download and install Java if you don't have it already. Download and install Apache Tika and run it on your computer https://tika.apache.org/download.html
