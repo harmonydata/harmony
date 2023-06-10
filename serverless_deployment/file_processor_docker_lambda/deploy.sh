@@ -1,1 +1,0 @@
-sam deploy --guided
