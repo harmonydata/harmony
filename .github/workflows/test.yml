@@ -11,7 +11,9 @@ on:
       - main
     paths:
       - harmony_pypi_package/**
-
+env:
+  HARMONY_LITE: no_transformers
+          
 jobs:
   build:
     runs-on: ubuntu-latest
