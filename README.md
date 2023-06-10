@@ -99,10 +99,14 @@ This package
 
 ## Re-releasing the package manually
 
-The code to re-release Harmony on PyPI is in the Bash script:
+The code to re-release Harmony on PyPI is as follows:
 
 ```
-./release.sh
+source activate py311
+pip install twine
+rm -rf dist
+python setup.py sdist
+twine upload dist/*
 ```
 
 ## License
