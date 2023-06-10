@@ -1,5 +1,12 @@
 # Harmony Python library
 
+<!-- badges: start -->
+![my badge](https://badgen.net/badge/Status/In%20Development/orange)
+
+[![PyPI package](https://img.shields.io/badge/pip%20install-harmonydata-brightgreen)](https://pypi.org/project/harmonydata/) [![version number](https://img.shields.io/pypi/v/harmonydata?color=green&label=version)](https://github.com/harmonydata/harmony/releases) [![License](https://img.shields.io/github/license/harmonydata/harmony)](https://github.com/harmonydata/harmony/blob/main/LICENSE)
+
+<!-- badges: end -->
+
 ## Who to contact?
 
 You can contact Harmony team at https://harmonydata.org/, or Thomas Wood at http://fastdatascience.com/.
