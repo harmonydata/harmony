@@ -57,7 +57,7 @@ def match_instruments_with_function(instruments: List[Instrument], query: str,
     similarity_difference = pairwise_similarity - pairwise_similarity_neg_mean
     similarity_polarity = np.sign(similarity_difference)
     # Make sure that any 0's in polarity are converted to 1's
-    where_0 = np.where(similarity_difference == 0)
+    where_0 = np.where(np.abs(similarity_difference) < 0.001)
     similarity_polarity[where_0] = 1
 
     similarity_max = np.max([pairwise_similarity, pairwise_similarity_neg_mean], axis=0)
