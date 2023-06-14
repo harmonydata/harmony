@@ -7,7 +7,7 @@ from numpy import dot, mat, matmul, ndarray
 from numpy.linalg import norm
 
 from harmony.schemas.requests.text import Instrument
-
+from harmony.matching.negator import negate
 
 def cosine_similarity(vec1: ndarray, vec2: ndarray) -> ndarray:
     dp = dot(vec1, vec2.T)
@@ -30,8 +30,7 @@ def match_instruments_with_function(instruments: List[Instrument], query: str,
             question.instrument_id = instrument.instrument_id
             all_questions.append(question)
             texts.append(question.question_text)
-            # negated = negate(question.question_text, instrument.language) # TODO
-            negated = question.question_text
+            negated = negate(question.question_text, instrument.language)
             negated_texts.append(negated)
             instrument_ids.append(instrument.instrument_id)
             question_indices.append(question_idx)
@@ -55,9 +54,10 @@ def match_instruments_with_function(instruments: List[Instrument], query: str,
     pairwise_similarity_neg2 = cosine_similarity(vectors_pos, vectors_neg)
     pairwise_similarity_neg_mean = np.mean([pairwise_similarity_neg1, pairwise_similarity_neg2], axis=0)
 
-    similarity_polarity = np.sign(pairwise_similarity - pairwise_similarity_neg_mean)
+    similarity_difference = pairwise_similarity - pairwise_similarity_neg_mean
+    similarity_polarity = np.sign(similarity_difference)
     # Make sure that any 0's in polarity are converted to 1's
-    where_0 = np.where(similarity_polarity == 0)
+    where_0 = np.where(similarity_difference == 0)
     similarity_polarity[where_0] = 1
 
     similarity_max = np.max([pairwise_similarity, pairwise_similarity_neg_mean], axis=0)
