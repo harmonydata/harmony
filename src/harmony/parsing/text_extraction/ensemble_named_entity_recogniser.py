@@ -5,7 +5,7 @@ import re
 from harmony.parsing.text_extraction.spacy_wrapper import mark_is_all_letters, \
     get_candidate_questions_and_mark_as_spans, set_is_numbered_bullet, mark_candidate_options_as_spans
 from harmony.parsing.text_extraction.smart_document_parser import parse_document, nlp, convert_to_dataframe, get_questions, add_candidate_options
-from harmony.schemas.requests.text import Question
+from harmony.schemas.requests.text import RawFile, Instrument, Question
 
 
 # The trained NER recogniser
@@ -72,6 +72,6 @@ def extract_questions(page_text):
                 questions.append(Question(question_text = cur_question_text))
             cur_question_text = None
     if cur_question_text is not None:
-        questions.append(Question(question_text=cur_question_text))
+        questions.append(Question(question_text=cur_question_text, question_intro="", question_no=1, options=[]))
 
     return questions, all_annotations
