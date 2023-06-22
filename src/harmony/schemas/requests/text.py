@@ -15,6 +15,7 @@ class RawFile(BaseModel):
     file_type: FileType = Field(description="The file type (pdf, xlsx, txt)")
     content: str = Field(description="The raw file contents")
     text_content: str = Field(None, description="The plain text content")
+    tables: list = Field([], description="The tables in the file")
 
     class Config:
         schema_extra = {

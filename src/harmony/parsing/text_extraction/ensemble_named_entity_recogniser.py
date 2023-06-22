@@ -8,14 +8,17 @@ from harmony.parsing.text_extraction.smart_document_parser import parse_document
 from harmony.schemas.requests.text import RawFile, Instrument, Question
 from harmony.parsing.text_extraction.options_words import OPTIONS_WORDS
 from harmony.parsing.text_extraction.smart_table_analyser import get_questions_from_tables
+import os
 
+data_path = os.getenv("DATA_PATH")
 
 # The trained NER recogniser
 nlp = spacy.load(
-    f'/media/thomas/642d0db5-2c98-4156-b591-1a3572c5868c/projects_client/wellcome/pdf_extraction_experiments/11_ner_0_spacy/model-best')
+    data_path + '/11_ner_0_spacy/model-best')
 
 
-nlp_final_classifier = spacy.load(f'/media/thomas/642d0db5-2c98-4156-b591-1a3572c5868c/projects_client/wellcome/pdf_extraction_experiments/output/model-best')
+nlp_final_classifier = spacy.load(
+    data_path + '/29_classifier_spacy/model-best')
 
 # from transformers import AutoTokenizer
 #
