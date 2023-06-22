@@ -37,7 +37,7 @@ def convert_text_to_instruments(file: RawFile) -> List[Instrument]:
                                 options=[])
             questions.append(question)
     else:
-        questions, _ = extract_questions(page_text)
+        questions, _, _ = extract_questions(page_text, file.tables)
 
     instrument = Instrument(
         file_id=file.file_id,

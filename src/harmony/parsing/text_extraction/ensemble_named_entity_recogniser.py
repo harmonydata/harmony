@@ -1,16 +1,28 @@
 import spacy
 import numpy as np
 import re
-
+import operator
 from harmony.parsing.text_extraction.spacy_wrapper import mark_is_all_letters, \
     get_candidate_questions_and_mark_as_spans, set_is_numbered_bullet, mark_candidate_options_as_spans
 from harmony.parsing.text_extraction.smart_document_parser import parse_document, nlp, convert_to_dataframe, get_questions, add_candidate_options
 from harmony.schemas.requests.text import RawFile, Instrument, Question
+from harmony.parsing.text_extraction.options_words import OPTIONS_WORDS
+from harmony.parsing.text_extraction.smart_table_analyser import get_questions_from_tables
 
 
 # The trained NER recogniser
 nlp = spacy.load(
     f'/media/thomas/642d0db5-2c98-4156-b591-1a3572c5868c/projects_client/wellcome/pdf_extraction_experiments/11_ner_0_spacy/model-best')
+
+
+nlp_final_classifier = spacy.load(f'/media/thomas/642d0db5-2c98-4156-b591-1a3572c5868c/projects_client/wellcome/pdf_extraction_experiments/output/model-best')
+
+# from transformers import AutoTokenizer
+#
+# from transformers import TFAutoModelForSequenceClassification
+#
+# nlp_final_classifier = TFAutoModelForSequenceClassification.from_pretrained(f'/media/thomas/642d0db5-2c98-4156-b591-1a3572c5868c/projects_client/wellcome/pdf_extraction_experiments/31_model_old.hf')
+# nlp_final_classifier_tokeniser = AutoTokenizer.from_pretrained(f'/media/thomas/642d0db5-2c98-4156-b591-1a3572c5868c/projects_client/wellcome/pdf_extraction_experiments/31_tokenizer.hf')
 
 
 def add_manual_features(doc):
@@ -41,14 +53,21 @@ def annotate_document(page_text):
             for ctr, token in enumerate(df.span.iloc[idx]):
                 token_classes[1, token.i] = min(2, ctr + 1)
 
-    return token_classes, doc
+    return token_classes, doc, df
 
-def extract_questions(page_text):
-    all_annotations, doc = annotate_document(page_text)
+def extract_questions(page_text, tables):
+    all_annotations, doc,df = annotate_document(page_text)
+
 
     questions = []
-    cur_question_text = None
+    # call to rule-based only
+    # for idx in range(len(df)):
+    #     if df.is_question_to_include.iloc[idx]:
+    #         questions.append(Question(question_text = re.sub(r'\n',  ' ', df.span.iloc[idx].text)))
+    # if len(questions) > 0:
+    #     return questions, all_annotations, df
 
+    cur_question_text = None
 
     for token in doc:
         result = 0
@@ -69,9 +88,35 @@ def extract_questions(page_text):
                 cur_question_text += re.sub(r'\n', ' ', token.text + ws)
         else:
             if cur_question_text is not None:
-                questions.append(Question(question_text = cur_question_text))
+                cur_question_text = re.sub(r'^- +', '', re.sub(r'\s+', ' ', cur_question_text).strip())
+                if cur_question_text.lower() not in OPTIONS_WORDS:
+                    questions.append(Question(question_text = cur_question_text, question_intro="", question_no=f"{len(questions)+1}", options=[]))
             cur_question_text = None
     if cur_question_text is not None:
-        questions.append(Question(question_text=cur_question_text, question_intro="", question_no=1, options=[]))
+        cur_question_text = re.sub(r'^- +', '', re.sub(r'\s+', ' ', cur_question_text).strip())
+        if cur_question_text.lower() not in OPTIONS_WORDS:
+            questions.append(Question(question_text=cur_question_text, question_intro="", question_no=f"{len(questions)+1}", options=[]))
 
-    return questions, all_annotations
+    # If any tables were detected in the PDF, extract questions from tables.
+    if len(tables) > 0:
+        questions_from_tables = get_questions_from_tables(tables)
+
+        if len(questions_from_tables) * 2 > len(questions):
+            print("Using tables response")
+            questions = questions_from_tables
+
+    questions_triaged = []
+    for question in questions:
+        # tokenized = nlp_final_classifier_tokeniser([question.question_text], return_tensors="np", padding="longest")
+        # outputs = nlp_final_classifier(tokenized).logits
+        # y_pred = np.argmax(outputs, axis=1)
+        #
+        # if y_pred == 1:
+        if nlp_final_classifier(question.question_text).cats["1"] > 0.5:
+            questions_triaged.append(question)
+        else:
+            print ("Excluding question", question.question_text)
+        if len(questions_triaged) > len(questions) / 2 and len(questions_triaged) > 5:
+            questions = questions_triaged
+
+    return questions, all_annotations, df
