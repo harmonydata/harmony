@@ -9,23 +9,23 @@ from harmony.schemas.requests.text import RawFile, Instrument, Question
 from harmony.parsing.text_extraction.options_words import OPTIONS_WORDS
 from harmony.parsing.text_extraction.smart_table_analyser import get_questions_from_tables
 import os
+import requests
+import urllib
+import json
+from spacy.tokens import DocBin
+import spacy
 
-data_path = os.getenv("DATA_PATH")
+nlp = spacy.blank("en")
 
-# The trained NER recogniser
-nlp = spacy.load(
-    data_path + '/11_ner_0_spacy/model-best')
+# data_path = os.getenv("DATA_PATH")
 
-
-nlp_final_classifier = spacy.load(
-    data_path + '/29_classifier_spacy/model-best')
-
-# from transformers import AutoTokenizer
+# # The trained NER recogniser
+# nlp = spacy.load(
+#     data_path + '/11_ner_0_spacy/model-best')
 #
-# from transformers import TFAutoModelForSequenceClassification
 #
-# nlp_final_classifier = TFAutoModelForSequenceClassification.from_pretrained(f'/media/thomas/642d0db5-2c98-4156-b591-1a3572c5868c/projects_client/wellcome/pdf_extraction_experiments/31_model_old.hf')
-# nlp_final_classifier_tokeniser = AutoTokenizer.from_pretrained(f'/media/thomas/642d0db5-2c98-4156-b591-1a3572c5868c/projects_client/wellcome/pdf_extraction_experiments/31_tokenizer.hf')
+# nlp_final_classifier = spacy.load(
+#     data_path + '/29_classifier_spacy/model-best')
 
 
 def add_manual_features(doc):
@@ -36,7 +36,13 @@ def add_manual_features(doc):
 
 
 def annotate_document(page_text):
-    doc = nlp(page_text)
+
+    response = requests.get(
+        'https://twspacytest.azurewebsites.net/api/ner?text=' + urllib.parse.quote(json.dumps([page_text])))
+    doc_bin = DocBin().from_bytes(response.content)
+    doc = list(doc_bin.get_docs(nlp.vocab))[0]
+
+    # doc = nlp(page_text)
     add_manual_features(doc)
 
     df = convert_to_dataframe(doc)
@@ -110,7 +116,11 @@ def extract_questions(page_text, tables):
 
     questions_triaged = []
 
-    for question, question_as_doc in zip(questions, nlp_final_classifier.pipe([q.question_text for q in questions])):
+    response = requests.get(
+        'https://twspacytest.azurewebsites.net/api/triage?text=' + urllib.parse.quote(json.dumps([q.question_text for q in questions])))
+    doc_bin = DocBin().from_bytes(response.content)
+
+    for question, question_as_doc in zip(questions, doc_bin.get_docs(nlp.vocab)):
         if question_as_doc.cats["1"] > 0.5:
             questions_triaged.append(question)
         else:
