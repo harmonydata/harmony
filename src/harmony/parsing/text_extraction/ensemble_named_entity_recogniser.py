@@ -109,17 +109,32 @@ def extract_questions(page_text, tables):
             questions = questions_from_tables
 
     questions_triaged = []
-    for question in questions:
-        # tokenized = nlp_final_classifier_tokeniser([question.question_text], return_tensors="np", padding="longest")
-        # outputs = nlp_final_classifier(tokenized).logits
-        # y_pred = np.argmax(outputs, axis=1)
-        #
-        # if y_pred == 1:
-        if nlp_final_classifier(question.question_text).cats["1"] > 0.5:
+
+    for question, question_as_doc in zip(questions, nlp_final_classifier.pipe([q.question_text for q in questions])):
+        if question_as_doc.cats["1"] > 0.5:
             questions_triaged.append(question)
         else:
             print ("Excluding question", question.question_text)
-        if len(questions_triaged) > len(questions) / 2 and len(questions_triaged) > 5:
-            questions = questions_triaged
+    if len(questions_triaged) > len(questions) / 2 and len(questions_triaged) > 5:
+        questions = questions_triaged
+
+    # Remove common suffixes
+    # from collections import Counter
+    # suffixes = Counter()
+    # for q in questions:
+    #     toks = q.question_text.split(" ")
+    #     for i in range(1, 4):
+    #         if i < len(toks) - 2:
+    #             suffix = " ".join(toks[-i:])
+    #             suffixes[suffix] += 1
+    # if len(suffixes) > 0:
+    #     sorted_suffixes = sorted(suffixes.items(), key = operator.itemgetter(1))
+    #     if sorted_suffixes[0][1] > len(questions) / 2 and sorted_suffixes[0][1] > 4:
+    #         print ("Removing", sorted_suffixes[0][1])
+    #         for q in questions:
+    #             try:
+    #                 q.question_text = re.sub(sorted_suffixes[0][1] + "$", "", q.question_text)
+    #             except:
+    #                 pass
 
     return questions, all_annotations, df
