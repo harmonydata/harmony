@@ -8,7 +8,14 @@ from harmony import match_instruments_with_function
 from harmony.schemas.requests.text import Instrument
 import os
 
-model = SentenceTransformer(os.environ.get("SENTENCE_TRANSFORMER_PATH", 'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2'))
+sentence_transformer_path = 'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2'
+if os.environ.get("DATA_PATH") is not None and os.environ.get("DATA_PATH") != "":
+    # Load locally if available
+    tmp_sentence_transformer_path = os.environ.get("DATA_PATH") + "/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+    if os.path.exists(tmp_sentence_transformer_path):
+        sentence_transformer_path = tmp_sentence_transformer_path
+
+model = SentenceTransformer(sentence_transformer_path)
 
 def convert_texts_to_vector(texts: np.ndarray):
     embeddings = model.encode(texts)
