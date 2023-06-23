@@ -6,8 +6,9 @@ from sentence_transformers import SentenceTransformer
 
 from harmony import match_instruments_with_function
 from harmony.schemas.requests.text import Instrument
+import os
 
-model = SentenceTransformer('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')
+model = SentenceTransformer(os.environ.get("SENTENCE_TRANSFORMER_PATH", 'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2'))
 
 def convert_texts_to_vector(texts: np.ndarray):
     embeddings = model.encode(texts)
