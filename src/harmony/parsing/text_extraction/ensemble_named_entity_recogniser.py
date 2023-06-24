@@ -36,9 +36,8 @@ def add_manual_features(doc):
 
 
 def annotate_document(page_text):
-
     response = requests.get(
-        'https://twspacytest.azurewebsites.net/api/ner?text=' + urllib.parse.quote(json.dumps([page_text])))
+        'https://twspacytest.azurewebsites.net/api/ner', json={"text": json.dumps([page_text])})
     doc_bin = DocBin().from_bytes(response.content)
     doc = list(doc_bin.get_docs(nlp.vocab))[0]
 
@@ -115,9 +114,8 @@ def extract_questions(page_text, tables):
             questions = questions_from_tables
 
     questions_triaged = []
-
     response = requests.get(
-        'https://twspacytest.azurewebsites.net/api/triage?text=' + urllib.parse.quote(json.dumps([q.question_text for q in questions])))
+        'https://twspacytest.azurewebsites.net/api/triage', json={"text": json.dumps([q.question_text for q in questions])})
     doc_bin = DocBin().from_bytes(response.content)
 
     for question, question_as_doc in zip(questions, doc_bin.get_docs(nlp.vocab)):
