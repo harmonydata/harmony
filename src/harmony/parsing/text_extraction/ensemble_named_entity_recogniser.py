@@ -8,6 +8,7 @@ from harmony.parsing.text_extraction.smart_document_parser import parse_document
 from harmony.schemas.requests.text import RawFile, Instrument, Question
 from harmony.parsing.text_extraction.options_words import OPTIONS_WORDS
 from harmony.parsing.text_extraction.smart_table_analyser import get_questions_from_tables
+from harmony.parsing.text_extraction.dictionary_options_matcher import options_matcher
 import os
 import requests
 import urllib
@@ -60,6 +61,13 @@ def annotate_document(page_text):
         if df.is_question_to_include.iloc[idx]:
             for ctr, token in enumerate(df.span.iloc[idx]):
                 token_classes[1, token.i] = min(2, ctr + 1)
+
+    # Override any tokens that could be part of an options sequence.
+    matches = options_matcher(doc)
+    for m in matches:
+        for idx in range(m[1], m[2]):
+            token_classes[0, idx] = 0
+            token_classes[1, idx] = 0
 
     return token_classes, doc, df
 
