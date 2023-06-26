@@ -38,7 +38,7 @@ def find_longest_uninterrupted_sequence(bullet_texts: list) -> list:
                     candidate_sequences.append(test_sequence)
 
             if len(candidate_sequences) > 0:
-                sequence_to_append_to = sorted(candidate_sequences, key=lambda s: len(s), reverse=True)[0]
+                sequence_to_append_to = sorted(candidate_sequences, key=lambda s: len(s) + s[-1][0] / 1000, reverse=True)[0]
             else:
                 sequence_to_append_to = []
                 running_sequences.append(sequence_to_append_to)

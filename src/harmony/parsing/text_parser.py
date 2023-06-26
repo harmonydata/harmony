@@ -4,7 +4,7 @@ from typing import List
 
 from langdetect import detect
 
-from harmony.parsing.text_extraction.smart_document_parser import parse_document
+from harmony.parsing.text_extraction.ensemble_named_entity_recogniser import extract_questions
 from harmony.schemas.enums.file_types import FileType
 from harmony.schemas.requests.text import RawFile, Instrument, Question
 
@@ -37,7 +37,7 @@ def convert_text_to_instruments(file: RawFile) -> List[Instrument]:
                                 options=[])
             questions.append(question)
     else:
-        questions = parse_document(page_text)
+        questions, _, _ = extract_questions(page_text, file.tables)
 
     instrument = Instrument(
         file_id=file.file_id,
