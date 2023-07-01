@@ -50,9 +50,9 @@ download_models()
 
 As an alternative to downloading models, you can set environment variables so that Harmony calls spaCy on a remote server. This is only necessary if you are making a server deployment of Harmony.
 
-`HARMONY_CLASSIFIER_ENDPOINT` - this can be an Azure Functions deployment of the text triage spaCy model. Example: https://twspacytest.azurewebsites.net/api/triage
-`HARMONY_NER_ENDPOINT` - this can be an Azure Functions deployment of the NER spaCy model. Example: https://twspacytest.azurewebsites.net/api/ner
-`HARMONY_DATA_PATH` - determines where model files are stored. Defaults to `HOME DIRECTORY/harmony`
+* `HARMONY_CLASSIFIER_ENDPOINT` - this can be an Azure Functions deployment of the text triage spaCy model. Example: https://twspacytest.azurewebsites.net/api/triage
+* `HARMONY_NER_ENDPOINT` - this can be an Azure Functions deployment of the NER spaCy model. Example: https://twspacytest.azurewebsites.net/api/ner
+* `HARMONY_DATA_PATH` - determines where model files are stored. Defaults to `HOME DIRECTORY/harmony`
 
 ## Loading instruments from PDFs
 
