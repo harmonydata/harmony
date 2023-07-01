@@ -9,7 +9,7 @@
 
 ## Who to contact?
 
-You can contact Harmony team at https://harmonydata.org/, or Thomas Wood at http://fastdatascience.com/.
+You can contact Harmony team at https://harmonydata.org/, or Thomas Wood at https://fastdatascience.com/.
 
 ## Looking to try Harmony in the browser?
 
