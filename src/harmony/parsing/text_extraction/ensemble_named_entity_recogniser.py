@@ -1,32 +1,44 @@
-import spacy
 import numpy as np
+import json
+import os
 import re
-import operator
-from harmony.parsing.text_extraction.spacy_wrapper import mark_is_all_letters, \
-    get_candidate_questions_and_mark_as_spans, set_is_numbered_bullet, mark_candidate_options_as_spans
-from harmony.parsing.text_extraction.smart_document_parser import parse_document, nlp, convert_to_dataframe, get_questions, add_candidate_options
-from harmony.schemas.requests.text import RawFile, Instrument, Question
+
+import numpy as np
+import requests
+import spacy
+from harmony.parsing.text_extraction.smart_document_parser import nlp, convert_to_dataframe, \
+    get_questions, add_candidate_options
+from spacy.tokens import DocBin
+
+from harmony.parsing.text_extraction.dictionary_options_matcher import options_matcher
 from harmony.parsing.text_extraction.options_words import OPTIONS_WORDS
 from harmony.parsing.text_extraction.smart_table_analyser import get_questions_from_tables
-from harmony.parsing.text_extraction.dictionary_options_matcher import options_matcher
-import os
-import requests
-import urllib
-import json
-from spacy.tokens import DocBin
-import spacy
+from harmony.parsing.text_extraction.spacy_wrapper import mark_is_all_letters, \
+    get_candidate_questions_and_mark_as_spans, set_is_numbered_bullet, mark_candidate_options_as_spans
+from harmony.schemas.requests.text import Question
 
 nlp = spacy.blank("en")
 
-# data_path = os.getenv("DATA_PATH")
+spacy_models = {"ner":None, "triage":None}
 
-# # The trained NER recogniser
-# nlp = spacy.load(
-#     data_path + '/11_ner_0_spacy/model-best')
-#
-#
-# nlp_final_classifier = spacy.load(
-#     data_path + '/29_classifier_spacy/model-best')
+def load_spacy_models():
+    if spacy_models["ner"]  is None:
+        if os.environ.get("HARMONY_NER_ENDPOINT") is None or os.environ.get("HARMONY_NER_ENDPOINT") == "":
+            path = os.getenv("HARMONY_DATA_PATH", os.path.expanduser("~") + "/harmony") + '/11_ner_0_spacy/model-best'
+            if not os.path.isdir(path):
+                print(f"Could not find model at {path}")
+                print("Please run:\nfrom harmony import download_models\ndownload_models()")
+                raise Exception()
+            spacy_models["ner"] = spacy.load(path)
+
+    if spacy_models["classifier"] is None:
+        if os.environ.get("HARMONY_CLASSIFIER_ENDPOINT") is None or os.environ.get("HARMONY_CLASSIFIER_ENDPOINT") == "":
+            path = os.getenv("HARMONY_DATA_PATH", os.path.expanduser("~") + "/harmony") + '/29_classifier_spacy/model-best'
+            if not os.path.isdir(path):
+                print(f"Could not find model at {path}")
+                print ("Please run:\nfrom harmony import download_models\ndownload_models()")
+                raise Exception()
+            spacy_models["classifier"] = spacy.load(path)
 
 
 def add_manual_features(doc):
@@ -37,12 +49,17 @@ def add_manual_features(doc):
 
 
 def annotate_document(page_text):
-    response = requests.get(
-        'https://twspacytest.azurewebsites.net/api/ner', json={"text": json.dumps([page_text])})
-    doc_bin = DocBin().from_bytes(response.content)
-    doc = list(doc_bin.get_docs(nlp.vocab))[0]
+    load_spacy_models()
 
-    # doc = nlp(page_text)
+    if os.environ.get("HARMONY_CLASSIFIER_ENDPOINT") is not None and os.environ.get(
+            "HARMONY_CLASSIFIER_ENDPOINT") != "":
+        response = requests.get(
+            os.environ.get("HARMONY_CLASSIFIER_ENDPOINT"), json={"text": json.dumps([page_text])})
+        doc_bin = DocBin().from_bytes(response.content)
+        doc = list(doc_bin.get_docs(nlp.vocab))[0]
+    else:
+        doc = spacy_models["classifier"](page_text)
+
     add_manual_features(doc)
 
     df = convert_to_dataframe(doc)
@@ -51,7 +68,7 @@ def annotate_document(page_text):
 
     add_candidate_options(df, doc)
 
-    token_classes = np.zeros((2,len(doc, )))
+    token_classes = np.zeros((2, len(doc, )))
 
     for span in doc.ents:
         for ctr, token in enumerate(span):
@@ -71,17 +88,11 @@ def annotate_document(page_text):
 
     return token_classes, doc, df
 
-def extract_questions(page_text, tables):
-    all_annotations, doc,df = annotate_document(page_text)
 
+def extract_questions(page_text, tables):
+    all_annotations, doc, df = annotate_document(page_text)
 
     questions = []
-    # call to rule-based only
-    # for idx in range(len(df)):
-    #     if df.is_question_to_include.iloc[idx]:
-    #         questions.append(Question(question_text = re.sub(r'\n',  ' ', df.span.iloc[idx].text)))
-    # if len(questions) > 0:
-    #     return questions, all_annotations, df
 
     cur_question_text = None
 
@@ -106,12 +117,15 @@ def extract_questions(page_text, tables):
             if cur_question_text is not None:
                 cur_question_text = re.sub(r'^- +', '', re.sub(r'\s+', ' ', cur_question_text).strip())
                 if cur_question_text.lower() not in OPTIONS_WORDS:
-                    questions.append(Question(question_text = cur_question_text, question_intro="", question_no=f"{len(questions)+1}", options=[]))
+                    questions.append(Question(question_text=cur_question_text, question_intro="",
+                                              question_no=f"{len(questions) + 1}", options=[]))
             cur_question_text = None
     if cur_question_text is not None:
         cur_question_text = re.sub(r'^- +', '', re.sub(r'\s+', ' ', cur_question_text).strip())
         if cur_question_text.lower() not in OPTIONS_WORDS:
-            questions.append(Question(question_text=cur_question_text, question_intro="", question_no=f"{len(questions)+1}", options=[]))
+            questions.append(
+                Question(question_text=cur_question_text, question_intro="", question_no=f"{len(questions) + 1}",
+                         options=[]))
 
     # If any tables were detected in the PDF, extract questions from tables.
     if len(tables) > 0:
@@ -122,35 +136,20 @@ def extract_questions(page_text, tables):
             questions = questions_from_tables
 
     questions_triaged = []
-    response = requests.get(
-        'https://twspacytest.azurewebsites.net/api/triage', json={"text": json.dumps([q.question_text for q in questions])})
-    doc_bin = DocBin().from_bytes(response.content)
+    if os.environ.get("HARMONY_NER_ENDPOINT") is not None and os.environ.get("HARMONY_NER_ENDPOINT") != "":
+        response = requests.get(
+            os.environ.get("HARMONY_NER_ENDPOINT"), json={"text": json.dumps([q.question_text for q in questions])})
+        doc_bin = DocBin().from_bytes(response.content)
+        docs = doc_bin.get_docs(nlp.vocab)
+    else:
+        docs = spacy_models["ner"].pipe([q.question_text for q in questions])
 
-    for question, question_as_doc in zip(questions, doc_bin.get_docs(nlp.vocab)):
+    for question, question_as_doc in zip(questions, docs):
         if question_as_doc.cats["1"] > 0.5:
             questions_triaged.append(question)
         else:
-            print ("Excluding question", question.question_text)
+            print("Excluding question", question.question_text)
     if len(questions_triaged) > len(questions) / 2 and len(questions_triaged) > 5:
         questions = questions_triaged
-
-    # Remove common suffixes
-    # from collections import Counter
-    # suffixes = Counter()
-    # for q in questions:
-    #     toks = q.question_text.split(" ")
-    #     for i in range(1, 4):
-    #         if i < len(toks) - 2:
-    #             suffix = " ".join(toks[-i:])
-    #             suffixes[suffix] += 1
-    # if len(suffixes) > 0:
-    #     sorted_suffixes = sorted(suffixes.items(), key = operator.itemgetter(1))
-    #     if sorted_suffixes[0][1] > len(questions) / 2 and sorted_suffixes[0][1] > 4:
-    #         print ("Removing", sorted_suffixes[0][1])
-    #         for q in questions:
-    #             try:
-    #                 q.question_text = re.sub(sorted_suffixes[0][1] + "$", "", q.question_text)
-    #             except:
-    #                 pass
 
     return questions, all_annotations, df

@@ -9,6 +9,7 @@ from .parsing.wrapper_all_parsers import convert_files_to_instruments
 from .parsing import *
 from .schemas import *
 from .matching.matcher import match_instruments_with_function
+from .util.model_helper import download_models
 try:
     from .matching.default_matcher import match_instruments
 except:

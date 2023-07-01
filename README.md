@@ -37,6 +37,23 @@ You can install from [PyPI](https://pypi.org/project/harmonydata/0.1.0/).
 pip install harmonydata
 ```
 
+## Loading all models
+
+Harmony uses spaCy to help with text extraction from PDFs. spaCy models can be downloaded with the following command in Python:
+
+```
+from harmony import download_models
+download_models()
+```
+
+## Optional environment variables
+
+As an alternative to downloading models, you can set environment variables so that Harmony calls spaCy on a remote server. This is only necessary if you are making a server deployment of Harmony.
+
+`HARMONY_CLASSIFIER_ENDPOINT` - this can be an Azure Functions deployment of the text triage spaCy model. Example: https://twspacytest.azurewebsites.net/api/triage
+`HARMONY_NER_ENDPOINT` - this can be an Azure Functions deployment of the NER spaCy model. Example: https://twspacytest.azurewebsites.net/api/ner
+`HARMONY_DATA_PATH` - determines where model files are stored. Defaults to `HOME DIRECTORY/harmony`
+
 ## Loading instruments from PDFs
 
 If you have a local file, you can load it into a list of `Instrument` instances:
