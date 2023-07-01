@@ -37,7 +37,7 @@ def download_models(is_force=False):
 
     print ("Downloading spaCy models to " + local_path + ".\nSet environment variable HARMONY_DATA_PATH if you want to change model file location.")
 
-    remote_base = "https://raw.githubusercontent.com/harmonydata/models/main/"
+    remote_base = "https://raw.githubusercontent.com/harmonydata/harmonymodels/main/"
 
     for file_to_download in files:
         url = remote_base + file_to_download
