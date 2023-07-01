@@ -46,6 +46,8 @@ from harmony import download_models
 download_models()
 ```
 
+Alternatively, you can clone https://github.com/harmonydata/models with Git LFS (make sure to install Git LFS first!) and set environment variable `HARMONY_DATA_PATH` to the path that you cloned it to.
+
 ## Optional environment variables
 
 As an alternative to downloading models, you can set environment variables so that Harmony calls spaCy on a remote server. This is only necessary if you are making a server deployment of Harmony.
