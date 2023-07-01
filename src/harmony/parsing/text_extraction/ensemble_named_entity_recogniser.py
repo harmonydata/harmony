@@ -19,7 +19,7 @@ from harmony.schemas.requests.text import Question
 
 nlp = spacy.blank("en")
 
-spacy_models = {"ner":None, "triage":None}
+spacy_models = {"ner":None, "classifier":None}
 
 def load_spacy_models():
     if spacy_models["ner"]  is None:

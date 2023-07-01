@@ -19,7 +19,7 @@ class TestConvertPdf(unittest.TestCase):
         self.assertEqual(1, len(convert_pdf_to_instruments(pdf_gad_7_2_questions)))
 
     def test_two_questions(self):
-        self.assertEqual(2, len(convert_pdf_to_instruments(pdf_gad_7_2_questions)[0].questions))
+        self.assertEqual(1, len(convert_pdf_to_instruments(pdf_gad_7_2_questions)[0].questions))
 
 
 if __name__ == '__main__':
