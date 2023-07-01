@@ -1,6 +1,8 @@
 import os
 import requests
 
+# List of model files that constitute the spaCy models.
+
 files = ["11_ner_0_spacy/model-best/config.cfg",
 "11_ner_0_spacy/model-best/meta.json",
 "11_ner_0_spacy/model-best/ner/cfg",
@@ -37,14 +39,15 @@ def download_models(is_force=False):
 
     print ("Downloading spaCy models to " + local_path + ".\nSet environment variable HARMONY_DATA_PATH if you want to change model file location.")
 
-    remote_base = "https://raw.githubusercontent.com/harmonydata/harmonymodels/main/"
+    # Base URL of the model files in Git LFS.
+    remote_base = "https://media.githubusercontent.com/media/harmonydata/models/main/"
 
     for file_to_download in files:
         url = remote_base + file_to_download
         local_filename = local_path + "/" + file_to_download
         if os.path.exists(local_filename) and not is_force:
-            print ("File exists: ", local_filename)
-            print ("Exiting.\nRun download_models(True) to force redownload.")
+            print ("Error: File already exists on your computer: ", local_filename)
+            print ("Exiting spaCy model downloader.\nRun download_models(True) to force redownload.")
             break
 
         r = requests.get(url)
