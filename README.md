@@ -7,6 +7,10 @@
 
 <!-- badges: end -->
 
+# The Harmony Project
+
+Harmony is a tool using AI which allows you to compare items from questionnaires and identify similar content. You can try Harmony at https://app.harmonydata.org and you can read our blog at https://harmonydata.org/blog/.
+
 ## Who to contact?
 
 You can contact Harmony team at https://harmonydata.org/, or Thomas Wood at https://fastdatascience.com/.
@@ -132,6 +136,22 @@ python setup.py sdist
 twine upload dist/*
 ```
 
+## Who worked on Harmony?
+
+Harmony is a collaboration project between the University of Ulster, University College London, the Universidade Federal de Santa Maria in Brazil, and Fast Data Science Ltd.
+
+The team at Harmony is made up of:
+
+* Bettina Moltrecht, PhD (UCL)
+* Dr Eoin McElroy (University of Ulster)
+* Dr George Ploubidis (UCL)
+* Dr Mauricio Scopel Hoffman (Universidade Federal de Santa Maria, Brazil)
+* Thomas Wood ([Fast Data Science](https://fastdatascience.com))
+
 ## License
 
 MIT License. Copyright (c) 2023 Ulster University (https://www.ulster.ac.uk)
+
+## How do I cite Harmony?
+
+McElroy, E., Moltrecht, B., Ploubidis, G.B., Scopel Hoffman, M., Wood, T.A., Harmony [Computer software], Version 1.0, accessed at https://app.harmonydata.org. Ulster University (2022)
