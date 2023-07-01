@@ -2,6 +2,7 @@ import os
 import requests
 
 # List of model files that constitute the spaCy models.
+# TODO: make it download from Azure
 
 files = ["11_ner_0_spacy/model-best/config.cfg",
 "11_ner_0_spacy/model-best/meta.json",
