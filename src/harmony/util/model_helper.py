@@ -50,6 +50,7 @@ def download_models(is_force=False):
             print ("Exiting spaCy model downloader.\nRun download_models(True) to force redownload.")
             break
 
+        print (f"Downloading {url}...")
         r = requests.get(url)
 
         if not os.path.isdir(os.path.dirname(local_filename)):
@@ -57,3 +58,4 @@ def download_models(is_force=False):
 
         with open(local_filename, 'wb') as f:
             f.write(r.content)
+        print(f"\tWrote to {local_filename}")

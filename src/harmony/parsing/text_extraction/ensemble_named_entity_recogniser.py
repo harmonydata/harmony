@@ -51,14 +51,14 @@ def add_manual_features(doc):
 def annotate_document(page_text):
     load_spacy_models()
 
-    if os.environ.get("HARMONY_CLASSIFIER_ENDPOINT") is not None and os.environ.get(
-            "HARMONY_CLASSIFIER_ENDPOINT") != "":
+    if os.environ.get("HARMONY_NER_ENDPOINT") is not None and os.environ.get(
+            "HARMONY_NER_ENDPOINT") != "":
         response = requests.get(
-            os.environ.get("HARMONY_CLASSIFIER_ENDPOINT"), json={"text": json.dumps([page_text])})
+            os.environ.get("HARMONY_NER_ENDPOINT"), json={"text": json.dumps([page_text])})
         doc_bin = DocBin().from_bytes(response.content)
         doc = list(doc_bin.get_docs(nlp.vocab))[0]
     else:
-        doc = spacy_models["classifier"](page_text)
+        doc = spacy_models["ner"](page_text)
 
     add_manual_features(doc)
 
@@ -136,13 +136,13 @@ def extract_questions(page_text, tables):
             questions = questions_from_tables
 
     questions_triaged = []
-    if os.environ.get("HARMONY_NER_ENDPOINT") is not None and os.environ.get("HARMONY_NER_ENDPOINT") != "":
+    if os.environ.get("HARMONY_CLASSIFIER_ENDPOINT") is not None and os.environ.get("HARMONY_CLASSIFIER_ENDPOINT") != "":
         response = requests.get(
-            os.environ.get("HARMONY_NER_ENDPOINT"), json={"text": json.dumps([q.question_text for q in questions])})
+            os.environ.get("HARMONY_CLASSIFIER_ENDPOINT"), json={"text": json.dumps([q.question_text for q in questions])})
         doc_bin = DocBin().from_bytes(response.content)
         docs = doc_bin.get_docs(nlp.vocab)
     else:
-        docs = spacy_models["ner"].pipe([q.question_text for q in questions])
+        docs = list(spacy_models["classifier"].pipe([q.question_text for q in questions]))
 
     for question, question_as_doc in zip(questions, docs):
         if question_as_doc.cats["1"] > 0.5:
