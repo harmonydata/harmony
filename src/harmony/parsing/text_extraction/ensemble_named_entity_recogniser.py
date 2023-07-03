@@ -24,7 +24,7 @@ spacy_models = {"ner":None, "classifier":None}
 def load_spacy_models():
     if spacy_models["ner"]  is None:
         if os.environ.get("HARMONY_NER_ENDPOINT") is None or os.environ.get("HARMONY_NER_ENDPOINT") == "":
-            path = os.getenv("HARMONY_DATA_PATH", os.path.expanduser("~") + "/harmony") + '/11_ner_0_spacy/model-best'
+            path = os.getenv("HARMONY_DATA_PATH", os.path.expanduser("~") + "/harmony") + '/harmony_spacy_models/11_ner_0_spacy/model-best'
             if not os.path.isdir(path):
                 print(f"Could not find model at {path}")
                 print("Please run:\nfrom harmony import download_models\ndownload_models()")
@@ -33,7 +33,7 @@ def load_spacy_models():
 
     if spacy_models["classifier"] is None:
         if os.environ.get("HARMONY_CLASSIFIER_ENDPOINT") is None or os.environ.get("HARMONY_CLASSIFIER_ENDPOINT") == "":
-            path = os.getenv("HARMONY_DATA_PATH", os.path.expanduser("~") + "/harmony") + '/29_classifier_spacy/model-best'
+            path = os.getenv("HARMONY_DATA_PATH", os.path.expanduser("~") + "/harmony") + '/harmony_spacy_models/29_classifier_spacy/model-best'
             if not os.path.isdir(path):
                 print(f"Could not find model at {path}")
                 print ("Please run:\nfrom harmony import download_models\ndownload_models()")
