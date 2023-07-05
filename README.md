@@ -46,11 +46,22 @@ pip install harmonydata
 Harmony uses spaCy to help with text extraction from PDFs. spaCy models can be downloaded with the following command in Python:
 
 ```
-from harmony import download_models
-download_models()
+import harmony
+harmony.download_models()
 ```
 
-Alternatively, you can clone https://github.com/harmonydata/models with Git LFS (make sure to install Git LFS first!) and set environment variable `HARMONY_DATA_PATH` to the path that you cloned it to.
+## Matching example instruments
+
+```
+instruments = harmony.example_instruments["CES_D English"], harmony.example_instruments["GAD-7 Portuguese"]
+questions, similarity, query_similarity = harmony.match_instruments(instruments)
+```
+
+## How to load a PDF, Excel or Word into an instrument
+
+```
+harmony.load_instruments_from_local_file("gad-7.pdf")
+```
 
 ## Optional environment variables
 
@@ -59,6 +70,8 @@ As an alternative to downloading models, you can set environment variables so th
 * `HARMONY_CLASSIFIER_ENDPOINT` - this can be an Azure Functions deployment of the text triage spaCy model. Example: https://twspacytest.azurewebsites.net/api/triage
 * `HARMONY_NER_ENDPOINT` - this can be an Azure Functions deployment of the NER spaCy model. Example: https://twspacytest.azurewebsites.net/api/ner
 * `HARMONY_DATA_PATH` - determines where model files are stored. Defaults to `HOME DIRECTORY/harmony`
+* `HARMONY_NO_PARSING` - set to 1 to import a lightweight variant of Harmony which doesn't support PDF parsing.
+* `HARMONY_NO_MATCHING` - set to 1 to import a lightweight variant of Harmony which doesn't support matching.
 
 ## Loading instruments from PDFs
 
