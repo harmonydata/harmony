@@ -38,6 +38,7 @@ setuptools.setup(
     ],
     python_requires=">=3.6",
     install_requires=[
+        "azure-storage-blob==12.16.0",
         "pydantic==1.10.7",
         "pandas==2.0.0",
         "tika==2.6.0",
@@ -46,7 +47,7 @@ setuptools.setup(
         "XlsxWriter==3.0.9",
         "openpyxl==3.1.2",
         "spacy==3.5.3",
-        "azure-storage-blob==12.16.0",
+        "wget==3.2",
     ],
     extras_require={
         "dev": ["check-manifest"],
