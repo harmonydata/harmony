@@ -20,7 +20,7 @@ def _get_instruments_from_file(file):
 
 
 def convert_files_to_instruments(files: List[RawFile]) -> List[Instrument]:
-    """Get cached instruments of files or convert files to instruments"""
+    """Convert files to instruments"""
 
     instruments = []
 
