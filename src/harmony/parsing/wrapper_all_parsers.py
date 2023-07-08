@@ -1,4 +1,3 @@
-import os
 from typing import List
 
 from harmony.parsing.excel_parser import convert_excel_to_instruments
@@ -19,7 +18,10 @@ def _get_instruments_from_file(file):
         instruments_from_this_file = []
     return instruments_from_this_file
 
+
 def convert_files_to_instruments(files: List[RawFile]) -> List[Instrument]:
+    """Get cached instruments of files or convert files to instruments"""
+
     instruments = []
 
     for file in files:
