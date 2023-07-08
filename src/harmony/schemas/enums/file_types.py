@@ -5,3 +5,4 @@ class FileType(str, Enum):
     pdf: str = 'pdf'
     xlsx: str = 'xlsx'
     txt: str = 'txt'
+    docx: str = 'docx'

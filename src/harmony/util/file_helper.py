@@ -12,10 +12,12 @@ def load_instruments_from_local_file(file_name: str) -> List[Instrument]:
         file_type = "pdf"
     elif file_name.lower().endswith("xlsx"):
         file_type = "xlsx"
+    elif file_name.lower().endswith("docx"):
+        file_type = "docx"
     else:
         file_type = "txt"
 
-    if file_type == "pdf" or file_type == "xlsx":
+    if file_type == "pdf" or file_type == "xlsx" or file_type == "docx":
         with open(
                 file_name,
                 "rb") as f:
