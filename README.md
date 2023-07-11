@@ -72,6 +72,7 @@ As an alternative to downloading models, you can set environment variables so th
 * `HARMONY_DATA_PATH` - determines where model files are stored. Defaults to `HOME DIRECTORY/harmony`
 * `HARMONY_NO_PARSING` - set to 1 to import a lightweight variant of Harmony which doesn't support PDF parsing.
 * `HARMONY_NO_MATCHING` - set to 1 to import a lightweight variant of Harmony which doesn't support matching.
+* `AZURE_STORAGE_CONNECTION_STRING` - Connection string for Azure Blob Storage.
 
 ## Loading instruments from PDFs
 
