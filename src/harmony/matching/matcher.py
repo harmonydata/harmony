@@ -37,8 +37,6 @@ def match_instruments_with_function(
     :param texts_cached_vectors: A dictionary of already cached vectors from texts (key is the text and value is the vector)
     """
 
-    texts_cached_vectors = {}
-
     all_questions = []
     all_texts_dicts: List[dict] = []
     for instrument in instruments:
