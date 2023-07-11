@@ -2,11 +2,10 @@ from collections import Counter
 from typing import List, Callable
 
 import numpy as np
-from numpy import dot, mat, matmul, ndarray
-from numpy.linalg import norm
-
 from harmony.matching.negator import negate
 from harmony.schemas.requests.text import Instrument
+from numpy import dot, mat, matmul, ndarray
+from numpy.linalg import norm
 
 
 def cosine_similarity(vec1: ndarray, vec2: ndarray) -> ndarray:
@@ -38,66 +37,88 @@ def match_instruments_with_function(
     :param texts_cached_vectors: A dictionary of already cached vectors from texts (key is the text and value is the vector)
     """
 
-    # Vectors of texts that are already cached
-    vectors_pos_cached = []
-    vectors_neg_cached = []
+    texts_cached_vectors = {}
 
-    texts = []
-    negated_texts = []
     all_questions = []
+    all_texts_dicts: List[dict] = []
     for instrument in instruments:
-        for question_idx, question in enumerate(instrument.questions):
+        for question in instrument.questions:
             question.instrument_id = instrument.instrument_id
             all_questions.append(question)
 
             # Text
             question_text = question.question_text
             if question_text not in texts_cached_vectors.keys():
-                texts.append(question_text)
+                all_texts_dicts.append(
+                    {"text": question_text, "vector": [], "negated": False}
+                )
             else:
-                vectors_pos_cached.append(texts_cached_vectors[question_text])
+                vector = texts_cached_vectors[question_text]
+                all_texts_dicts.append(
+                    {"text": question_text, "vector": vector, "negated": False}
+                )
 
             # Negated text
             negated_text = negate(question_text, instrument.language)
             if negated_text not in texts_cached_vectors.keys():
-                negated_texts.append(negated_text)
+                all_texts_dicts.append(
+                    {"text": negated_text, "vector": [], "negated": True}
+                )
             else:
-                vectors_neg_cached.append(texts_cached_vectors[negated_text])
+                vector = texts_cached_vectors[negated_text]
+                all_texts_dicts.append(
+                    {"text": negated_text, "vector": vector, "negated": True}
+                )
 
-    # Add all texts together including query
-    all_texts = texts + negated_texts
+    # Add query
     if query:
-        all_texts.append(query)
+        if query not in texts_cached_vectors.keys():
+            all_texts_dicts.append(
+                {"text": query, "vector": [], "negated": False, "is_query": True}
+            )
+        else:
+            vector = texts_cached_vectors[query]
+            all_texts_dicts.append(
+                {"text": query, "vector": vector, "negated": False, "is_query": True}
+            )
 
-    # Get vectors for all texts
-    all_vectors = vectorisation_function(all_texts)
+    # Texts with no cached vector
+    texts_not_cached = [x["text"] for x in all_texts_dicts if not x["vector"]]
+
+    # Get vectors for all texts not cached
+    new_vectors_list: List = vectorisation_function(texts_not_cached).tolist()
 
     # Create a dictionary with new vectors
-    new_vectors = {}
-    for vector, text in zip(all_vectors, all_texts):
-        new_vectors[text] = vector
+    new_vectors_dict = {}
+    for vector, text in zip(new_vectors_list, texts_not_cached):
+        new_vectors_dict[text] = vector
+
+    # Add new vectors to all_texts
+    for index, text_dict in enumerate(all_texts_dicts):
+        if not text_dict["vector"]:
+            all_texts_dicts[index]["vector"] = new_vectors_list.pop(0)
 
     # Create numpy array of texts vectors
-    tmp_vectors_pos = all_vectors[: len(texts), :]
-    if vectors_pos_cached:
-        # Concatenate the new vectors and the cached vectors
-        vectors_pos = np.concatenate([tmp_vectors_pos, vectors_pos_cached], axis=0)
-    else:
-        # New vectors only
-        vectors_pos = tmp_vectors_pos
+    vectors_pos = np.array(
+        [
+            x["vector"]
+            for x in all_texts_dicts
+            if (not x["negated"] and not x.get("is_query"))
+        ]
+    )
 
     # Create numpy array of negated texts vectors
-    tmp_vectors_neg = all_vectors[len(texts) : len(texts) * 2, :]
-    if vectors_neg_cached:
-        # Concatenate the new vectors and the cached vectors
-        vectors_neg = np.concatenate([tmp_vectors_neg, vectors_neg_cached], axis=0)
-    else:
-        # New vectors only
-        vectors_neg = tmp_vectors_neg
+    vectors_neg = np.array(
+        [
+            x["vector"]
+            for x in all_texts_dicts
+            if (x["negated"] and not x.get("is_query"))
+        ]
+    )
 
     # Get query similarity
     if query:
-        vector_query = all_vectors[-1:, :]
+        vector_query = np.array([all_texts_dicts[-1]["vector"]])
         query_similarity = cosine_similarity(vectors_pos, vector_query)[:, 0]
     else:
         query_similarity = None
@@ -142,4 +163,4 @@ def match_instruments_with_function(
         for question in all_questions:
             question.topics_auto = instrument_to_category[question.instrument_id]
 
-    return all_questions, similarity_with_polarity, query_similarity, new_vectors
+    return all_questions, similarity_with_polarity, query_similarity, new_vectors_dict
