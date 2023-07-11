@@ -115,50 +115,57 @@ def match_instruments_with_function(
     )
 
     # Get query similarity
-    if query:
+    if query and vectors_pos.any():
         vector_query = np.array([all_texts_dicts[-1]["vector"]])
         query_similarity = cosine_similarity(vectors_pos, vector_query)[:, 0]
     else:
-        query_similarity = None
+        query_similarity = np.array([])
 
-    pairwise_similarity = cosine_similarity(vectors_pos, vectors_pos)
-    pairwise_similarity_neg1 = cosine_similarity(vectors_neg, vectors_pos)
-    pairwise_similarity_neg2 = cosine_similarity(vectors_pos, vectors_neg)
-    pairwise_similarity_neg_mean = np.mean(
-        [pairwise_similarity_neg1, pairwise_similarity_neg2], axis=0
-    )
+    # Get similarity with polarity
+    if vectors_pos.any():
+        pairwise_similarity = cosine_similarity(vectors_pos, vectors_pos)
+        pairwise_similarity_neg1 = cosine_similarity(vectors_neg, vectors_pos)
+        pairwise_similarity_neg2 = cosine_similarity(vectors_pos, vectors_neg)
+        pairwise_similarity_neg_mean = np.mean(
+            [pairwise_similarity_neg1, pairwise_similarity_neg2], axis=0
+        )
 
-    similarity_difference = pairwise_similarity - pairwise_similarity_neg_mean
-    similarity_polarity = np.sign(similarity_difference)
+        similarity_difference = pairwise_similarity - pairwise_similarity_neg_mean
+        similarity_polarity = np.sign(similarity_difference)
 
-    # Make sure that any 0's in polarity are converted to 1's
-    where_0 = np.where(np.abs(similarity_difference) < 0.001)
-    similarity_polarity[where_0] = 1
+        # Make sure that any 0's in polarity are converted to 1's
+        where_0 = np.where(np.abs(similarity_difference) < 0.001)
+        similarity_polarity[where_0] = 1
 
-    similarity_max = np.max([pairwise_similarity, pairwise_similarity_neg_mean], axis=0)
-    similarity_with_polarity = similarity_max * similarity_polarity
+        similarity_max = np.max(
+            [pairwise_similarity, pairwise_similarity_neg_mean], axis=0
+        )
+        similarity_with_polarity = similarity_max * similarity_polarity
+    else:
+        similarity_with_polarity = np.array([])
 
     # Work out similarity with MHC
-    if len(mhc_embeddings) > 0:
-        similarities_mhc = cosine_similarity(vectors_pos, mhc_embeddings)
+    if vectors_pos.any():
+        if len(mhc_embeddings) > 0:
+            similarities_mhc = cosine_similarity(vectors_pos, mhc_embeddings)
 
-        ctrs = {}
-        for idx, a in enumerate(np.argmax(similarities_mhc, axis=1)):
-            if all_questions[idx].instrument_id not in ctrs:
-                ctrs[all_questions[idx].instrument_id] = Counter()
-            for topic in mhc_all_metadatas[a]["topics"]:
-                ctrs[all_questions[idx].instrument_id][topic] += 1
-            all_questions[idx].nearest_match_from_mhc_auto = mhc_questions[a].dict()
+            ctrs = {}
+            for idx, a in enumerate(np.argmax(similarities_mhc, axis=1)):
+                if all_questions[idx].instrument_id not in ctrs:
+                    ctrs[all_questions[idx].instrument_id] = Counter()
+                for topic in mhc_all_metadatas[a]["topics"]:
+                    ctrs[all_questions[idx].instrument_id][topic] += 1
+                all_questions[idx].nearest_match_from_mhc_auto = mhc_questions[a].dict()
 
-        instrument_to_category = {}
-        for instrument_id, counts in ctrs.items():
-            instrument_to_category[instrument_id] = []
-            max_count = max(counts.values())
-            for topic, topic_count in counts.items():
-                if topic_count > max_count / 2:
-                    instrument_to_category[instrument_id].append(topic)
+            instrument_to_category = {}
+            for instrument_id, counts in ctrs.items():
+                instrument_to_category[instrument_id] = []
+                max_count = max(counts.values())
+                for topic, topic_count in counts.items():
+                    if topic_count > max_count / 2:
+                        instrument_to_category[instrument_id].append(topic)
 
-        for question in all_questions:
-            question.topics_auto = instrument_to_category[question.instrument_id]
+            for question in all_questions:
+                question.topics_auto = instrument_to_category[question.instrument_id]
 
     return all_questions, similarity_with_polarity, query_similarity, new_vectors_dict
