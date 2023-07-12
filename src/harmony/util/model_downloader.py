@@ -13,10 +13,10 @@ def download_models(is_force=False):
     """
     Downloads spaCy models to local.
     """
-    local_path = os.getenv("HARMONY_DATA_PATH", os.path.expanduser("~") + "/harmony")
+    local_path = os.getenv("HARMONY_SPACY_PATH", os.path.expanduser("~") + "/harmony")
 
     print(
-        "Downloading spaCy models to " + local_path + ".\nSet environment variable HARMONY_DATA_PATH if you want to change model file location.")
+        "Downloading spaCy models to " + local_path + ".\nSet environment variable HARMONY_SPACY_PATH if you want to change model file location.")
 
     # Base URL of the model files in Azure Blob Storage static hosted site.
     url = "https://harmonyapistorage.z33.web.core.windows.net/harmony_spacy_models.tar.bz2"

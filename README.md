@@ -65,7 +65,8 @@ As an alternative to downloading models, you can set environment variables so th
 
 * `HARMONY_CLASSIFIER_ENDPOINT` - this can be an Azure Functions deployment of the text triage spaCy model. Example: https://twspacytest.azurewebsites.net/api/triage
 * `HARMONY_NER_ENDPOINT` - this can be an Azure Functions deployment of the NER spaCy model. Example: https://twspacytest.azurewebsites.net/api/ner
-* `HARMONY_DATA_PATH` - determines where model files are stored. Defaults to `HOME DIRECTORY/harmony`
+* `HARMONY_SPACY_PATH` - determines where model files are stored. Defaults to `HOME DIRECTORY/harmony`
+* `HARMONY_DATA_PATH` - determines where data files are stored. Defaults to `HOME DIRECTORY/harmony`
 * `HARMONY_NO_PARSING` - set to 1 to import a lightweight variant of Harmony which doesn't support PDF parsing.
 * `HARMONY_NO_MATCHING` - set to 1 to import a lightweight variant of Harmony which doesn't support matching.
 
