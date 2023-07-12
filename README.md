@@ -21,10 +21,6 @@ Visit: https://app.harmonydata.org/
 
 You can also visit our blog at https://harmonydata.org/
 
-## Looking for the Harmony API?
-
-Visit: https://github.com/harmonydata/harmonyapi
-
 ## You need Tika if you want to extract instruments from PDFs
 
 Download and install Java if you don't have it already. Download and install Apache Tika and run it on your computer https://tika.apache.org/download.html
@@ -94,6 +90,33 @@ all_questions, similarity, query_similarity = match_instruments(instruments)
 * `all_questions` is a list of the questions passed to Harmony, in order.
 * `similarity` is the similarity matrix returned by Harmony.
 * `query_similarity` is the degree of similarity of each item to an optional query passed as argument to `match_instruments`.
+ 
+## Do you want to run Harmony in your browser locally?
+
+Download and install Docker:
+
+* https://docs.docker.com/desktop/install/mac-install/
+* https://docs.docker.com/desktop/install/windows-install/
+* https://docs.docker.com/desktop/install/linux-install/
+
+Open a Terminal and run
+
+```
+docker run -p 8000:8000 -p 3000:3000 harmonydata/harmonylocal
+```
+
+Then go to http://localhost:3000 in your browser.
+
+## Looking for the Harmony API?
+
+Visit: https://github.com/harmonydata/harmonyapi
+
+## Docker images
+
+If you are a Docker user, you can run Harmony from a pre-built Docker image.
+
+* https://hub.docker.com/repository/docker/harmonydata/harmonyapi - just the Harmony API
+* https://hub.docker.com/repository/docker/harmonydata/harmonylocal - Harmony API and React front end
 
 ## Contributing to Harmony
 
