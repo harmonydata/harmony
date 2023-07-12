@@ -38,7 +38,6 @@ setuptools.setup(
     ],
     python_requires=">=3.6",
     install_requires=[
-        "azure-storage-blob==12.16.0",
         "pydantic==1.10.7",
         "pandas==2.0.0",
         "tika==2.6.0",
