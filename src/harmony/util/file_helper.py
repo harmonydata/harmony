@@ -8,6 +8,11 @@ from harmony.schemas.requests.text import RawFile
 
 
 def load_instruments_from_local_file(file_name: str) -> List[Instrument]:
+    """
+    Open a local file (PDF, Excel, Word or TXT format) and parse it into a list of Instrument objects.
+    :param file_name: Local file path, either absolute or relative.
+    :return: List of Instruments.
+    """
     if file_name.lower().endswith("pdf"):
         file_type = "pdf"
     elif file_name.lower().endswith("xlsx"):
@@ -25,12 +30,14 @@ def load_instruments_from_local_file(file_name: str) -> List[Instrument]:
 
         file_as_base64 = base64.b64encode(file_as_bytes).decode('ascii')
 
-        harmony_file = RawFile(file_type=file_type, content="," + file_as_base64, file_id=uuid.uuid4().hex)
+        harmony_file = RawFile(file_type=file_type, content="," + file_as_base64, file_id=uuid.uuid4().hex,
+                               instrument_name=file_name, file_name=file_name)
     else:
         with open(
                 file_name,
                 "r", encoding="utf-8") as f:
             file_as_string = f.read()
-        harmony_file = RawFile(file_type="txt", content=file_as_string, file_id=uuid.uuid4().hex)
+        harmony_file = RawFile(file_type="txt", content=file_as_string, file_id=uuid.uuid4().hex,
+                               instrument_name=file_name, file_name=file_name)
 
     return convert_files_to_instruments([harmony_file])

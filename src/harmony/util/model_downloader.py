@@ -1,17 +1,24 @@
 import os
 import shutil
-import tarfile
-import wget
 import sys
+import tarfile
+
+import wget
+
 
 def bar_custom(current, total, width=80):
+    """
+    Display a progress bar to track the download.
+    :param current: Current bytes downloaded
+    :param total: Total bytes.
+    :param width: Width of the bar in chars.
+    """
     print("Downloading: %d%% [%d / %d] bytes" % (current / total * 100, current, total), end="\r")
 
-# List of model files that constitute the spaCy models.
 
 def download_models(is_force=False):
     """
-    Downloads spaCy models to local.
+    Downloads spaCy models to local path HARMONY_SPACY_PATH, defaulting to home directory.
     """
     local_path = os.getenv("HARMONY_SPACY_PATH", os.path.expanduser("~") + "/harmony")
 
@@ -52,8 +59,9 @@ def download_models(is_force=False):
     os.remove(tmpfile)
     print(f"Deleted {tmpfile}.")
 
+
 if __name__ == "__main__":
-    print ("Usage: python model_downloader.py --force [if you want to force overwrite of existing folder]")
+    print("Usage: python model_downloader.py --force [if you want to force overwrite of existing folder]")
     is_force = False
     if len(sys.argv) > 1 and "force" in sys.argv[1]:
         is_force = True
