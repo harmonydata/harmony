@@ -31,7 +31,7 @@ java -jar tika-server-standard-2.3.0.jar
 
 ## Installing Harmony Python package
 
-You can install from [PyPI](https://pypi.org/project/harmonydata/0.1.0/).
+You can install from [PyPI](https://pypi.org/project/harmonydata/).
 
 ```
 pip install harmonydata
