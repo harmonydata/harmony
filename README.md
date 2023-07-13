@@ -85,7 +85,7 @@ Once you have some instruments, you can match them with each other with a call t
 
 ```
 from harmony import match_instruments
-all_questions, similarity, query_similarity = match_instruments(instruments)
+all_questions, similarity, query_similarity, new_vectors_dict = match_instruments(instruments)
 ```
 
 * `all_questions` is a list of the questions passed to Harmony, in order.
