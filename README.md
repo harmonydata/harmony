@@ -17,7 +17,7 @@ You can contact Harmony team at https://harmonydata.org/, or Thomas Wood at http
 
 ## Installation instructions (video)
 
-[![Installing Harmony](/images/installation_video.jpg)](https://www.youtube.com/watch?v=enWh0-4I0Sg "Installing Harmony")
+[![Installing Harmony](https://raw.githubusercontent.com/harmonydata/.github/main/profile/installation_video.jpg)](https://www.youtube.com/watch?v=enWh0-4I0Sg "Installing Harmony")
 
 ## Looking to try Harmony in the browser?
 
