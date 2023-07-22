@@ -47,6 +47,7 @@ setuptools.setup(
         "openpyxl==3.1.2",
         "spacy==3.5.3",
         "wget==3.2",
+        "sentence_transformers==2.2.2"
     ],
     extras_require={
         "dev": ["check-manifest"],
