@@ -35,13 +35,153 @@ from harmony.schemas.text_vector import TextVector
 from numpy import dot, mat, matmul, ndarray
 from numpy.linalg import norm
 
-
+#match_instruments_with_function(
+#instruments=instruments,
+#query=query,
+#vectorisation_function=convert_texts_to_vector,
+#mhc_questions=mhc_questions,
+#mhc_all_metadatas=mhc_all_metadatas,
+#mhc_embeddings=mhc_embeddings,
+#texts_cached_vectors=texts_cached_vectors,
+ 
 def cosine_similarity(vec1: ndarray, vec2: ndarray) -> ndarray:
     dp = dot(vec1, vec2.T)
     m1 = mat(norm(vec1, axis=1))
     m2 = mat(norm(vec2.T, axis=0))
 
     return np.asarray(dp / matmul(m1.T, m2))
+
+"""Eve"""
+def process_questions(questions):
+    texts_cached_vectors: dict[str, List[float]] = {}
+    text_vectors: List[TextVector] = []
+    for question_text in questions:
+        if question_text not in texts_cached_vectors.keys():
+            text_vectors.append(
+                TextVector(
+                    text=question_text, vector=[], is_negated=False, is_query=False
+                )
+            )
+        else:
+            vector = texts_cached_vectors[question_text]
+            text_vectors.append(
+                TextVector(
+                    text=question_text,
+                    vector=vector,
+                    is_negated=False,
+                    is_query=False,
+                )
+            )
+
+        negated_text = negate(question_text, 'en')
+        if negated_text not in texts_cached_vectors.keys():
+            text_vectors.append(
+                TextVector(
+                    text=negated_text, vector=[], is_negated=True, is_query=False
+                )
+            )
+        else:
+            vector = texts_cached_vectors[negated_text]
+            text_vectors.append(
+                TextVector(
+                    text=negated_text,
+                    vector=vector,
+                    is_negated=True,
+                    is_query=False,
+                )
+            )
+    return text_vectors
+
+def vectorise_texts(text_vectors,vectorisation_function):
+    # Texts with no cached vector
+    texts_not_cached = [x.text for x in text_vectors if not x.vector]
+#
+#    # Get vectors for all texts not cached
+    new_vectors_list: List = vectorisation_function(texts_not_cached).tolist()
+#
+#    # Create a dictionary with new vectors
+    new_vectors_dict = dict(zip(texts_not_cached,new_vectors_list))
+    print(new_vectors_dict.keys())
+
+    # Add new vectors to all_texts
+    for index, text_dict in enumerate(text_vectors):
+        if not text_dict.vector:
+            text_vectors[index].vector = new_vectors_list.pop(0)
+    return text_vectors
+
+def texts_similarity_matrix(text_vectors):
+    # Create numpy array of texts vectors
+    vectors_pos = np.array(
+        [
+            x.vector
+            for x in text_vectors
+            if (x.is_negated is False and x.is_query is False)
+        ]
+    )
+
+    print(len(vectors_pos))
+
+    # Create numpy array of negated texts vectors
+    vectors_neg = np.array(
+        [
+            x.vector
+            for x in text_vectors
+            if (x.is_negated is True and x.is_query is False)
+        ]
+    )
+
+
+    # Get similarity with polarity
+    if vectors_pos.any():
+        pairwise_similarity = cosine_similarity(vectors_pos, vectors_pos)
+        pairwise_similarity_neg1 = cosine_similarity(vectors_neg, vectors_pos)
+        pairwise_similarity_neg2 = cosine_similarity(vectors_pos, vectors_neg)
+        pairwise_similarity_neg_mean = np.mean(
+            [pairwise_similarity_neg1, pairwise_similarity_neg2], axis=0
+        )
+
+        similarity_difference = pairwise_similarity - pairwise_similarity_neg_mean
+        similarity_polarity = np.sign(similarity_difference)
+
+        # Make sure that any 0's in polarity are converted to 1's
+        where_0 = np.where(np.abs(similarity_difference) < 0.001)
+        similarity_polarity[where_0] = 1
+
+        similarity_max = np.max(
+            [pairwise_similarity, pairwise_similarity_neg_mean], axis=0
+        )
+        similarity_with_polarity = similarity_max * similarity_polarity
+    else:
+        similarity_with_polarity = np.array([])
+    print(pairwise_similarity)
+
+#    # Work out similarity with MHC
+#    if vectors_pos.any():
+#        if len(mhc_embeddings) > 0:
+#            similarities_mhc = cosine_similarity(vectors_pos, mhc_embeddings)
+#
+#            ctrs = {}
+#            for idx, a in enumerate(np.argmax(similarities_mhc, axis=1)):
+#                if all_questions[idx].instrument_id not in ctrs:
+#                    ctrs[all_questions[idx].instrument_id] = Counter()
+#                for topic in mhc_all_metadatas[a]["topics"]:
+#                    ctrs[all_questions[idx].instrument_id][topic] += 1
+#                all_questions[idx].nearest_match_from_mhc_auto = mhc_questions[a].dict()
+#
+#            instrument_to_category = {}
+#            for instrument_id, counts in ctrs.items():
+#                instrument_to_category[instrument_id] = []
+#                max_count = max(counts.values())
+#                for topic, topic_count in counts.items():
+#                    if topic_count > max_count / 2:
+#                        instrument_to_category[instrument_id].append(topic)
+#
+#            for question in all_questions:
+#                question.topics_auto = instrument_to_category[question.instrument_id]
+
+ 
+
+
 
 
 def match_instruments_with_function(
