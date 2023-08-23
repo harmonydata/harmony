@@ -119,8 +119,6 @@ def texts_similarity_matrix(text_vectors):
         ]
     )
 
-    print(len(vectors_pos))
-
     # Create numpy array of negated texts vectors
     vectors_neg = np.array(
         [
@@ -154,6 +152,7 @@ def texts_similarity_matrix(text_vectors):
     else:
         similarity_with_polarity = np.array([])
     print(pairwise_similarity)
+    print(similarity_polarity)
 
 #    # Work out similarity with MHC
 #    if vectors_pos.any():
@@ -178,11 +177,8 @@ def texts_similarity_matrix(text_vectors):
 #
 #            for question in all_questions:
 #                question.topics_auto = instrument_to_category[question.instrument_id]
-
+    return pairwise_similarity
  
-
-
-
 
 def match_instruments_with_function(
     instruments: List[Instrument],
