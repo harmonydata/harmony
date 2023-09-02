@@ -9,11 +9,11 @@
 
 # The Harmony Project
 
-Harmony is a tool using AI which allows you to compare items from questionnaires and identify similar content. You can try Harmony at https://app.harmonydata.org and you can read our blog at https://harmonydata.org/blog/.
+Harmony is a tool using AI which allows you to compare items from questionnaires and identify similar content. You can try Harmony at https://app.harmonydata.ac.uk and you can read our blog at https://harmonydata.ac.uk/blog/.
 
 ## Who to contact?
 
-You can contact Harmony team at https://harmonydata.org/, or Thomas Wood at https://fastdatascience.com/.
+You can contact Harmony team at https://harmonydata.ac.uk/, or Thomas Wood at https://fastdatascience.com/.
 
 ## Installation instructions (video)
 
@@ -21,9 +21,9 @@ You can contact Harmony team at https://harmonydata.org/, or Thomas Wood at http
 
 ## Looking to try Harmony in the browser?
 
-Visit: https://app.harmonydata.org/
+Visit: https://app.harmonydata.ac.uk/
 
-You can also visit our blog at https://harmonydata.org/
+You can also visit our blog at https://harmonydata.ac.uk/
 
 ## You need Tika if you want to extract instruments from PDFs
 
@@ -149,7 +149,7 @@ If you are a Docker user, you can run Harmony from a pre-built Docker image.
 
 ## Contributing to Harmony
 
-If you'd like to contribute to this project, you can contact us at https://harmonydata.org/ or make a pull request on our [Github repository](https://github.com/harmonydata/harmonyapi). You can also [raise an issue](https://github.com/harmony/harmony/issues). 
+If you'd like to contribute to this project, you can contact us at https://harmonydata.ac.uk/ or make a pull request on our [Github repository](https://github.com/harmonydata/harmonyapi). You can also [raise an issue](https://github.com/harmony/harmony/issues). 
 
 ## Developing Harmony
 
