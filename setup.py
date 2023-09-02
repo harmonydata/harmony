@@ -40,7 +40,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/harmonydata/harmony",
     project_urls={
-        "Documentation": "https://harmonydata.org/",
+        "Documentation": "https://harmonydata.ac.uk/",
         "Bug Reports": "https://github.com/harmonydata/harmony/issues",
         "Source Code": "https://github.com/harmonydata/harmony",
         # 'Funding': '',
