@@ -226,4 +226,4 @@ MIT License. Copyright (c) 2023 Ulster University (https://www.ulster.ac.uk)
 
 ## How do I cite Harmony?
 
-McElroy, E., Moltrecht, B., Ploubidis, G.B., Scopel Hoffman, M., Wood, T.A., Harmony [Computer software], Version 1.0, accessed at https://app.harmonydata.org. Ulster University (2022)
+McElroy, E., Moltrecht, B., Ploubidis, G.B., Scopel Hoffman, M., Wood, T.A., Harmony [Computer software], Version 1.0, accessed at https://harmonydata.ac.uk/app. Ulster University (2023)
