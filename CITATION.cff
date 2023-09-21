@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Wood"
+  given-names: "Thomas"
+  orcid: "https://orcid.org/0000-0001-8962-8571"
+- family-names: "McElroy"
+  given-names: "Eoin"
+  orcid: "https://orcid.org/0000-0001-5466-8522"
+- family-names: "Moltrecht"
+  given-names: "Bettina"
+  orcid: "https://orcid.org/0000-0002-1838-428X"
+- family-names: "Scopel Hoffmann"
+  given-names: "Mauricio"
+  orcid: "https://orcid.org/0000-0003-4232-3169"
+- family-names: "Ploubidis"
+  given-names: "George"
+  orcid: "https://orcid.org/0000-0002-8198-5790"
+title: "Harmony"
+version: 0.5.0
+doi: DOI 10.17605/OSF.IO/BCT6K
+date-released: 2023-07-22
+url: "https://harmonydata.ac.uk"
