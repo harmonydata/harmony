@@ -11,7 +11,8 @@
 
 <!-- badges: start -->
 ![my badge](https://badgen.net/badge/Status/In%20Development/orange)
-
+<a href="https://github.com/badges/shields/graphs/contributors" alt="Contributors">
+        <img src="https://img.shields.io/github/contributors/badges/shields" /></a>
 [![PyPI package](https://img.shields.io/badge/pip%20install-harmonydata-brightgreen)](https://pypi.org/project/harmonydata/) [![version number](https://img.shields.io/pypi/v/harmonydata?color=green&label=version)](https://github.com/harmonydata/harmony/releases) [![License](https://img.shields.io/github/license/harmonydata/harmony)](https://github.com/harmonydata/harmony/blob/main/LICENSE)
 
 You can run the walkthrough notebook in [Google Colab](https://colab.research.google.com/github/harmonydata/harmony/blob/main/Harmony_example_walkthrough.ipynb) with a single click: <a href="https://colab.research.google.com/github/harmonydata/harmony/blob/main/Harmony_example_walkthrough.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
