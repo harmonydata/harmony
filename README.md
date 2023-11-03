@@ -37,17 +37,17 @@ Harmony is a tool using AI which allows you to compare items from questionnaires
 
 You can contact Harmony team at https://harmonydata.ac.uk/, or Thomas Wood at https://fastdatascience.com/.
 
-## Installation instructions (video)
+## 🖥 Installation instructions (video)
 
 [![Installing Harmony](https://raw.githubusercontent.com/harmonydata/.github/main/profile/installation_video.jpg)](https://www.youtube.com/watch?v=enWh0-4I0Sg "Installing Harmony")
 
-## Looking to try Harmony in the browser?
+## 🖱 Looking to try Harmony in the browser?
 
 Visit: https://app.harmonydata.ac.uk/
 
 You can also visit our blog at https://harmonydata.ac.uk/
 
-## You need Tika if you want to extract instruments from PDFs
+## ✅ You need Tika if you want to extract instruments from PDFs
 
 Download and install Java if you don't have it already. Download and install Apache Tika and run it on your computer https://tika.apache.org/download.html
 
@@ -55,7 +55,7 @@ Download and install Java if you don't have it already. Download and install Apa
 java -jar tika-server-standard-2.3.0.jar
 ```
 
-## Installing Harmony Python package
+## 🖥 Installing Harmony Python package
 
 You can install from [PyPI](https://pypi.org/project/harmonydata/).
 
@@ -116,7 +116,7 @@ all_questions, similarity, query_similarity, new_vectors_dict = match_instrument
 * `similarity` is the similarity matrix returned by Harmony.
 * `query_similarity` is the degree of similarity of each item to an optional query passed as argument to `match_instruments`.
 
-## Using a different vectorisation function
+## ⇗⇗ Using a different vectorisation function
 
 Harmony defaults to `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2` ([HuggingFace link](https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2)). However you can use other sentence transformers from HuggingFace by setting the environment `HARMONY_SENTENCE_TRANSFORMER_PATH` before importing Harmony:
 
@@ -140,7 +140,7 @@ instruments = example_instruments["CES_D English"], example_instruments["GAD-7 P
 all_questions, similarity, query_similarity, new_vectors_dict = match_instruments_with_function(instruments, None, convert_texts_to_vector)
 ```
  
-## Do you want to run Harmony in your browser locally?
+## 💻 Do you want to run Harmony in your browser locally?
 
 Download and install Docker:
 
@@ -173,13 +173,13 @@ If you'd like to contribute to this project, you can contact us at https://harmo
 
 ## Developing Harmony
 
-### Automated tests
+### 🧪 Automated tests
 
 Test code is in **tests/** folder using [unittest](https://docs.python.org/3/library/unittest.html).
 
 The testing tool `tox` is used in the automation with GitHub Actions CI/CD.
 
-### Use tox locally
+### 🧪 Use tox locally
 
 Install tox and run it:
 
@@ -198,7 +198,7 @@ tox -e py39
 
 Thanks to GitHub Actions' automated process, you don't need to generate distribution files locally. But if you insist, click to read the "Generate distribution files" section.
 
-### Continuous integration/deployment to PyPI
+### ⚙️Continuous integration/deployment to PyPI
 
 This package is based on the template https://pypi.org/project/example-pypi-package/
 
@@ -209,7 +209,7 @@ This package
 - includes test files in the source distribution
 - uses **setup.cfg** for [version single-sourcing](https://packaging.python.org/guides/single-sourcing-package-version/) (setuptools 46.4.0+)
 
-## Re-releasing the package manually
+## ⚙️Re-releasing the package manually
 
 The code to re-release Harmony on PyPI is as follows:
 
@@ -221,22 +221,22 @@ python setup.py sdist
 twine upload dist/*
 ```
 
-## Who worked on Harmony?
+## ‎😃💁 Who worked on Harmony?
 
-Harmony is a collaboration project between the University of Ulster, University College London, the Universidade Federal de Santa Maria in Brazil, and Fast Data Science Ltd.
+Harmony is a collaboration project between [Ulster University](https://ulster.ac.uk/), [University College London](https://ucl.ac.uk/), the [Universidade Federal de Santa Maria](https://www.ufsm.br/), and [Fast Data Science](http://fastdatascience.com/).  Harmony is funded by [Wellcome](https://wellcome.org/) as part of the [Wellcome Data Prize in Mental Health](https://wellcome.org/grant-funding/schemes/wellcome-mental-health-data-prize).
 
-The team at Harmony is made up of:
+The core team at Harmony is made up of:
 
-* Bettina Moltrecht, PhD (UCL)
-* Dr Eoin McElroy (University of Ulster)
-* Dr George Ploubidis (UCL)
-* Dr Mauricio Scopel Hoffman (Universidade Federal de Santa Maria, Brazil)
-* Thomas Wood ([Fast Data Science](https://fastdatascience.com))
+* [Dr Bettina Moltrecht, PhD](https://profiles.ucl.ac.uk/60736-bettina-moltrecht) (UCL)
+* [Dr Eoin McElroy](https://www.ulster.ac.uk/staff/e-mcelroy) (University of Ulster)
+* [Dr George Ploubidis](https://profiles.ucl.ac.uk/48171-george-ploubidis) (UCL)
+* [Dr Mauricio Scopel Hoffmann](https://ufsmpublica.ufsm.br/docente/18264) (Universidade Federal de Santa Maria, Brazil)
+* [Thomas Wood](https://freelancedatascientist.net/) ([Fast Data Science](https://fastdatascience.com))
 
-## License
+## 📜 License
 
 MIT License. Copyright (c) 2023 Ulster University (https://www.ulster.ac.uk)
 
-## How do I cite Harmony?
+## 📜 How do I cite Harmony?
 
 McElroy, E., Moltrecht, B., Ploubidis, G.B., Scopel Hoffman, M., Wood, T.A., Harmony [Computer software], Version 1.0, accessed at https://harmonydata.ac.uk/app. Ulster University (2023)
