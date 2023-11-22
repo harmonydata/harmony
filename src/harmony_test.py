@@ -9,21 +9,16 @@ def main():
     questions = ["how old are your dogs", "which year were you born","I like your hair","what is your email address"]
     vectorisation_function = harmony.matching.default_matcher.convert_texts_to_vector
     text_vectors = harmony.matching.matcher.process_questions(questions)
-    text_vectors = harmony.matching.matcher.vectorise_texts(text_vectors,vectorisation_function)
-    harmony.matching.matcher.texts_similarity_matrix(text_vectors)
+#    text_vectors = harmony.matching.matcher.vectorise_texts(text_vectors,vectorisation_function)
+#    harmony.matching.matcher.texts_similarity_matrix_benchmark(text_vectors)
+#
+
+
+
+#main()
 
 
 
 
-main()
 
 
-
-
-
-#    instruments = harmony.example_instruments["CES_D English"], harmony.example_instruments["GAD-7 English"]
-#    print(type(instruments[0].language))
-#    questions, similarity, query_similarity, new_vectors_dict = harmony.match_instruments(instruments)
-#    print(instruments[0])
-#    a = harmony.matching.matcher.cosine_similarity(np.random.rand(2,2),np.random.rand(2,2))
- 
