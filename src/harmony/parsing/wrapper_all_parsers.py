@@ -37,7 +37,7 @@ from harmony.schemas.requests.text import RawFile, Instrument
 def _get_instruments_from_file(file):
     if file.file_type == FileType.pdf or file.file_type == FileType.docx:
         instruments_from_this_file = convert_pdf_to_instruments(file)
-    elif file.file_type == FileType.txt:
+    elif file.file_type == FileType.txt or file.file_type == FileType.csv:
         instruments_from_this_file = convert_text_to_instruments(file)
     elif file.file_type == FileType.xlsx:
         instruments_from_this_file = convert_excel_to_instruments(file)
