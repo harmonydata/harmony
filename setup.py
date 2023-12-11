@@ -38,7 +38,7 @@ setuptools.setup(
     keywords="harmony, harmonisation, harmonization, harmonise, harmonize",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/harmonydata/harmony",
+    url="https://harmonydata.ac.uk",
     project_urls={
         "Documentation": "https://harmonydata.ac.uk/",
         "Bug Reports": "https://github.com/harmonydata/harmony/issues",
