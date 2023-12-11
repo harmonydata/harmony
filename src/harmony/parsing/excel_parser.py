@@ -25,8 +25,8 @@ SOFTWARE.
 
 '''
 
+import re
 import traceback
-import uuid
 from typing import List
 
 import numpy as np
@@ -36,6 +36,8 @@ from langdetect import detect
 from harmony.parsing.util.excel_to_pandas import parse_excel_to_pandas
 from harmony.schemas.requests.text import Question
 from harmony.schemas.requests.text import RawFile, Instrument
+
+re_header_column = re.compile(r'(?i)(?:question|text|pergunta)')
 
 
 def clean_option_no(option_could_be_int):
@@ -89,9 +91,9 @@ def convert_excel_to_instruments(file: RawFile) -> List[Instrument]:
         rows_to_delete = []
         for i in range(len(df_questions)):
             if df_questions.question.iloc[i] is None or type(df_questions.question.iloc[i]) is not str or \
-                    df_questions.question.iloc[i].lower() in ["question", "text",
-                                                              "pergunta", "texto"]:
+                    re_header_column.match(df_questions.question.iloc[i]):
                 rows_to_delete.append(i)
+                break
 
         if len(rows_to_delete) > 0:
             df_questions.drop(rows_to_delete, inplace=True)

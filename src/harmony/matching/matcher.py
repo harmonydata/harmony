@@ -29,11 +29,12 @@ from collections import Counter
 from typing import List, Callable
 
 import numpy as np
+from numpy import dot, mat, matmul, ndarray
+from numpy.linalg import norm
+
 from harmony.matching.negator import negate
 from harmony.schemas.requests.text import Instrument
 from harmony.schemas.text_vector import TextVector
-from numpy import dot, mat, matmul, ndarray
-from numpy.linalg import norm
 
 
 def cosine_similarity(vec1: ndarray, vec2: ndarray) -> ndarray:
@@ -45,13 +46,13 @@ def cosine_similarity(vec1: ndarray, vec2: ndarray) -> ndarray:
 
 
 def match_instruments_with_function(
-    instruments: List[Instrument],
-    query: str,
-    vectorisation_function: Callable,
-    mhc_questions: List = [],
-    mhc_all_metadatas: List = [],
-    mhc_embeddings: np.ndarray = np.zeros((0, 0)),
-    texts_cached_vectors: dict[str, List[float]] = {},
+        instruments: List[Instrument],
+        query: str,
+        vectorisation_function: Callable,
+        mhc_questions: List = [],
+        mhc_all_metadatas: List = [],
+        mhc_embeddings: np.ndarray = np.zeros((0, 0)),
+        texts_cached_vectors: dict[str, List[float]] = {},
 ) -> tuple:
     """
     Match instruments
@@ -70,6 +71,9 @@ def match_instruments_with_function(
     text_vectors: List[TextVector] = []
     for instrument in instruments:
         for question in instrument.questions:
+            if question.question_text is None or question.question_text.strip() == "":
+                continue  # skip empty questions
+
             question.instrument_id = instrument.instrument_id
             all_questions.append(question)
 

@@ -32,4 +32,5 @@ class FileType(str, Enum):
     pdf: str = 'pdf'
     xlsx: str = 'xlsx'
     txt: str = 'txt'
+    csv: str = 'csv'
     docx: str = 'docx'
