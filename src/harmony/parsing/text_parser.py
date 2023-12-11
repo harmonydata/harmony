@@ -37,6 +37,9 @@ from harmony.parsing.text_extraction.ensemble_named_entity_recogniser import ext
 from harmony.schemas.enums.file_types import FileType
 from harmony.schemas.requests.text import RawFile, Instrument, Question
 
+re_question_text_column = re.compile(r'(?i)(?:question|text|pergunta)')
+re_number_column = re.compile(r'(?i)(?:number|\bno)')
+
 
 def convert_text_to_instruments(file: RawFile) -> List[Instrument]:
     if file.file_type == FileType.txt or file.file_type == FileType.csv:  # text files not binary
@@ -74,7 +77,7 @@ def convert_text_to_instruments(file: RawFile) -> List[Instrument]:
         question_column = max(col_lengths, key=col_lengths.get)
 
         for col in df.columns:
-            if "question" in col.lower():
+            if re_question_text_column.match(col) and not re_number_column.findall(col):
                 question_column = col
                 break
         options_column = None
@@ -89,7 +92,7 @@ def convert_text_to_instruments(file: RawFile) -> List[Instrument]:
         questions = []
         for idx in range(len(df)):
             if numbers_column is not None:
-                question_no = df[numbers_column].iloc[idx]
+                question_no = str(df[numbers_column].iloc[idx])
             else:
                 question_no = "Q" + str(len(questions) + 1).zfill(3)
 
