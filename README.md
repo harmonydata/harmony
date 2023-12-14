@@ -33,7 +33,7 @@ You can run the walkthrough R notebook in Google Colab with a single click: <a h
 
 # The Harmony Project
 
-Harmony is a tool using AI which allows you to compare items from questionnaires and identify similar content. You can try Harmony at https://app.harmonydata.ac.uk and you can read our blog at https://harmonydata.ac.uk/blog/.
+Harmony is a tool using AI which allows you to compare items from questionnaires and identify similar content. You can try Harmony at https://harmonydata.ac.uk/app and you can read our blog at https://harmonydata.ac.uk/blog/.
 
 ## Who to contact?
 
@@ -45,7 +45,7 @@ You can contact Harmony team at https://harmonydata.ac.uk/, or Thomas Wood at ht
 
 ## 🖱 Looking to try Harmony in the browser?
 
-Visit: https://app.harmonydata.ac.uk/
+Visit: https://harmonydata.ac.uk/app/
 
 You can also visit our blog at https://harmonydata.ac.uk/
 
