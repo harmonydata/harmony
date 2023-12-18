@@ -204,6 +204,9 @@ def match_instruments_with_function(
                     ctrs[all_questions[idx].instrument_id] = Counter()
                 for topic in mhc_all_metadatas[a]["topics"]:
                     ctrs[all_questions[idx].instrument_id][topic] += 1
+                qt = mhc_questions[a].question_text
+                if qt is None or len(qt) < 3:  # Ignore empty entries in MHC questionnaires
+                    continue
                 all_questions[idx].nearest_match_from_mhc_auto = mhc_questions[a].dict()
 
             instrument_to_category = {}
