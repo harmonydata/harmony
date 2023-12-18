@@ -67,6 +67,15 @@ Download and install Java if you don't have it already. Download and install Apa
 java -jar tika-server-standard-2.3.0.jar
 ```
 
+## Requirements
+
+You need a Windows, Linux or Mac system with
+
+* Python 3.8 or above
+* the requirements in [requirements.txt](./requirements.txt)
+* Java (if you want to extract items from PDFs)
+* [Apache Tika](https://tika.apache.org/download.html) (if you want to extract items from PDFs)
+
 ## 🖥 Installing Harmony Python package
 
 You can install from [PyPI](https://pypi.org/project/harmonydata/).
