@@ -28,10 +28,18 @@ from collections import Counter
 from typing import List, Callable
 
 import numpy as np
+from numpy import dot, mat, matmul, ndarray
+from numpy.linalg import norm
 from harmony.matching.negator import negate
 from harmony.schemas.requests.text import Instrument
 from harmony.schemas.text_vector import TextVector
-from harmony.matching.matcher_utils import *
+
+def cosine_similarity(vec1: ndarray, vec2: ndarray) -> ndarray:
+    dp = dot(vec1, vec2.T)
+    m1 = mat(norm(vec1, axis=1))
+    m2 = mat(norm(vec2.T, axis=0))
+
+    return np.asarray(dp / matmul(m1.T, m2))
 
 def add_text_to_vec(text,texts_cached_vectors,text_vectors,is_negated_,is_query_):
     if text not in texts_cached_vectors.keys():
@@ -115,6 +123,15 @@ def create_full_text_vectors(all_questions,query,vectorisation_function,texts_ca
             text_vectors[index].vector = new_vectors_list.pop(0)    
     return text_vectors, new_vectors_dict
 
+def process_instruments(instruments):
+    return [instrument for instrument in instruments for q in instrument.questions if q.question_text is not None or q.question_text.strip() != ""]
+#    in_ = []
+#    for instrument in instruments:
+#        for question in instrument.questions:
+#            if question.question_text is not None and question.question_text.strip() != "":
+#                in_.append(instrument)
+#    return in_
+    
 #
 def match_instruments_with_function(
     instruments: List[Instrument],
@@ -136,8 +153,9 @@ def match_instruments_with_function(
     :param mhc_embeddings
     :param texts_cached_vectors: A dictionary of already cached vectors from texts (key is the text and value is the vector)
     """
-#    all_questions= [q.question for q in instrument.question for instrument in instruments]
-    all_questions = [instrument["question_text"] for instrument in instruments]
+    instruments = process_instruments(instruments)
+    all_questions = [q.question_text for instrument in instruments for q in instrument.questions]
+#    all_questions = [instrument["question_text"] for instrument in instruments]
 
     text_vectors,new_vectors_dict = create_full_text_vectors(all_questions,query,vectorisation_function,texts_cached_vectors)
     vectors_pos,vectors_neg = vectors_pos_neg(text_vectors)
@@ -153,7 +171,6 @@ def match_instruments_with_function(
 
     # Get similarity with polarity
     if vectors_pos.any():
-        print(len(vectors_neg),len(vectors_pos))
         pairwise_similarity = cosine_similarity(vectors_pos, vectors_pos)
         pairwise_similarity_neg1 = cosine_similarity(vectors_neg, vectors_pos)
         pairwise_similarity_neg2 = cosine_similarity(vectors_pos, vectors_neg)
