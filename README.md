@@ -181,6 +181,8 @@ Then go to http://localhost:3000 in your browser.
 
 Visit: https://github.com/harmonydata/harmonyapi
 
+* 📰 The code for training the PDF extraction is here: https://github.com/harmonydata/pdf-questionnaire-extraction
+
 ## Docker images
 
 If you are a Docker user, you can run Harmony from a pre-built Docker image.
