@@ -30,9 +30,11 @@ from typing import List, Callable
 import numpy as np
 from numpy import dot, mat, matmul, ndarray
 from numpy.linalg import norm
+
 from harmony.matching.negator import negate
 from harmony.schemas.requests.text import Instrument
 from harmony.schemas.text_vector import TextVector
+
 
 def cosine_similarity(vec1: ndarray, vec2: ndarray) -> ndarray:
     dp = dot(vec1, vec2.T)
@@ -41,7 +43,8 @@ def cosine_similarity(vec1: ndarray, vec2: ndarray) -> ndarray:
 
     return np.asarray(dp / matmul(m1.T, m2))
 
-def add_text_to_vec(text,texts_cached_vectors,text_vectors,is_negated_,is_query_):
+
+def add_text_to_vec(text, texts_cached_vectors, text_vectors, is_negated_, is_query_):
     if text not in texts_cached_vectors.keys():
         text_vectors.append(
             TextVector(
@@ -52,7 +55,7 @@ def add_text_to_vec(text,texts_cached_vectors,text_vectors,is_negated_,is_query_
         vector = texts_cached_vectors[text]
         text_vectors.append(
             TextVector(
-                text=question_text,
+                text=text,
                 vector=vector,
                 is_negated=is_negated_,
                 is_query=is_query_,
@@ -60,21 +63,23 @@ def add_text_to_vec(text,texts_cached_vectors,text_vectors,is_negated_,is_query_
         )
     return text_vectors
 
+
 def process_questions(questions):
     texts_cached_vectors: dict[str, List[float]] = {}
     text_vectors: List[TextVector] = []
     for question_text in questions:
-        text_vectors = add_text_to_vec(question_text,texts_cached_vectors,text_vectors,False,False)
+        text_vectors = add_text_to_vec(question_text, texts_cached_vectors, text_vectors, False, False)
         negated_text = negate(question_text, 'en')
-        text_vectors = add_text_to_vec(negated_text,texts_cached_vectors,text_vectors,True,False)
+        text_vectors = add_text_to_vec(negated_text, texts_cached_vectors, text_vectors, True, False)
     return text_vectors
 
 
-def vectorise_texts(text_vectors,vectorisation_function):
+def vectorise_texts(text_vectors, vectorisation_function):
     for index, text_dict in enumerate(text_vectors):
         if not text_dict.vector:
             text_vectors[index].vector = vectorisation_function([text_dict.text]).tolist()[0]
     return text_vectors
+
 
 def vectors_pos_neg(text_vectors):
     vectors_pos = np.array(
@@ -93,18 +98,17 @@ def vectors_pos_neg(text_vectors):
             if (x.is_negated is True and x.is_query is False)
         ]
     )
-    return vectors_pos,vectors_neg
+    return vectors_pos, vectors_neg
 
 
-
-def create_full_text_vectors(all_questions,query,vectorisation_function,texts_cached_vectors):
+def create_full_text_vectors(all_questions, query, vectorisation_function, texts_cached_vectors):
     # Create a list of text vectors
     text_vectors: List[TextVector] = []
     text_vectors = process_questions(all_questions)
 
     # Add query
     if query:
-        text_vectors = add_text_to_vec(query,texts_cached_vectors,text_vectors,False,True)
+        text_vectors = add_text_to_vec(query, texts_cached_vectors, text_vectors, False, True)
 
     # Texts with no cached vector
     texts_not_cached = [x.text for x in text_vectors if not x.vector]
@@ -112,7 +116,7 @@ def create_full_text_vectors(all_questions,query,vectorisation_function,texts_ca
     # Get vectors for all texts not cached
     new_vectors_list: List = vectorisation_function(texts_not_cached).tolist()
 
-     # Create a dictionary with new vectors
+    # Create a dictionary with new vectors
     new_vectors_dict = {}
     for vector, text in zip(new_vectors_list, texts_not_cached):
         new_vectors_dict[text] = vector
@@ -120,27 +124,24 @@ def create_full_text_vectors(all_questions,query,vectorisation_function,texts_ca
     # Add new vectors to all_texts
     for index, text_dict in enumerate(text_vectors):
         if not text_dict.vector:
-            text_vectors[index].vector = new_vectors_list.pop(0)    
+            text_vectors[index].vector = new_vectors_list.pop(0)
     return text_vectors, new_vectors_dict
 
+
 def process_instruments(instruments):
-    return [instrument for instrument in instruments for q in instrument.questions if q.question_text is not None or q.question_text.strip() != ""]
-#    in_ = []
-#    for instrument in instruments:
-#        for question in instrument.questions:
-#            if question.question_text is not None and question.question_text.strip() != "":
-#                in_.append(instrument)
-#    return in_
-    
+    return [instrument for instrument in instruments for q in instrument.questions if
+            q.question_text is not None or q.question_text.strip() != ""]
+
+
 #
 def match_instruments_with_function(
-    instruments: List[Instrument],
-    query: str,
-    vectorisation_function: Callable,
-    mhc_questions: List = [],
-    mhc_all_metadatas: List = [],
-    mhc_embeddings: np.ndarray = np.zeros((0, 0)),
-    texts_cached_vectors: dict[str, List[float]] = {},
+        instruments: List[Instrument],
+        query: str,
+        vectorisation_function: Callable,
+        mhc_questions: List = [],
+        mhc_all_metadatas: List = [],
+        mhc_embeddings: np.ndarray = np.zeros((0, 0)),
+        texts_cached_vectors: dict[str, List[float]] = {},
 ) -> tuple:
     """
     Match instruments
@@ -154,11 +155,12 @@ def match_instruments_with_function(
     :param texts_cached_vectors: A dictionary of already cached vectors from texts (key is the text and value is the vector)
     """
     instruments = process_instruments(instruments)
-    all_questions = [q.question_text for instrument in instruments for q in instrument.questions]
-#    all_questions = [instrument["question_text"] for instrument in instruments]
+    all_questions: List[TextVector] = [q.question_text for instrument in instruments for q in instrument.questions]
+    #    all_questions = [instrument["question_text"] for instrument in instruments]
 
-    text_vectors,new_vectors_dict = create_full_text_vectors(all_questions,query,vectorisation_function,texts_cached_vectors)
-    vectors_pos,vectors_neg = vectors_pos_neg(text_vectors)
+    text_vectors, new_vectors_dict = create_full_text_vectors(all_questions, query, vectorisation_function,
+                                                              texts_cached_vectors)
+    vectors_pos, vectors_neg = vectors_pos_neg(text_vectors)
 
     # Get similarity between the query (only one query?) and the questions
     if vectors_pos.any() and query:
@@ -203,6 +205,9 @@ def match_instruments_with_function(
                     ctrs[all_questions[idx].instrument_id] = Counter()
                 for topic in mhc_all_metadatas[a]["topics"]:
                     ctrs[all_questions[idx].instrument_id][topic] += 1
+                qt = mhc_questions[a].question_text
+                if qt is None or len(qt) < 3:  # Ignore empty entries in MHC questionnaires
+                    continue
                 all_questions[idx].nearest_match_from_mhc_auto = mhc_questions[a].dict()
 
             instrument_to_category = {}
