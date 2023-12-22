@@ -38,9 +38,9 @@ setuptools.setup(
     keywords="harmony, harmonisation, harmonization, harmonise, harmonize",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/harmonydata/harmony",
+    url="https://harmonydata.ac.uk",
     project_urls={
-        "Documentation": "https://harmonydata.org/",
+        "Documentation": "https://harmonydata.ac.uk/",
         "Bug Reports": "https://github.com/harmonydata/harmony/issues",
         "Source Code": "https://github.com/harmonydata/harmony",
         # 'Funding': '',
@@ -74,7 +74,7 @@ setuptools.setup(
         "openpyxl==3.1.2",
         "spacy==3.5.3",
         "wget==3.2",
-        "sentence_transformers==2.2.2"
+        "sentence-transformers==2.2.2"
     ],
     extras_require={
         "dev": ["check-manifest"],

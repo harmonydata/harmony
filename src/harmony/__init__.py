@@ -45,5 +45,5 @@ if os.environ.get("HARMONY_NO_MATCHING") is None or os.environ.get("HARMONY_NO_M
     from .matching.matcher import match_instruments_with_function
     try:
         from .matching.default_matcher import match_instruments
-    except:
+    except ModuleNotFoundError:
         print ("Warning: transformers not available. To use transformers, run pip install sentence-transformers")

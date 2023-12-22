@@ -2,3 +2,6 @@ include pyproject.toml
 include *.md
 include LICENSE
 recursive-include tests test*.py
+include *.cff
+include *.ipynb
+include requirements.txt

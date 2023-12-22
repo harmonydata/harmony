@@ -133,6 +133,13 @@ def process_instruments(instruments):
             q.question_text is not None or q.question_text.strip() != ""]
 
 
+#    in_ = []
+#    for instrument in instruments:
+#        for question in instrument.questions:
+#            if question.question_text is not None and question.question_text.strip() != "":
+#                in_.append(instrument)
+#    return in_
+
 #
 def match_instruments_with_function(
         instruments: List[Instrument],
