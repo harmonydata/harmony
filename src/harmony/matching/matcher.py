@@ -28,12 +28,11 @@ from collections import Counter
 from typing import List, Callable
 
 import numpy as np
-from numpy import dot, mat, matmul, ndarray
-from numpy.linalg import norm
-
 from harmony.matching.negator import negate
 from harmony.schemas.requests.text import Instrument
 from harmony.schemas.text_vector import TextVector
+from numpy import dot, mat, matmul, ndarray
+from numpy.linalg import norm
 
 
 def cosine_similarity(vec1: ndarray, vec2: ndarray) -> ndarray:
@@ -103,7 +102,6 @@ def vectors_pos_neg(text_vectors):
 
 def create_full_text_vectors(all_questions, query, vectorisation_function, texts_cached_vectors):
     # Create a list of text vectors
-    text_vectors: List[TextVector] = []
     text_vectors = process_questions(all_questions)
 
     # Add query
@@ -162,10 +160,14 @@ def match_instruments_with_function(
     :param texts_cached_vectors: A dictionary of already cached vectors from texts (key is the text and value is the vector)
     """
     instruments = process_instruments(instruments)
-    all_questions: List[TextVector] = [q.question_text for instrument in instruments for q in instrument.questions]
+    all_questions = []
+    for instrument in instruments:
+        all_questions.extend(instrument.questions)
+    # all_questions: List[Question] = all_questions
+    all_questions_str: List[str] = [q.question_text for q in all_questions]
     #    all_questions = [instrument["question_text"] for instrument in instruments]
 
-    text_vectors, new_vectors_dict = create_full_text_vectors(all_questions, query, vectorisation_function,
+    text_vectors, new_vectors_dict = create_full_text_vectors(all_questions_str, query, vectorisation_function,
                                                               texts_cached_vectors)
     vectors_pos, vectors_neg = vectors_pos_neg(text_vectors)
 
@@ -229,3 +231,4 @@ def match_instruments_with_function(
                 question.topics_auto = instrument_to_category[question.instrument_id]
 
     return all_questions, similarity_with_polarity, query_similarity, new_vectors_dict
+
