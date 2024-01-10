@@ -28,11 +28,12 @@ from collections import Counter
 from typing import List, Callable
 
 import numpy as np
+from numpy import dot, mat, matmul, ndarray
+from numpy.linalg import norm
+
 from harmony.matching.negator import negate
 from harmony.schemas.requests.text import Instrument
 from harmony.schemas.text_vector import TextVector
-from numpy import dot, mat, matmul, ndarray
-from numpy.linalg import norm
 
 
 def cosine_similarity(vec1: ndarray, vec2: ndarray) -> ndarray:
@@ -229,6 +230,8 @@ def match_instruments_with_function(
 
             for question in all_questions:
                 question.topics_auto = instrument_to_category[question.instrument_id]
+        else:
+            for question in all_questions:
+                question.topics_auto = []
 
     return all_questions, similarity_with_polarity, query_similarity, new_vectors_dict
-
