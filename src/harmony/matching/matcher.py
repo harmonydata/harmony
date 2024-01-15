@@ -28,12 +28,11 @@ from collections import Counter
 from typing import List, Callable
 
 import numpy as np
-from numpy import dot, mat, matmul, ndarray
-from numpy.linalg import norm
-
 from harmony.matching.negator import negate
 from harmony.schemas.requests.text import Instrument
 from harmony.schemas.text_vector import TextVector
+from numpy import dot, mat, matmul, ndarray
+from numpy.linalg import norm
 
 
 def cosine_similarity(vec1: ndarray, vec2: ndarray) -> ndarray:
@@ -127,18 +126,6 @@ def create_full_text_vectors(all_questions, query, vectorisation_function, texts
     return text_vectors, new_vectors_dict
 
 
-def process_instruments(instruments):
-    return [instrument for instrument in instruments for q in instrument.questions if
-            q.question_text is not None or q.question_text.strip() != ""]
-
-
-#    in_ = []
-#    for instrument in instruments:
-#        for question in instrument.questions:
-#            if question.question_text is not None and question.question_text.strip() != "":
-#                in_.append(instrument)
-#    return in_
-
 #
 def match_instruments_with_function(
         instruments: List[Instrument],
@@ -160,7 +147,6 @@ def match_instruments_with_function(
     :param mhc_embeddings
     :param texts_cached_vectors: A dictionary of already cached vectors from texts (key is the text and value is the vector)
     """
-    instruments = process_instruments(instruments)
     all_questions = []
     for instrument in instruments:
         all_questions.extend(instrument.questions)
