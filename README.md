@@ -31,6 +31,8 @@
 
 # Quick start with the code
 
+[Read our guide to contributing to Harmony here](https://harmonydata.ac.uk/contributing-to-harmony/).
+
 You can run the walkthrough Python notebook in [Google Colab](https://colab.research.google.com/github/harmonydata/harmony/blob/main/Harmony_example_walkthrough.ipynb) with a single click: <a href="https://colab.research.google.com/github/harmonydata/harmony/blob/main/Harmony_example_walkthrough.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
 
 You can also download an R markdown notebook to run in R Studio: <a href="https://harmonydata.ac.uk/harmony_r_example.nb.html" target="_parent"><img src="https://img.shields.io/badge/RStudio-4285F4" alt="Open In R Studio"/></a>
