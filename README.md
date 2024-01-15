@@ -192,7 +192,7 @@ If you are a Docker user, you can run Harmony from a pre-built Docker image.
 
 ## Contributing to Harmony
 
-If you'd like to contribute to this project, you can contact us at https://harmonydata.ac.uk/ or make a pull request on our [Github repository](https://github.com/harmonydata/harmonyapi). You can also [raise an issue](https://github.com/harmony/harmony/issues). 
+If you'd like to contribute to this project, you can contact us at https://harmonydata.ac.uk/ or make a pull request on our [Github repository](https://github.com/harmonydata/harmonyapi). You can also [raise an issue](https://github.com/harmonydata/harmony/issues). 
 
 ## Developing Harmony
 
