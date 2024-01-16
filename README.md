@@ -31,7 +31,7 @@
 
 # Quick start with the code
 
-[Read our guide to contributing to Harmony here](https://harmonydata.ac.uk/contributing-to-harmony/).
+[Read our guide to contributing to Harmony here](https://harmonydata.ac.uk/contributing-to-harmony/) or read [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 You can run the walkthrough Python notebook in [Google Colab](https://colab.research.google.com/github/harmonydata/harmony/blob/main/Harmony_example_walkthrough.ipynb) with a single click: <a href="https://colab.research.google.com/github/harmonydata/harmony/blob/main/Harmony_example_walkthrough.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
 
@@ -202,7 +202,7 @@ If you'd like to contribute to this project, you can contact us at https://harmo
 
 Test code is in **tests/** folder using [unittest](https://docs.python.org/3/library/unittest.html).
 
-The testing tool `tox` is used in the automation with GitHub Actions CI/CD.
+The testing tool `tox` is used in the automation with GitHub Actions CI/CD. **Since the PDF extraction also needs Java and Tika installed, you cannot run the unit tests without first installing Java and Tika. See above for instructions.**
 
 ### 🧪 Use tox locally
 
@@ -221,7 +221,7 @@ The automated tests are run against several Python versions, but on your machine
 tox -e py39
 ```
 
-Thanks to GitHub Actions' automated process, you don't need to generate distribution files locally. But if you insist, click to read the "Generate distribution files" section.
+Thanks to GitHub Actions' automated process, you don't need to generate distribution files locally. 
 
 ### ⚙️Continuous integration/deployment to PyPI
 
