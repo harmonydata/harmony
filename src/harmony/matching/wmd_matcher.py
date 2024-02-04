@@ -1,6 +1,7 @@
 from wmd import WMD
 import numpy as np
 import math
+import libwmdrelax
 
 def euclidean_dist(point1, point2):
     if len(point1) != len(point2):
@@ -22,19 +23,22 @@ def dist(vecs1,vecs2):
         for j in range(i):
             dist_[i,j] = dist_[j,i] = euclidean_dist(vec_union[i],vec_union[j])
 
-    nw1 = [1 for i in range(n1)]+[0 for i in range(n2)]
-    nw2 = [1 for i in range(n2)]+[0 for i in range(n1)]
-    return dist_,nw1,nw2
+    nw1 = [1. for i in range(n1)]+[0. for i in range(n2)]
+    nw2 = [1. for i in range(n2)]+[0. for i in range(n1)]
+    return np.array(dist_,dtype=np.float32),np.array(nw1,dtype=np.float32),np.array(nw2,dtype=np.float32)
 
 
 def pars_dist_emd_emdrelaxed(par1,par2,vectorisation_function):
-    relax_cache = libwmdrelax.emd_relaxed_cache_init(1e5) 
-    cache = libwmdrelax.emd_cache_init(1e5) 
+    relax_cache = libwmdrelax.emd_relaxed_cache_init(int(100)) 
+    cache = libwmdrelax.emd_cache_init(int(100)) 
  
-    vecs1,vecs2 = par_to_vecs(par1),par_to_vecs(par2)
+    vecs1,vecs2 = par_to_vecs(par1,vectorisation_function),par_to_vecs(par2,vectorisation_function)
     dist_,nw1,nw2 = dist(vecs1,vecs2)
-    emd = libwmdrelax.emd(nw1,nw2,dist_,)
-    emd_relaxed = libwmrelax.emd_relaxed(nw1,nw2,dist_,relax_cache)
+    emd = libwmdrelax.emd(nw1,nw2,dist_,cache)
+    emd_relaxed = libwmdrelax.emd_relaxed(nw1,nw2,dist_,relax_cache)
+    return emd,emd_relaxed
+
+   
 
 
     

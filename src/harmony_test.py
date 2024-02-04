@@ -1,11 +1,9 @@
 import harmony
 import numpy as np
-#harmony.download_models()
 from harmony import match_instruments
-#from harmony.schemes.requests.text import Instrument
-#from harmony import match_instruments
-#
 import json
+import harmony.matching.wmd_matcher
+from wmd import WMD
 
 def import_():
     instruments = []
@@ -46,9 +44,17 @@ def test_match_instruments_with_function():
     np.savetxt("sim_with_polarity.txt", similarity_with_polarity, fmt='%d', delimiter='\t')
 
 
+def test_wwd():
+    vectorisation_function = harmony.matching.default_matcher.convert_texts_to_vector
+    par1 = ["I want to go outside","oh outside is nice"]
+    par2 = ["Who wants to go outside","oh the dog wants to go outside"]
+    emd,emd_relaxed = harmony.matching.wmd_matcher.pars_dist_emd_emdrelaxed(par1,par2,vectorisation_function)
+    print(emd)
+    print(emd_relaxed)
 
+test_wwd()
+ 
 
-test_match_instruments_with_function()
 
 
 
