@@ -47,8 +47,12 @@ def test_match_instruments_with_function():
 def test_wwd():
     vectorisation_function = harmony.matching.default_matcher.convert_texts_to_vector
     par1 = ["I want to go outside","oh outside is nice"]
-    par2 = ["Who wants to go outside","oh the dog wants to go outside"]
-    emd,emd_relaxed = harmony.matching.wmd_matcher.pars_dist_emd_emdrelaxed(par1,par2,vectorisation_function)
+    par2 = ["I want to go outside maybe","oh outside is nice"]
+    par3 = ["You are a dog", "I love dogs"]
+    par4 = ["I am sad","are you sad"]
+ 
+#    par2 = ["Who wants to go outside","oh the dog wants to go outside"]
+    emd,emd_relaxed = harmony.matching.wmd_matcher.pars_dist_emd_emdrelaxed(par4,par3,vectorisation_function)
     print(emd)
     print(emd_relaxed)
 

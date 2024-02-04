@@ -24,7 +24,7 @@ def dist(vecs1,vecs2):
             dist_[i,j] = dist_[j,i] = euclidean_dist(vec_union[i],vec_union[j])
 
     nw1 = [1. for i in range(n1)]+[0. for i in range(n2)]
-    nw2 = [1. for i in range(n2)]+[0. for i in range(n1)]
+    nw2 = [0. for i in range(n1)] +[1. for i in range(n2)]
     return np.array(dist_,dtype=np.float32),np.array(nw1,dtype=np.float32),np.array(nw2,dtype=np.float32)
 
 
