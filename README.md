@@ -21,7 +21,7 @@
 [![forks](https://img.shields.io/github/forks/harmonydata/harmony)](https://github.com/harmonydata/harmony/forks)
 [![docker](https://img.shields.io/badge/docker-pull-blue.svg?logo=docker&logoColor=white)](https://hub.docker.com/r/harmonydata/harmonyapi)
 
-You can also join [our Discord server](https://discord.gg/harmonydata)!
+You can also join [our Discord server](https://discord.gg/harmonydata)! If you found Harmony helpful, you can [leave us a review](https://g.page/r/CaRWc2ViO653EBM/review)!
 
 # What does Harmony do?
 
