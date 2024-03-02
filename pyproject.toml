@@ -1,3 +1,58 @@
+[project]
+name = "harmonydata"
+version = "0.5.1"
+description = "Harmony Tool for Retrospective Data Harmonisation"
+readme = "README.md"
+keywords = [
+  "harmony",
+  "harmonisation",
+  "harmonization",
+  "harmonise",
+]
+license = { file = "LICENSE" }
+maintainers = [
+  { name = "Thomas Wood", email = "thomas@fastdatascience.com" },
+]
+authors = [
+    { name = "Thomas Wood", email = "thomas@fastdatascience.com" },
+]
+requires-python = ">=3.6,<3.12"
+classifiers=[
+    # see https://pypi.org/classifiers/
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Build Tools",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3 :: Only",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+# core dependencies of harmony
+# this set should be kept minimal!
+dependencies = [
+    "pydantic==1.10.7; python_version < '3.12'",
+    "pandas==2.0.0; python_version < '3.12'",
+    "tika==2.6.0; python_version < '3.12'",
+    "lxml==4.9.2; python_version < '3.12'",
+    "langdetect==1.0.9; python_version < '3.12'",
+    "XlsxWriter==3.0.9; python_version < '3.12'",
+    "openpyxl==3.1.2; python_version < '3.12'",
+    "spacy==3.5.3; python_version < '3.12'",
+    "wget==3.2; python_version < '3.12'",
+    "sentence-transformers==2.2.2; python_version < '3.12'"
+]
+
+[project.optional-dependencies]
+
+# dev - the developer dependency set, for contributors to harmony
+dev = ["check-manifest"]
+
 [build-system]
 requires = ["setuptools>=46.4.0", "wheel"]
 build-backend = "setuptools.build_meta"
