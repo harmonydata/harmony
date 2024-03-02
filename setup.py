@@ -63,7 +63,7 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    python_requires=">=3.6",
+    python_requires=">=3.6, <3.12",
     install_requires=[
         "pydantic==1.10.7",
         "pandas==2.0.0",
