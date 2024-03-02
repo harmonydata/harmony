@@ -53,6 +53,11 @@ dependencies = [
 # dev - the developer dependency set, for contributors to harmony
 dev = ["check-manifest", "pytest"]
 
+[project.urls]
+"Documentation" = "https://harmonydata.ac.uk/"
+"Bug Reports" = "https://github.com/harmonydata/harmony/issues"
+"Source Code" = "https://github.com/harmonydata/harmony"
+
 [build-system]
 requires = ["setuptools>=46.4.0", "wheel"]
 build-backend = "setuptools.build_meta"
