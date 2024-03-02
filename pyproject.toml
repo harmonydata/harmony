@@ -51,7 +51,7 @@ dependencies = [
 [project.optional-dependencies]
 
 # dev - the developer dependency set, for contributors to harmony
-dev = ["check-manifest"]
+dev = ["check-manifest", "pytest"]
 
 [build-system]
 requires = ["setuptools>=46.4.0", "wheel"]
