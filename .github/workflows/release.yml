@@ -19,7 +19,6 @@ jobs:
           python3 -m
           pip install
           build
-          --user
       - name: Build and publish
         env:
           TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
