@@ -160,7 +160,7 @@ from harmony import match_instruments_with_function, example_instruments
 model_name = "text-embedding-ada-002"
 def convert_texts_to_vector(texts):
     vectors = openai.Embedding.create(input = texts, model=model_name)['data']
-    return [vectors[i]["embedding"] for i in range(len(vectors))]
+    return np.asarray([vectors[i]["embedding"] for i in range(len(vectors))])
 instruments = example_instruments["CES_D English"], example_instruments["GAD-7 Portuguese"]
 all_questions, similarity, query_similarity, new_vectors_dict = match_instruments_with_function(instruments, None, convert_texts_to_vector)
 ```
