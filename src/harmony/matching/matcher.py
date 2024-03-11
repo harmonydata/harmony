@@ -207,7 +207,7 @@ def match_instruments_with_function(
                     ctrs[all_questions[idx].instrument_id][topic] += 1
                 all_questions[idx].nearest_match_from_mhc_auto = mhc_questions[mhc_item_idx].dict()
                 strength_of_match = similarities_mhc[idx, mhc_item_idx]
-                all_questions[idx].topics_strengths = {topic: strength_of_match}
+                all_questions[idx].topics_strengths = {topic: float(strength_of_match)}
 
             instrument_to_category = {}
             for instrument_id, counts in ctrs.items():
