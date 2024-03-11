@@ -64,6 +64,7 @@ class Question(BaseModel):
     instrument_id: str = Field(None, description="Unique identifier for the instrument (UUID-4)")
     instrument_name: str = Field(None, description="Human readable name for the instrument")
     topics_auto: list = Field(None, description="Automated list of topics identified by model")
+    topics_strengths: dict = Field(None, description="Automated list of topics identified by model with strength of topic")
     nearest_match_from_mhc_auto: dict = Field(None, description="Automatically identified nearest MHC match")
 
     class Config:
