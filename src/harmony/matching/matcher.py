@@ -196,15 +196,18 @@ def match_instruments_with_function(
             similarities_mhc = cosine_similarity(vectors_pos, mhc_embeddings)
 
             ctrs = {}
-            for idx, a in enumerate(np.argmax(similarities_mhc, axis=1)):
+            top_mhc_match_ids = np.argmax(similarities_mhc, axis=1)
+            for idx, mhc_item_idx in enumerate(top_mhc_match_ids):
+                question_text = mhc_questions[mhc_item_idx].question_text
+                if question_text is None or len(question_text) < 3:  # Ignore empty entries in MHC questionnaires
+                    continue
                 if all_questions[idx].instrument_id not in ctrs:
                     ctrs[all_questions[idx].instrument_id] = Counter()
-                for topic in mhc_all_metadatas[a]["topics"]:
+                for topic in mhc_all_metadatas[mhc_item_idx]["topics"]:
                     ctrs[all_questions[idx].instrument_id][topic] += 1
-                qt = mhc_questions[a].question_text
-                if qt is None or len(qt) < 3:  # Ignore empty entries in MHC questionnaires
-                    continue
-                all_questions[idx].nearest_match_from_mhc_auto = mhc_questions[a].dict()
+                all_questions[idx].nearest_match_from_mhc_auto = mhc_questions[mhc_item_idx].dict()
+                strength_of_match = similarities_mhc[idx, mhc_item_idx]
+                all_questions[idx].topics_strengths = {topic: float(strength_of_match)}
 
             instrument_to_category = {}
             for instrument_id, counts in ctrs.items():
