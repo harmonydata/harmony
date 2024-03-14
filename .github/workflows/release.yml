@@ -3,6 +3,7 @@ name: Release Pypi package
 on:
   release:
     types: [created]
+  workflow_dispatch:
 
 jobs:
   deploy:
