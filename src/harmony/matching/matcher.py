@@ -156,6 +156,7 @@ def match_instruments_with_function(
 
     text_vectors, new_vectors_dict = create_full_text_vectors(all_questions_str, query, vectorisation_function,
                                                               texts_cached_vectors)
+    # get vectors for all orignal texts and vectors for negated texts
     vectors_pos, vectors_neg = vectors_pos_neg(text_vectors)
 
     # Get similarity between the query (only one query?) and the questions
@@ -168,14 +169,16 @@ def match_instruments_with_function(
         query_similarity = np.array([])
 
     # Get similarity with polarity
-    if vectors_pos.any():
+    if vectors_pos.any(): # NOTE: Should an error be thrown if vectors_pos is empty?
         pairwise_similarity = cosine_similarity(vectors_pos, vectors_pos)
+        # NOTE: Similarity of (vectors_neg, vectors_pos) & (vectors_pos, vectors_neg) should be the same
         pairwise_similarity_neg1 = cosine_similarity(vectors_neg, vectors_pos)
         pairwise_similarity_neg2 = cosine_similarity(vectors_pos, vectors_neg)
         pairwise_similarity_neg_mean = np.mean(
             [pairwise_similarity_neg1, pairwise_similarity_neg2], axis=0
         )
 
+        # Polarity of 1 means the sentence shouldn't be negated, -1 means it should
         similarity_difference = pairwise_similarity - pairwise_similarity_neg_mean
         similarity_polarity = np.sign(similarity_difference)
 
@@ -186,6 +189,7 @@ def match_instruments_with_function(
         similarity_max = np.max(
             [pairwise_similarity, pairwise_similarity_neg_mean], axis=0
         )
+        # NOTE: A value of -1 and +1 both mean sentences are similar, 0 means not similar
         similarity_with_polarity = similarity_max * similarity_polarity
     else:
         similarity_with_polarity = np.array([])
