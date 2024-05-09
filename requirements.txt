@@ -7,4 +7,5 @@ XlsxWriter==3.0.9
 openpyxl==3.1.2
 spacy==3.5.3
 wget==3.2
-sentence-transformers==2.2.2
+sentence-transformers==2.6.1
+scikit-learn==1.4.1.post1

@@ -30,9 +30,13 @@ from harmony.parsing.util.tika_wrapper import parse_pdf_to_plain_text
 # from harmony.parsing.util.tesseract_wrapper import parse_image_pdf_to_plain_text
 # from harmony.parsing.util.camelot_wrapper import parse_pdf_to_tables
 from harmony.schemas.requests.text import RawFile, Instrument
-
+from harmony.parsing.create_sample_submission_amol import extract_questions
 def convert_pdf_to_instruments(file: RawFile) -> Instrument:
+    print(file)
     if not file.text_content:
         file.text_content = parse_pdf_to_plain_text(file.content)
-
-    return convert_text_to_instruments(file)
+    
+    print(file.tables)
+    question_list = extract_questions(file.text_content, file.tables)
+    return question_list
+    # return convert_text_to_instruments(file)
