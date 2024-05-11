@@ -42,7 +42,7 @@ if (
     sentence_transformer_path = os.environ["HARMONY_SENTENCE_TRANSFORMER_PATH"]
 else:
     sentence_transformer_path = (
-        "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
+        "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
     )
 
 model = SentenceTransformer(sentence_transformer_path)
