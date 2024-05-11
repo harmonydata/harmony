@@ -46,7 +46,7 @@ mhc_metadata = [{'topics': ['alcohol use']},
 
 mhc_questions_as_text = ["Have you ever felt annoyed by criticism of your drinking?", "Have you recently"]
 
-model = SentenceTransformer('sentence-transformers/paraphrase-multilingual-mpnet-base-v2')
+model = SentenceTransformer('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')
 
 mhc_embeddings = model.encode(np.asarray(mhc_questions_as_text))
 
