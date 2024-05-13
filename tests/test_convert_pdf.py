@@ -25,7 +25,10 @@ SOFTWARE.
 
 '''
 
+import sys
 import unittest
+
+sys.path.append("../src")
 
 from harmony import convert_pdf_to_instruments
 from harmony.schemas.requests.text import RawFile
@@ -39,6 +42,7 @@ pdf_gad_7_2_questions = RawFile.parse_obj({
 })
 
 download_models()
+
 
 class TestConvertPdf(unittest.TestCase):
 

@@ -25,7 +25,10 @@ SOFTWARE.
 
 '''
 
+import sys
 import unittest
+
+sys.path.append("../src")
 
 from harmony import convert_excel_to_instruments
 from harmony.schemas.requests.text import RawFile

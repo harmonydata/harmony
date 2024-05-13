@@ -25,7 +25,10 @@ SOFTWARE.
 
 '''
 
+import sys
 import unittest
+
+sys.path.append("../src")
 
 import numpy as np
 from sentence_transformers import SentenceTransformer

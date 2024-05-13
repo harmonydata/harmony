@@ -25,7 +25,10 @@ SOFTWARE.
 
 '''
 
+import sys
 import unittest
+
+sys.path.append("../src")
 
 from harmony import match_instruments
 from harmony.schemas.requests.text import Instrument, Question
@@ -36,8 +39,8 @@ instrument_en = Instrument(questions=questions_en)
 
 questions_pt = [Question(
     question_text="Durante as últimas 2 semanas, com que freqüência você foi incomodado/a pelos problemas abaixo?"),
-                Question(
-                    question_text="Durante as últimas 2 semanas, com que freqüência você foi incomodado/a pelos problemas abaixo?")]
+    Question(
+        question_text="Durante as últimas 2 semanas, com que freqüência você foi incomodado/a pelos problemas abaixo?")]
 instrument_pt = Instrument(questions=questions_pt, language="pt")
 
 instrument_1 = Instrument.parse_obj({
