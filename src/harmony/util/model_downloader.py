@@ -47,28 +47,28 @@ def download_models(is_force=False):
     """
     Downloads spaCy models to local path HARMONY_SPACY_PATH, defaulting to home directory.
     """
-    local_path = os.getenv("HARMONY_SPACY_PATH", os.path.expanduser("~") + "/harmony")
+    local_path = os.getenv("HARMONY_MODELS_PATH", os.path.expanduser("~") + "/harmony")
 
     print(
         "Downloading spaCy models to " + local_path + ".\nSet environment variable HARMONY_SPACY_PATH if you want to change model file location.")
 
     # Base URL of the model files in Azure Blob Storage static hosted site.
-    url = "https://harmonyapistorage.z33.web.core.windows.net/harmony_spacy_models.tar.bz2"
+    url = "https://harmonyapistorage.z33.web.core.windows.net/models.zip"
 
-    if os.path.exists(local_path + "/harmony_spacy_models"):
+    if os.path.exists(local_path + "/models"):
         if not is_force:
-            print("Error: Path already exists on your computer: ", local_path + "/harmony_spacy_models")
+            print("Error: Path already exists on your computer: ", local_path + "/models")
             print("Exiting spaCy model downloader.\nRun download_models(True) to force redownload.")
             return
         else:
-            print("Removing ", local_path + "/harmony_spacy_models")
-            shutil.rmtree(local_path + "/harmony_spacy_models")
-            print("Removed ", local_path + "/harmony_spacy_models")
+            print("Removing ", local_path + "/models")
+            shutil.rmtree(local_path + "/models")
+            print("Removed ", local_path + "/models")
 
     if not os.path.exists(local_path):
         os.makedirs(local_path)
 
-    tmpfile = local_path + "/harmony_spacy_models.tar.bz2"
+    tmpfile = local_path + "/models.zip"
 
     print(f"Downloading {url} to {tmpfile}...")
 
