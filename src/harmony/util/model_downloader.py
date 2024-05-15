@@ -31,6 +31,7 @@ import sys
 import tarfile
 
 import wget
+import zipfile
 
 
 def bar_custom(current, total, width=80):
@@ -77,8 +78,8 @@ def download_models(is_force=False):
     print(f"Downloaded {url} to {tmpfile}.")
     print(f"Unzipping {tmpfile}...")
 
-    file = tarfile.open(tmpfile)
-    file.extractall(local_path)
+    with zipfile.ZipFile(tmpfile, 'r') as zip_ref:
+        zip_ref.extractall(local_path)
 
     print(f"\tWrote models to {local_path}")
 
