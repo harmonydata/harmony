@@ -29,14 +29,31 @@ from harmony.parsing.text_parser import convert_text_to_instruments
 from harmony.parsing.util.tika_wrapper import parse_pdf_to_plain_text
 # from harmony.parsing.util.tesseract_wrapper import parse_image_pdf_to_plain_text
 # from harmony.parsing.util.camelot_wrapper import parse_pdf_to_tables
-from harmony.schemas.requests.text import RawFile, Instrument
-from harmony.parsing.create_sample_submission_amol import extract_questions
+from harmony.schemas.requests.text import RawFile, Instrument, Question
+from harmony.parsing.prediction_amol import extract_questions
 def convert_pdf_to_instruments(file: RawFile) -> Instrument:
-    print(file)
+    # print(file)
     if not file.text_content:
         file.text_content = parse_pdf_to_plain_text(file.content)
     
-    print(file.tables)
+    # print(file.tables)
     question_list = extract_questions(file.text_content, file.tables)
-    return question_list
+
+    questions = []
+    for question_no, question_text in enumerate(question_list):
+        question =  Question(question_no=str(question_no+1), question_intro="", question_text=question_text,
+                                options=[])
+        questions.append(question)
+    # print(question_list)
+    instrument = Instrument(
+        file_id=file.file_id,
+        instrument_id=file.file_id + "_0",
+        instrument_name=file.file_name,
+        file_name=file.file_name,
+        file_type=file.file_type,
+        file_section="",
+        language="en",
+        questions=questions
+    )
+    return [instrument]
     # return convert_text_to_instruments(file)
