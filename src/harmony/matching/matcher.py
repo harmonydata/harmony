@@ -44,7 +44,7 @@ def cosine_similarity(vec1: ndarray, vec2: ndarray) -> ndarray:
 
 
 def add_text_to_vec(text, texts_cached_vectors, text_vectors, is_negated_, is_query_):
-    if text not in texts_cached_vectors.keys():
+    if text not in texts_cached_vectors:
         text_vectors.append(
             TextVector(
                 text=text, vector=[], is_negated=is_negated_, is_query=is_query_
@@ -63,8 +63,7 @@ def add_text_to_vec(text, texts_cached_vectors, text_vectors, is_negated_, is_qu
     return text_vectors
 
 
-def process_questions(questions):
-    texts_cached_vectors: dict[str, List[float]] = {}
+def process_questions(questions, texts_cached_vectors):
     text_vectors: List[TextVector] = []
     for question_text in questions:
         text_vectors = add_text_to_vec(question_text, texts_cached_vectors, text_vectors, False, False)
@@ -102,7 +101,7 @@ def vectors_pos_neg(text_vectors):
 
 def create_full_text_vectors(all_questions, query, vectorisation_function, texts_cached_vectors):
     # Create a list of text vectors
-    text_vectors = process_questions(all_questions)
+    text_vectors = process_questions(all_questions, texts_cached_vectors)
 
     # Add query
     if query:
