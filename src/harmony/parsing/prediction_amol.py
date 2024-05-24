@@ -52,11 +52,11 @@ model_fine_tuned = AutoModelForTokenClassification.from_pretrained("harmony/src/
 bert_tokenizer = BertTokenizerFast.from_pretrained("harmony/src/harmony/models/tokenizer")
 nlp = pipeline("ner", model=model_fine_tuned, tokenizer=bert_tokenizer)
 
-tokenizer = AutoTokenizer.from_pretrained('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')
+tokenizer = AutoTokenizer.from_pretrained('sentence-transformers/paraphrase-multilingual-mpnet-base-v2')
 class LSTMClassifier(nn.Module):
     def __init__(self, hidden_dim, output_dim):
         super(LSTMClassifier, self).__init__()
-        self.encoder = AutoModel.from_pretrained('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')
+        self.encoder = AutoModel.from_pretrained('sentence-transformers/paraphrase-multilingual-mpnet-base-v2')
         for param in self.encoder.parameters():
             param.requires_grad = False
         self.lstm = nn.LSTM(self.encoder.config.hidden_size, hidden_dim, batch_first=True, bidirectional=True)
