@@ -44,12 +44,15 @@ import torch
 from transformers import BertTokenizerFast
 from transformers import AutoModelForTokenClassification
 from transformers import pipeline
-
+# Default local path for harmony models
+local_path = os.getenv("HARMONY_MODELS_PATH", os.path.expanduser("~") + "/harmony")
 
 ####Loading models
-
-model_fine_tuned = AutoModelForTokenClassification.from_pretrained("harmony/src/harmony/models/ner_model")
-bert_tokenizer = BertTokenizerFast.from_pretrained("harmony/src/harmony/models/tokenizer")
+ner_model_path = os.path.join(local_path, "ner_model")
+tokenizer_path = os.path.join(local_path, "tokenizer")
+print(ner_model_path)
+model_fine_tuned = AutoModelForTokenClassification.from_pretrained(ner_model_path)
+bert_tokenizer = BertTokenizerFast.from_pretrained(tokenizer_path)
 nlp = pipeline("ner", model=model_fine_tuned, tokenizer=bert_tokenizer)
 
 tokenizer = AutoTokenizer.from_pretrained('sentence-transformers/paraphrase-multilingual-mpnet-base-v2')
@@ -73,14 +76,14 @@ sentence_model = SentenceTransformer('sentence-transformers/paraphrase-multiling
 def create_embeddings(X):
     return np.array(sentence_model.encode(X, show_progress_bar=True))
 
-with open(r'harmony\src\harmony\models\json_xgb.pkl', 'rb') as file:
+with open(rf'{local_path}\json_xgb.pkl', 'rb') as file:
             json_model = pickle.load(file)
 
-with open(r'harmony\src\harmony\models\stack_model_with_undersampling.pkl', 'rb') as file:
+with open(rf'{local_path}\stack_model_with_undersampling.pkl', 'rb') as file:
                 text_model = pickle.load(file)
 
 model  = LSTMClassifier(128, 1)
-model.load_state_dict(torch.load(r"harmony\src\harmony\models\model.pth", map_location=torch.device('cpu')))
+model.load_state_dict(torch.load(rf'{local_path}\model.pth', map_location=torch.device('cpu')))
 model.eval()
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
