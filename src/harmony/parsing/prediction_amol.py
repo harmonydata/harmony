@@ -76,14 +76,14 @@ sentence_model = SentenceTransformer('sentence-transformers/paraphrase-multiling
 def create_embeddings(X):
     return np.array(sentence_model.encode(X, show_progress_bar=True))
 
-with open(rf'{local_path}\json_xgb.pkl', 'rb') as file:
+with open(os.path.join(local_path, "json_xgb.pkl"), 'rb') as file:
             json_model = pickle.load(file)
 
-with open(rf'{local_path}\stack_model_with_undersampling.pkl', 'rb') as file:
+with open(os.path.join(local_path, "stack_model_with_undersampling.pkl"), 'rb') as file:
                 text_model = pickle.load(file)
 
 model  = LSTMClassifier(128, 1)
-model.load_state_dict(torch.load(rf'{local_path}\model.pth', map_location=torch.device('cpu')))
+model.load_state_dict(torch.load(os.path.join(local_path, "model.pth"), map_location=torch.device('cpu')))
 model.eval()
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
