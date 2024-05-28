@@ -235,12 +235,12 @@ def find_questions(text, json_data, lstm=False):
     df = txt_to_df(text)
     df = combine_text_rows(df)
     #regex to find questions
-    pattern = r'(^.*(?:who|what|when|where|why|how|\?)$)|(^\d+\.\sI.*\.$)'
-    df['Text'] = df['Text'].str.strip()
-    mask_df = df['Text'].str.contains(pattern, regex=True)
-    valid_questions = df[mask_df]
-    final_questions.extend(valid_questions['Text'].tolist())
-    df = df[~mask_df]
+    # pattern = r'(^.*(?:who|what|when|where|why|how|\?)$)|(^\d+\.\sI.*\.$)'
+    # df['Text'] = df['Text'].str.strip()
+    # mask_df = df['Text'].str.contains(pattern, regex=True)
+    # valid_questions = df[mask_df]
+    # final_questions.extend(valid_questions['Text'].tolist())
+    # df = df[~mask_df]
     if not df.empty:
         if lstm:
              # Ensure model is on the correct device
