@@ -26,10 +26,8 @@ SOFTWARE.
 '''
 
 import spacy
-import re
 
 nlp = spacy.blank("en")
-
 
 
 def get_change_en(doc) -> dict:
@@ -81,15 +79,6 @@ def get_change_pt(doc) -> dict:
         return result
     return {0: ("insert_before", "não")}
 
-def get_change_fr(doc) -> dict:
-    """
-    Identify how to change a French sentence from positive to negative. Note that negative to positive
-    is not currently supported.
-    :param doc:
-    :return:
-    """
-    return negate_french_sentence(doc)
-
 
 def get_change_es(doc) -> dict:
     """
@@ -98,7 +87,8 @@ def get_change_es(doc) -> dict:
     :return:
     """
     for tok in doc:
-        if tok.text.lower() in {"siempre", "bastante", "realmente", "muy", "mucho", "totalmente", "totalmente", "absolutamente",
+        if tok.text.lower() in {"siempre", "bastante", "realmente", "muy", "mucho", "totalmente", "totalmente",
+                                "absolutamente",
                                 "completamente",
                                 "frecuentemente", "frequentemente", "veces"}:
             return {tok.i: ("replace", "nunca")}
@@ -110,7 +100,6 @@ def get_change_es(doc) -> dict:
     return {0: ("insert_before", "no")}
 
 
-
 def get_change_it(doc) -> dict:
     """
     # Team Cheemu: Identify how to change an Italian sentence from positive to negative or vice versa.
@@ -118,7 +107,8 @@ def get_change_it(doc) -> dict:
     :return:
     """
     for tok in doc:
-        if tok.text.lower() in {"sempre", "abbastanza", "realmente", "davvero", "veramente", "molto", "molta", "molti", "molte", "totalmente", "assolutamente",
+        if tok.text.lower() in {"sempre", "abbastanza", "realmente", "davvero", "veramente", "molto", "molta", "molti",
+                                "molte", "totalmente", "assolutamente",
                                 "completamente",
                                 "frequentemente", "qualche volta", "a volte", "ogni tanto"}:
             return {tok.i: ("replace", "mai")}
@@ -126,11 +116,13 @@ def get_change_it(doc) -> dict:
             return {tok.i: ("replace", "")}
     result = {}
     for tok in doc:
-        if tok.text.lower() in {"è", "sono", "ero", "erano", "avevano", "avevo", "ho avuto", "sono stato", "sono stata", "sono stati", "siamo stati", "sono state"}:
+        if tok.text.lower() in {"è", "sono", "ero", "erano", "avevano", "avevo", "ho avuto", "sono stato", "sono stata",
+                                "sono stati", "siamo stati", "sono state"}:
             result[tok.i] = "insert_before", "non"
     if len(result) > 0:
         return result
     return {0: ("insert_before", "non")}
+
 
 def get_change_de(doc) -> dict:
     """
@@ -149,6 +141,8 @@ def get_change_de(doc) -> dict:
     if len(result) > 0:
         return result
     return {0: ("insert_before", "nicht")}
+
+
 # if we had time: add functionality to handle german word order using Spacy
 
 
@@ -163,7 +157,8 @@ def get_change_fr(doc) -> dict:
                                 "complètement", "plus", "trop de", "plein de",
                                 "souvent", "de temps en temps"}:
             return {tok.i: ("replace", "nie")}
-        if tok.text.lower() in {"personne", "jamais", "ni", "rien", "pas", "non", "ne", "n'", "nulle", "aucun", "aucune", "guère"}:
+        if tok.text.lower() in {"personne", "jamais", "ni", "rien", "pas", "non", "ne", "n'", "nulle", "aucun",
+                                "aucune", "guère"}:
             return {tok.i: ("replace", "")}
     result = {}
     if len(result) > 0:
