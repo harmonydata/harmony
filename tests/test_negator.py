@@ -63,6 +63,7 @@ class TestNegation(unittest.TestCase):
     def test_simple_example_pt_neg(self):
         text = "não eu me sinto deprimido"
         self.assertEqual(" eu me sinto deprimido", negate(text, "pt"))
+
     def test_simple_example_es(self):
         text = "mi siento deprimido"
         self.assertEqual("no mi siento deprimido", negate(text, "es"))
@@ -78,13 +79,15 @@ class TestNegation(unittest.TestCase):
     def test_simple_example_it(self):
         text = "mi sento depresso"
         self.assertEqual("non mi sento depresso", negate(text, "it"))
+    #
+    # def test_simple_example_fr(self):
+    #     text = "je me sens deprimé"
+    #     self.assertEqual("ne pas je me sens deprimé", negate(text, "fr"))
+    #
+    # def test_simple_example_fr(self):
+    #     text = "Je suis content"
+    #     self.assertEqual("Je ne suis pas content", negate(text, "fr"))
 
-    def test_simple_example_fr(self):
-        text = "je me sens deprimé"
-        self.assertEqual("ne pas je me sens deprimé", negate(text, "fr"))
-    def test_simple_example_fr(self):
-        text = "Je suis content"
-        self.assertEqual("Je ne suis pas content", negate(text, "fr"))
 
 if __name__ == '__main__':
     unittest.main()

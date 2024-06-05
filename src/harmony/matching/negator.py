@@ -31,25 +31,6 @@ import re
 nlp = spacy.blank("en")
 
 
-def negate_french_sentence(sentence):
-    # Regular expression to match verbs
-    verb_pattern = re.compile(r'\b(je|tu|il|elle|nous|vous|ils|elles|on)\s+([a-zA-Zéèàùûôâî]+)\b', re.IGNORECASE)
-
-    # Function to replace the verb with negated form
-    def replace_verb(match):
-        subject = match.group(1)
-        verb = match.group(2)
-        return f"{subject} ne {verb} pas"
-
-    # Apply the negation
-    negated_sentence = verb_pattern.sub(replace_verb, sentence)
-
-    # Check if the sentence had a match, if not, return original sentence with negation applied directly
-    if negated_sentence == sentence:
-        negated_sentence = re.sub(r'(\w+)', r'ne \1 pas', sentence)
-
-    return negated_sentence
-
 
 def get_change_en(doc) -> dict:
     """
@@ -188,6 +169,7 @@ def get_change_fr(doc) -> dict:
     if len(result) > 0:
         return result
     return {0: ("insert_before", "ne pas")}
+
 
 def negate(text: str, language: str) -> str:
     """
