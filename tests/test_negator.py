@@ -82,6 +82,9 @@ class TestNegation(unittest.TestCase):
     def test_simple_example_fr(self):
         text = "je me sens deprimé"
         self.assertEqual("ne pas je me sens deprimé", negate(text, "fr"))
+    def test_simple_example_fr(self):
+        text = "Je suis content"
+        self.assertEqual("Je ne suis pas content", negate(text, "fr"))
 
 if __name__ == '__main__':
     unittest.main()
