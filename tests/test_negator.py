@@ -36,12 +36,52 @@ class TestNegation(unittest.TestCase):
 
     def test_simple_example(self):
         text = "I never feel depressed"
+        print(negate(text, "en"))
         self.assertEqual("I  feel depressed", negate(text, "en"))
+
+    def test_simple_example_neg(self):
+        text = "I feel depressed"
+        print(negate(text, "en"))
+        self.assertEqual("never I feel depressed", negate(text, "en"))
+
+    def test_verb_can_negation_en(self):
+        text = "I can't feel happy"
+        self.assertEqual("I can feel happy", negate(text, "en"))
+
+    def test_verb_will_negation_en(self):
+        text = "I won't feel happy"
+        self.assertEqual("I will feel happy", negate(text, "en"))
+
+    def test_verb_shall_negation_en(self):
+        text = "I shan't feel happy"
+        self.assertEqual("I shall feel happy", negate(text, "en"))
 
     def test_simple_example_pt(self):
         text = "eu me sinto deprimido"
         self.assertEqual("não eu me sinto deprimido", negate(text, "pt"))
 
+    def test_simple_example_pt_neg(self):
+        text = "não eu me sinto deprimido"
+        self.assertEqual(" eu me sinto deprimido", negate(text, "pt"))
+    def test_simple_example_es(self):
+        text = "mi siento deprimido"
+        self.assertEqual("no mi siento deprimido", negate(text, "es"))
+
+    def test_simple_example_de(self):
+        text = "Ich fühle mich nicht deprimiert"
+        self.assertEqual("Ich fühle mich  deprimiert", negate(text, "de"))
+
+    def test_simple_example_de_neg(self):
+        text = "Ich fühle mich deprimiert"
+        self.assertEqual("nicht Ich fühle mich deprimiert", negate(text, "de"))
+
+    def test_simple_example_it(self):
+        text = "mi sento depresso"
+        self.assertEqual("non mi sento depresso", negate(text, "it"))
+
+    def test_simple_example_fr(self):
+        text = "je me sens deprimé"
+        self.assertEqual("ne pas je me sens deprimé", negate(text, "fr"))
 
 if __name__ == '__main__':
     unittest.main()
