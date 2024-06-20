@@ -1,4 +1,4 @@
-'''
+"""
 MIT License
 
 Copyright (c) 2023 Ulster University (https://www.ulster.ac.uk).
@@ -22,14 +22,15 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-'''
+"""
 
 from typing import List
 
+from pydantic import BaseModel, Field
+
+from harmony.schemas.catalogue_instrument import CatalogueInstrument
 from harmony.schemas.requests.text import Instrument
 from harmony.schemas.requests.text import Question
-from pydantic import BaseModel, Field
 
 
 class MatchResponse(BaseModel):
@@ -39,6 +40,14 @@ class MatchResponse(BaseModel):
     matches: List[List] = Field(description="Matrix of cosine similarity matches")
     query_similarity: List = Field(
         None, description="Similarity metric between query string and items"
+    )
+
+
+class MatchCatalogueResponse(BaseModel):
+    instruments: List[Instrument] = Field(description="A list of instruments")
+    closest_catalogue_instrument_match: CatalogueInstrument = Field(
+        default=None,
+        description="The closest catalogue instrument match"
     )
 
 

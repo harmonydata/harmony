@@ -29,6 +29,8 @@ from typing import List
 
 from pydantic import BaseModel, Field
 
+from harmony.schemas.catalogue_instrument import CatalogueInstrument
+from harmony.schemas.catalogue_question import CatalogueQuestion
 from harmony.schemas.enums.file_types import FileType
 from harmony.schemas.enums.languages import Language
 
@@ -64,8 +66,13 @@ class Question(BaseModel):
     instrument_id: str = Field(None, description="Unique identifier for the instrument (UUID-4)")
     instrument_name: str = Field(None, description="Human readable name for the instrument")
     topics_auto: list = Field(None, description="Automated list of topics identified by model")
-    topics_strengths: dict = Field(None, description="Automated list of topics identified by model with strength of topic")
+    topics_strengths: dict = Field(
+        None, description="Automated list of topics identified by model with strength of topic"
+    )
     nearest_match_from_mhc_auto: dict = Field(None, description="Automatically identified nearest MHC match")
+    closest_catalogue_question_match: CatalogueQuestion = Field(
+        None, description="The closest question match in the catalogue for the question"
+    )
 
     class Config:
         schema_extra = {
@@ -92,7 +99,10 @@ class Instrument(BaseModel):
                            description="Optional metadata about the instrument (URL, citation, DOI, copyright holder)")
     language: Language = Field(Language.English,
                                description="The ISO 639-2 (alpha-2) encoding of the instrument language")
-    questions: List[Question] = Field(description="the items inside the instrument")
+    questions: List[Question] = Field(description="The items inside the instrument")
+    closest_catalogue_instrument_match: CatalogueInstrument = Field(
+        None, description="The closest instrument match in the catalogue for the instrument"
+    )
 
     class Config:
         schema_extra = {
@@ -194,6 +204,71 @@ class MatchBody(BaseModel):
 
                 ],
                 "query": "anxiety",
+                "parameters": {"framework": DEFAULT_FRAMEWORK,
+                               "model": DEFAULT_MODEL}
+            }
+        }
+
+
+class MatchCatalogueBody(BaseModel):
+    instruments: List[Instrument] = Field(description="Instruments to match")
+    parameters: MatchParameters = Field(DEFAULT_MATCH_PARAMETERS, description="Parameters on how to match")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "instruments": [{
+                    "file_id": "fd60a9a64b1b4078a68f4bc06f20253c",
+                    "instrument_id": "7829ba96f48e4848abd97884911b6795",
+                    "instrument_name": "GAD-7 English",
+                    "file_name": "GAD-7 EN.pdf",
+                    "file_type": "pdf",
+                    "file_section": "GAD-7 English",
+                    "language": "en",
+                    "questions": [{"question_no": "1",
+                                   "question_intro": "Over the last two weeks, how often have you been bothered by the following problems?",
+                                   "question_text": "Feeling nervous, anxious, or on edge",
+                                   "options": ["Not at all", "Several days", "More than half the days",
+                                               "Nearly every day"],
+                                   "source_page": 0
+                                   },
+                                  {"question_no": "2",
+                                   "question_intro": "Over the last two weeks, how often have you been bothered by the following problems?",
+                                   "question_text": "Not being able to stop or control worrying",
+                                   "options": ["Not at all", "Several days", "More than half the days",
+                                               "Nearly every day"],
+                                   "source_page": 0
+                                   }
+
+                                  ]
+                },
+                    {
+                        "file_id": "fd60a9a64b1b4078a68f4bc06f20253c",
+                        "instrument_id": "7829ba96f48e4848abd97884911b6795",
+                        "instrument_name": "GAD-7 Portuguese",
+                        "file_name": "GAD-7 PT.pdf",
+                        "file_type": "pdf",
+                        "file_section": "GAD-7 Portuguese",
+                        "language": "en",
+                        "questions": [{"question_no": "1",
+                                       "question_intro": "Durante as últimas 2 semanas, com que freqüência você foi incomodado/a pelos problemas abaixo?",
+                                       "question_text": "Sentir-se nervoso/a, ansioso/a ou muito tenso/a",
+                                       "options": ["Nenhuma vez", "Vários dias", "Mais da metade dos dias",
+                                                   "Quase todos os dias"],
+                                       "source_page": 0
+                                       },
+                                      {"question_no": "2",
+                                       "question_intro": "Durante as últimas 2 semanas, com que freqüência você foi incomodado/a pelos problemas abaixo?",
+                                       "question_text": " Não ser capaz de impedir ou de controlar as preocupações",
+                                       "options": ["Nenhuma vez", "Vários dias", "Mais da metade dos dias",
+                                                   "Quase todos os dias"],
+                                       "source_page": 0
+                                       }
+
+                                      ]
+                    }
+
+                ],
                 "parameters": {"framework": DEFAULT_FRAMEWORK,
                                "model": DEFAULT_MODEL}
             }

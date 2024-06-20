@@ -1,4 +1,4 @@
-'''
+"""
 MIT License
 
 Copyright (c) 2023 Ulster University (https://www.ulster.ac.uk).
@@ -22,17 +22,24 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+"""
 
-'''
+import statistics
 from collections import Counter
 from typing import List, Callable
 
 import numpy as np
-from harmony.matching.negator import negate
-from harmony.schemas.requests.text import Instrument
-from harmony.schemas.text_vector import TextVector
 from numpy import dot, mat, matmul, ndarray
 from numpy.linalg import norm
+
+from harmony.matching.negator import negate
+from harmony.schemas.catalogue_instrument import CatalogueInstrument
+from harmony.schemas.catalogue_question import CatalogueQuestion
+from harmony.schemas.requests.text import (
+    Instrument,
+    Question,
+)
+from harmony.schemas.text_vector import TextVector
 
 
 def cosine_similarity(vec1: ndarray, vec2: ndarray) -> ndarray:
@@ -99,7 +106,16 @@ def vectors_pos_neg(text_vectors):
     return vectors_pos, vectors_neg
 
 
-def create_full_text_vectors(all_questions, query, vectorisation_function, texts_cached_vectors):
+def create_full_text_vectors(
+    all_questions: List[str],
+    query: str | None,
+    vectorisation_function: Callable,
+    texts_cached_vectors:  dict[str, list[float]],
+) -> tuple[List[TextVector], dict]:
+    """
+    Create full text vectors.
+    """
+
     # Create a list of text vectors
     text_vectors = process_questions(all_questions, texts_cached_vectors)
 
@@ -122,7 +138,286 @@ def create_full_text_vectors(all_questions, query, vectorisation_function, texts
     for index, text_dict in enumerate(text_vectors):
         if not text_dict.vector:
             text_vectors[index].vector = new_vectors_list.pop(0)
+
     return text_vectors, new_vectors_dict
+
+
+def match_instruments_with_catalogue_instruments(
+    instruments: List[Instrument],
+    catalogue_data: dict,
+    vectorisation_function: Callable,
+    texts_cached_vectors: dict[str, List[float]],
+) -> tuple[List[Instrument], CatalogueInstrument]:
+    """
+    Match instruments with catalogue instruments.
+
+    :param instruments: The instruments.
+    :param catalogue_data: The catalogue data.
+    :param vectorisation_function: A function to vectorize a text.
+    :param texts_cached_vectors: A dictionary of already cached vectors from texts (key is the text and value is the vector).
+
+    :return: A tuple, index 0 contains the list of instruments that now each contain the best instrument match from the
+    catalog, and index 1 contains the closest instrument match from the catalog for all the instruments.
+    """
+
+    # For each instrument, find the best matching instrument for it in the catalogue
+    for instrument in instruments:
+        instrument.closest_catalogue_instrument_match = (
+            match_questions_with_catalogue_instruments(
+                questions=instrument.questions,
+                catalogue_data=catalogue_data,
+                vectorisation_function=vectorisation_function,
+                texts_cached_vectors=texts_cached_vectors,
+                questions_are_from_one_instrument=True,
+            )
+        )
+
+    # Gather all questions from all instruments and find the best matching instrument in the catalogue
+    all_instrument_questions: List[Question] = []
+    for instrument in instruments:
+        all_instrument_questions.extend(instrument.questions)
+    closest_catalogue_instrument_match = match_questions_with_catalogue_instruments(
+        questions=all_instrument_questions,
+        catalogue_data=catalogue_data,
+        vectorisation_function=vectorisation_function,
+        texts_cached_vectors=texts_cached_vectors,
+        questions_are_from_one_instrument=False,
+    )
+
+    return instruments, closest_catalogue_instrument_match
+
+
+def match_questions_with_catalogue_instruments(
+    questions: List[Question],
+    catalogue_data: dict,
+    vectorisation_function: Callable,
+    texts_cached_vectors: dict[str, List[float]],
+    questions_are_from_one_instrument: bool,
+) -> CatalogueInstrument:
+    """
+    Match questions with catalogue instruments.
+    Each question will receive a list of closest instrument matches, and at the end one closest instrument match for
+    all questions is returned.
+
+    :param questions: The questions.
+    :param catalogue_data: The catalogue data.
+    :param vectorisation_function: A function to vectorize a text.
+    :param texts_cached_vectors: A dictionary of already cached vectors from texts (key is the text and value is the vector).
+    :param questions_are_from_one_instrument: If the questions provided are coming from one instrument only.
+
+    :return: The closest instrument match for the questions provided.
+    """
+
+    # Catalogue data
+    catalogue_instrument_idx_to_catalogue_questions_idx = catalogue_data[
+        "instrument_idx_to_question_idx"
+    ]
+    all_catalogue_questions_embeddings_concatenated = catalogue_data[
+        "all_embeddings_concatenated"
+    ]
+    all_catalogue_instruments = catalogue_data["all_instruments"]
+    all_catalogue_questions = catalogue_data["all_questions"]
+
+    # Create text vectors
+    text_vectors, new_vectors_dict = create_full_text_vectors(
+        all_questions=[q.question_text for q in questions],
+        query=None,
+        vectorisation_function=vectorisation_function,
+        texts_cached_vectors=texts_cached_vectors,
+    )
+
+    # The total number of questions we received as input.
+    num_input_questions = len(questions)
+
+    # Get an array of dimensions.
+    # (number of input questions) x (number of dimensions of LLM - typically 768, 384, 500, 512, etc.)
+    text_vectors_dict = {
+        text_vector.text: text_vector.vector for text_vector in text_vectors
+    }
+    vectors = np.array(
+        [text_vectors_dict[question.question_text] for question in questions]
+    )
+
+    # Get a 2D array of (number of input questions) x (number of questions in catalogue).
+    # E.g. index 0 (matches for the first input question) will contain a list of matches for each question in the
+    # catalogue. So the best match for the first input question is the highest similarity found in index 0.
+    catalogue_similarities = cosine_similarity(
+        vectors, all_catalogue_questions_embeddings_concatenated
+    )
+
+    # Get a 1D array of length (number of input questions).
+    # For each input question, this is the index of the single closest matching question text in our catalogues.
+    # Note that each question text in the catalogue (vector index) is unique, and we must later do a further mapping to
+    # find out which instrument(s) it occurs in.
+    idxs_top_input_questions_matches = np.argmax(catalogue_similarities, axis=1)
+
+    # Get a set of all the top matching question text indices in our catalogue.
+    # idxs_top_input_questions_matches_set = set(idxs_top_input_questions_matches)
+
+    # This keeps track of each instrument matches how many question items in the query
+    # e.g. if the first instrument in our catalogue (instrument 0) matches 4 items, then this dictionary will
+    # contain {0: 4}.
+    # instrument_idx_to_num_matching_items_with_query = {}
+
+    # This dictionary will contain the index of the instrument and the cosine similarities to the top matched questions
+    # in that instrument e.g. {50: [ ... ]}
+    instrument_idx_to_cosine_similarities_top_match: dict[int, []] = {}
+
+    # This keeps track of how many question items in total are contained in each instrument, irrespective of the
+    # number of matches.
+    # This is needed for stats such as precision and recall.
+    instrument_idx_to_total_num_question_items_present = {}
+
+    # Find any instruments matching
+    input_question_idx_to_matching_instruments: List[List[dict]] = []
+    for input_question_idx in range(len(questions)):
+        input_question_idx_to_matching_instruments.append([])
+    for input_question_idx in range(len(questions)):
+        top_match_catalogue_question_idx = idxs_top_input_questions_matches[
+            input_question_idx
+        ]
+        for instrument_idx, question_idxs_in_this_instrument in enumerate(
+            catalogue_instrument_idx_to_catalogue_questions_idx
+        ):
+            if top_match_catalogue_question_idx in question_idxs_in_this_instrument:
+                instrument_from_catalogue = all_catalogue_instruments[instrument_idx]
+                if not any(
+                    x["instrument_name"] == instrument_from_catalogue["instrument_name"]
+                    for x in input_question_idx_to_matching_instruments[input_question_idx]
+                ):
+                    input_question_idx_to_matching_instruments[
+                        input_question_idx
+                    ].append(instrument_from_catalogue)
+
+    # For each catalogue instrument get the total number of question matches in the query
+    # For each catalogue instrument get the total number of questions
+    for instrument_idx, question_idxs_in_this_instrument in enumerate(
+        catalogue_instrument_idx_to_catalogue_questions_idx
+    ):
+        catalogue_question_idxs_in_this_instrument_set = set(
+            question_idxs_in_this_instrument
+        )
+        # instrument_idx_to_num_matching_items_with_query[instrument_idx] = len(
+        #     catalogue_question_idxs_in_this_instrument_set.intersection(
+        #         idxs_top_input_questions_matches_set
+        #     )
+        # )
+        instrument_idx_to_total_num_question_items_present[instrument_idx] = len(
+            catalogue_question_idxs_in_this_instrument_set
+        )
+
+    # Question similarity with catalogue questions
+    for idx, question in enumerate(questions):
+
+        seen_in_instruments: List[CatalogueInstrument] = []
+        for instrument in input_question_idx_to_matching_instruments[idx]:
+            instrument_name = instrument["instrument_name"]
+            instrument_url = instrument["metadata"].get("url", "")
+            source = instrument["metadata"]["source"].upper()
+            sweep = instrument["metadata"].get("sweep_id", "")
+            seen_in_instruments.append(
+                CatalogueInstrument(
+                    instrument_name=instrument_name,
+                    instrument_url=instrument_url,
+                    source=source,
+                    sweep=sweep,
+                )
+            )
+
+        question.closest_catalogue_question_match = CatalogueQuestion(
+            question=all_catalogue_questions[idxs_top_input_questions_matches[idx]],
+            seen_in_instruments=seen_in_instruments,
+        )
+
+    # Instrument index to list of cosine similarities top question match
+    for input_question_idx, idx_top_input_question_match_in_catalogue in enumerate(
+        idxs_top_input_questions_matches
+    ):
+        for (
+            catalogue_instrument_idx,
+            catalogue_question_idxs_in_this_instrument,
+        ) in enumerate(catalogue_instrument_idx_to_catalogue_questions_idx):
+            catalogue_question_idxs_set = set(
+                catalogue_question_idxs_in_this_instrument
+            )
+            if idx_top_input_question_match_in_catalogue in catalogue_question_idxs_set:
+                # Create the list if it doesn't exist yet
+                if not instrument_idx_to_cosine_similarities_top_match.get(
+                    catalogue_instrument_idx
+                ):
+                    instrument_idx_to_cosine_similarities_top_match[
+                        catalogue_instrument_idx
+                    ] = []
+
+                # Add the cosine similarity
+                instrument_idx_to_cosine_similarities_top_match[
+                    catalogue_instrument_idx
+                ].append(
+                    catalogue_similarities[input_question_idx][
+                        idx_top_input_question_match_in_catalogue
+                    ]
+                )
+
+    # Keep track of the instrument id and the count of top question matches that belong to it
+    instrument_idx_to_top_matches_ct = {
+        k: len(v) for k, v in instrument_idx_to_cosine_similarities_top_match.items()
+    }
+
+    # Calculate the average for each list of cosine similarities from instruments
+    for (
+        instrument_idx,
+        cosine_similarities,
+    ) in instrument_idx_to_cosine_similarities_top_match.items():
+        instrument_idx_to_cosine_similarities_top_match[instrument_idx] = (
+            statistics.mean(cosine_similarities)
+        )
+
+    # Find the index of the best instrument match
+    best_catalogue_instrument_idx = max(
+        instrument_idx_to_cosine_similarities_top_match,
+        key=instrument_idx_to_cosine_similarities_top_match.get,
+    )
+
+    # Get the best instrument match
+    best_catalogue_instrument = all_catalogue_instruments[best_catalogue_instrument_idx]
+    num_questions_in_ref_instrument = (
+        instrument_idx_to_total_num_question_items_present[
+            best_catalogue_instrument_idx
+        ]
+    )
+    num_top_match_questions = instrument_idx_to_top_matches_ct[
+        best_catalogue_instrument_idx
+    ]
+
+    instrument_name = best_catalogue_instrument["instrument_name"]
+    instrument_url = best_catalogue_instrument["metadata"].get("url", "")
+    source = best_catalogue_instrument["metadata"]["source"].upper()
+    sweep = best_catalogue_instrument["metadata"].get("sweep_id", "")
+
+    if questions_are_from_one_instrument:
+        info = (
+            f"{instrument_name} Sweep {sweep if sweep else 'UNKNOWN'} matched {num_top_match_questions} "
+            f"question(s) in your instrument, your instrument contains {num_input_questions} question(s). "
+            f"The reference instrument contains {num_questions_in_ref_instrument} question(s)."
+        )
+    else:
+        info = (
+            f"{instrument_name} Sweep {sweep if sweep else 'UNKNOWN'} matched {num_top_match_questions} "
+            f"question(s) in all of your instruments, your instruments contains {num_input_questions} "
+            f"question(s). The reference instrument contains {num_questions_in_ref_instrument} question(s)."
+        )
+
+    return CatalogueInstrument(
+        instrument_name=instrument_name,
+        instrument_url=instrument_url,
+        source=source,
+        sweep=sweep,
+        metadata={
+            "info": info,
+            "num_matched_questions": num_top_match_questions,
+            "num_ref_instrument_questions": num_questions_in_ref_instrument,
+        },
+    )
 
 
 #
@@ -136,7 +431,7 @@ def match_instruments_with_function(
         texts_cached_vectors: dict[str, List[float]] = {},
 ) -> tuple:
     """
-    Match instruments
+    Match instruments.
 
     :param instruments: The instruments
     :param query: The query
@@ -146,6 +441,7 @@ def match_instruments_with_function(
     :param mhc_embeddings
     :param texts_cached_vectors: A dictionary of already cached vectors from texts (key is the text and value is the vector)
     """
+
     all_questions = []
     for instrument in instruments:
         all_questions.extend(instrument.questions)
@@ -155,7 +451,7 @@ def match_instruments_with_function(
 
     text_vectors, new_vectors_dict = create_full_text_vectors(all_questions_str, query, vectorisation_function,
                                                               texts_cached_vectors)
-    # get vectors for all orignal texts and vectors for negated texts
+    # get vectors for all original texts and vectors for negated texts
     vectors_pos, vectors_neg = vectors_pos_neg(text_vectors)
 
     # Get similarity between the query (only one query?) and the questions
