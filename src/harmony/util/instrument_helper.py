@@ -31,7 +31,7 @@ import json
 from harmony.schemas.requests.text import Instrument, Question
 
 
-def load_instrument_from_list(question_texts: list, instrument_name: str = "My instrument") -> Instrument:
+def create_instrument_from_list(question_texts: list, instrument_name: str = "My instrument") -> Instrument:
     """
     Read a list of strings and create an Instrument object.
     :return: Single Instrument.

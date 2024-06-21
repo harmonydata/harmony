@@ -30,22 +30,22 @@ import unittest
 
 sys.path.append("../src")
 
-from harmony import load_instrument_from_list, import_instrument_into_harmony_web
+from harmony import create_instrument_from_list, import_instrument_into_harmony_web
 
 
 class TestCreateInstrument(unittest.TestCase):
 
     def test_single_instrument_simple(self):
-        instrument = load_instrument_from_list(["question A", "question B"])
+        instrument = create_instrument_from_list(["question A", "question B"])
         self.assertEqual(2, len(instrument.questions))
 
     def test_single_instrument_simple_2(self):
-        instrument = load_instrument_from_list(["question A", "question B", "question C"], instrument_name="potato")
+        instrument = create_instrument_from_list(["question A", "question B", "question C"], instrument_name="potato")
         self.assertEqual(3, len(instrument.questions))
         self.assertEqual("potato", instrument.instrument_name)
 
     def test_single_instrument_send_to_web(self):
-        instrument = load_instrument_from_list(["question A", "question B"])
+        instrument = create_instrument_from_list(["question A", "question B"])
         web_url = import_instrument_into_harmony_web(instrument)
         self.assertIn("harmonydata.ac.uk", web_url)
 
