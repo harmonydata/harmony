@@ -147,7 +147,7 @@ def match_instruments_with_catalogue_instruments(
     catalogue_data: dict,
     vectorisation_function: Callable,
     texts_cached_vectors: dict[str, List[float]],
-) -> tuple[List[Instrument], CatalogueInstrument]:
+) -> tuple[List[Instrument], CatalogueInstrument | None]:
     """
     Match instruments with catalogue instruments.
 
@@ -193,7 +193,7 @@ def match_questions_with_catalogue_instruments(
     vectorisation_function: Callable,
     texts_cached_vectors: dict[str, List[float]],
     questions_are_from_one_instrument: bool,
-) -> CatalogueInstrument:
+) -> CatalogueInstrument | None:
     """
     Match questions with catalogue instruments.
     Each question will receive a list of closest instrument matches, and at the end one closest instrument match for
@@ -209,14 +209,18 @@ def match_questions_with_catalogue_instruments(
     """
 
     # Catalogue data
-    catalogue_instrument_idx_to_catalogue_questions_idx = catalogue_data[
+    catalogue_instrument_idx_to_catalogue_questions_idx: List[List[int]] = catalogue_data[
         "instrument_idx_to_question_idx"
     ]
-    all_catalogue_questions_embeddings_concatenated = catalogue_data[
+    all_catalogue_questions_embeddings_concatenated: np.ndarray = catalogue_data[
         "all_embeddings_concatenated"
     ]
-    all_catalogue_instruments = catalogue_data["all_instruments"]
-    all_catalogue_questions = catalogue_data["all_questions"]
+    all_catalogue_instruments: List[dict] = catalogue_data["all_instruments"]
+    all_catalogue_questions: List[str] = catalogue_data["all_questions"]
+
+    # No embeddings = nothing to find
+    if len(all_catalogue_questions_embeddings_concatenated) == 0:
+        return None
 
     # Create text vectors
     text_vectors, new_vectors_dict = create_full_text_vectors(
@@ -308,7 +312,6 @@ def match_questions_with_catalogue_instruments(
 
     # Question similarity with catalogue questions
     for idx, question in enumerate(questions):
-
         seen_in_instruments: List[CatalogueInstrument] = []
         for instrument in input_question_idx_to_matching_instruments[idx]:
             instrument_name = instrument["instrument_name"]
