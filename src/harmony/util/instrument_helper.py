@@ -25,6 +25,9 @@ SOFTWARE.
 
 '''
 
+import base64
+import json
+
 from harmony.schemas.requests.text import Instrument, Question
 
 
@@ -39,3 +42,19 @@ def load_instrument_from_list(question_texts: list, instrument_name: str = "My i
         questions.append(Question(question_text=question_text, question_no=str(ctr + 1)))
 
     return Instrument(questions=questions, instrument_name=instrument_name)
+
+
+def import_instrument_into_harmony_web(instrument: Instrument, harmony_fe_base_url="https://harmonydata.ac.uk") -> str:
+    """
+    Import a single instrument into the Harmony web UI.
+    @param instrument: An instrument object created by Harmony
+    @param harmony_fe_base_url: The base URL of the React app front end, defaulting to the web Harmony front end at harmonydata.ac.uk
+    @return: a URL which you can click which will take you to the browser.
+    """
+    instrument_serialised_as_json = json.dumps(instrument.dict())
+    instrument_json_b64_encoded_bytes = base64.b64encode(instrument_serialised_as_json.encode('utf-8'))
+    instrument_json_b64_encoded_str = instrument_json_b64_encoded_bytes.decode("utf-8")
+
+    url = f"{harmony_fe_base_url}/#/import/{instrument_json_b64_encoded_str}"
+
+    return url

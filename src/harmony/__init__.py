@@ -32,7 +32,7 @@ import os
 
 from .examples import example_instruments
 from .schemas import *
-from .util.instrument_helper import load_instrument_from_list
+from .util.instrument_helper import load_instrument_from_list, import_instrument_into_harmony_web
 from .util.model_downloader import download_models
 
 if os.environ.get("HARMONY_NO_PARSING") is None or os.environ.get("HARMONY_NO_PARSING") == "":
