@@ -25,28 +25,30 @@ SOFTWARE.
 
 '''
 
-__version__ = "0.5.2"
+import sys
+import unittest
 
-# TODO: make these configurable at package level
-import os
+sys.path.append("../src")
 
-from .examples import example_instruments
-from .schemas import *
-from .util.instrument_helper import create_instrument_from_list, import_instrument_into_harmony_web
-from .util.model_downloader import download_models
+from harmony import create_instrument_from_list, import_instrument_into_harmony_web
 
-if os.environ.get("HARMONY_NO_PARSING") is None or os.environ.get("HARMONY_NO_PARSING") == "":
-    from .parsing.text_parser import convert_text_to_instruments
-    from .parsing.excel_parser import convert_excel_to_instruments
-    from .parsing.pdf_parser import convert_pdf_to_instruments
-    from .parsing.wrapper_all_parsers import convert_files_to_instruments
-    from .parsing import *
-    from .util.file_helper import load_instruments_from_local_file
 
-if os.environ.get("HARMONY_NO_MATCHING") is None or os.environ.get("HARMONY_NO_MATCHING") == "":
-    from .matching.matcher import match_instruments_with_function
+class TestCreateInstrument(unittest.TestCase):
 
-    try:
-        from .matching.default_matcher import match_instruments
-    except ModuleNotFoundError:
-        print("Warning: transformers not available. To use transformers, run pip install sentence-transformers")
+    def test_single_instrument_simple(self):
+        instrument = create_instrument_from_list(["question A", "question B"])
+        self.assertEqual(2, len(instrument.questions))
+
+    def test_single_instrument_simple_2(self):
+        instrument = create_instrument_from_list(["question A", "question B", "question C"], instrument_name="potato")
+        self.assertEqual(3, len(instrument.questions))
+        self.assertEqual("potato", instrument.instrument_name)
+
+    def test_single_instrument_send_to_web(self):
+        instrument = create_instrument_from_list(["question A", "question B"])
+        web_url = import_instrument_into_harmony_web(instrument)
+        self.assertIn("harmonydata.ac.uk", web_url)
+
+
+if __name__ == '__main__':
+    unittest.main()
