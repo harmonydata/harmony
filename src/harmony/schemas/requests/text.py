@@ -100,8 +100,10 @@ class Instrument(BaseModel):
     language: Language = Field(Language.English,
                                description="The ISO 639-2 (alpha-2) encoding of the instrument language")
     questions: List[Question] = Field(description="The items inside the instrument")
-    closest_catalogue_instrument_match: CatalogueInstrument | None = Field(
-        None, description="The closest instrument match in the catalogue for the instrument"
+    closest_catalogue_instrument_matches: List[CatalogueInstrument] = Field(
+        None,
+        description="The closest instrument matches in the catalogue for the instrument, the first index "
+                    "contains the best match etc"
     )
 
     class Config:
