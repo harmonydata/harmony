@@ -147,7 +147,7 @@ def match_instruments_with_catalogue_instruments(
     catalogue_data: dict,
     vectorisation_function: Callable,
     texts_cached_vectors: dict[str, List[float]],
-) -> tuple[List[Instrument], List[CatalogueInstrument]]:
+) -> tuple[List[Instrument], List[CatalogueInstrument], dict[str, float]]:
     """
     Match instruments with catalogue instruments.
 
@@ -158,8 +158,22 @@ def match_instruments_with_catalogue_instruments(
 
     :return: Index 0 in the tuple contains the list of instruments that now each contain the best instrument matches
     from the catalog. Index 1 in the tuple contains a list of closest instrument matches from the catalog for all the
-    instruments.
+    instruments. Index 2 contains the new text vectors to be cached.
     """
+
+    # Gather all questions
+    all_questions: List[str] = []
+    for instrument in instruments:
+        all_questions.extend([q.question_text for q in instrument.questions])
+    all_questions = list(set(all_questions))
+
+    # Create text vectors for all questions in all the uploaded instruments
+    all_instruments_text_vectors, new_text_vectors_dict = create_full_text_vectors(
+        all_questions=all_questions,
+        query=None,
+        vectorisation_function=vectorisation_function,
+        texts_cached_vectors=texts_cached_vectors,
+    )
 
     # For each instrument, find the best instrument matches for it in the catalogue
     for instrument in instruments:
@@ -167,8 +181,7 @@ def match_instruments_with_catalogue_instruments(
             match_questions_with_catalogue_instruments(
                 questions=instrument.questions,
                 catalogue_data=catalogue_data,
-                vectorisation_function=vectorisation_function,
-                texts_cached_vectors=texts_cached_vectors,
+                all_instruments_text_vectors=all_instruments_text_vectors,
                 questions_are_from_one_instrument=True,
             )
         )
@@ -180,19 +193,17 @@ def match_instruments_with_catalogue_instruments(
     closest_catalogue_instrument_matches = match_questions_with_catalogue_instruments(
         questions=all_instrument_questions,
         catalogue_data=catalogue_data,
-        vectorisation_function=vectorisation_function,
-        texts_cached_vectors=texts_cached_vectors,
+        all_instruments_text_vectors=all_instruments_text_vectors,
         questions_are_from_one_instrument=False,
     )
 
-    return instruments, closest_catalogue_instrument_matches
+    return instruments, closest_catalogue_instrument_matches, new_text_vectors_dict
 
 
 def match_questions_with_catalogue_instruments(
     questions: List[Question],
     catalogue_data: dict,
-    vectorisation_function: Callable,
-    texts_cached_vectors: dict[str, List[float]],
+    all_instruments_text_vectors: List[TextVector],
     questions_are_from_one_instrument: bool,
 ) -> List[CatalogueInstrument]:
     """
@@ -202,8 +213,7 @@ def match_questions_with_catalogue_instruments(
 
     :param questions: The questions.
     :param catalogue_data: The catalogue data.
-    :param vectorisation_function: A function to vectorize a text.
-    :param texts_cached_vectors: A dictionary of already cached vectors from texts (key is the text and value is the vector).
+    :param all_instruments_text_vectors: A list of text vectors of all questions found in all the instruments uploaded.
     :param questions_are_from_one_instrument: If the questions provided are coming from one instrument only.
 
     :return: A list of closest instrument matches for the questions provided.
@@ -223,24 +233,18 @@ def match_questions_with_catalogue_instruments(
     if len(all_catalogue_questions_embeddings_concatenated) == 0:
         return []
 
-    # Create text vectors
-    text_vectors, new_vectors_dict = create_full_text_vectors(
-        all_questions=[q.question_text for q in questions],
-        query=None,
-        vectorisation_function=vectorisation_function,
-        texts_cached_vectors=texts_cached_vectors,
-    )
+    # All instruments text vectors to dict
+    all_instruments_text_vectors_dict = {
+        text_vector.text: text_vector.vector for text_vector in all_instruments_text_vectors
+    }
 
     # The total number of questions we received as input.
     num_input_questions = len(questions)
 
     # Get an array of dimensions.
     # (number of input questions) x (number of dimensions of LLM - typically 768, 384, 500, 512, etc.)
-    text_vectors_dict = {
-        text_vector.text: text_vector.vector for text_vector in text_vectors
-    }
     vectors = np.array(
-        [text_vectors_dict[question.question_text] for question in questions]
+        [all_instruments_text_vectors_dict[question.question_text] for question in questions]
     )
 
     # Get a 2D array of (number of input questions) x (number of questions in catalogue).
@@ -257,7 +261,7 @@ def match_questions_with_catalogue_instruments(
     idxs_of_top_questions_matched_in_catalogue = np.argmax(catalogue_similarities, axis=1)
 
     # Get a set of all the top matching question text indices in our catalogue.
-    idxs_of_top_questions_matched_in_catalogue_set = set(idxs_of_top_questions_matched_in_catalogue)
+    # idxs_of_top_questions_matched_in_catalogue_set = set(idxs_of_top_questions_matched_in_catalogue)
 
     # This keeps track of each instrument matches how many question items in the query
     # e.g. if the first instrument in our catalogue (instrument 0) matches 4 items, then this dictionary will
