@@ -45,7 +45,7 @@ class MatchResponse(BaseModel):
 
 class MatchCatalogueResponse(BaseModel):
     instruments: List[Instrument] = Field(description="A list of instruments")
-    closest_catalogue_instrument_match: CatalogueInstrument = Field(
+    closest_catalogue_instrument_match: CatalogueInstrument | None = Field(
         default=None,
         description="The closest catalogue instrument match"
     )

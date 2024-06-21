@@ -100,7 +100,7 @@ class Instrument(BaseModel):
     language: Language = Field(Language.English,
                                description="The ISO 639-2 (alpha-2) encoding of the instrument language")
     questions: List[Question] = Field(description="The items inside the instrument")
-    closest_catalogue_instrument_match: CatalogueInstrument = Field(
+    closest_catalogue_instrument_match: CatalogueInstrument | None = Field(
         None, description="The closest instrument match in the catalogue for the instrument"
     )
 
@@ -211,8 +211,12 @@ class MatchBody(BaseModel):
 
 
 class MatchCatalogueBody(BaseModel):
-    instruments: List[Instrument] = Field(description="Instruments to match")
-    parameters: MatchParameters = Field(DEFAULT_MATCH_PARAMETERS, description="Parameters on how to match")
+    instruments: List[Instrument] = Field(description="Instruments to match.")
+    parameters: MatchParameters = Field(DEFAULT_MATCH_PARAMETERS, description="Parameters on how to match.")
+    sources: List[str] = Field(
+        default=[],
+        description="The instrument sources to use for matching. If empty, all instrument sources will be considered."
+    )
 
     class Config:
         schema_extra = {
@@ -270,6 +274,7 @@ class MatchCatalogueBody(BaseModel):
 
                 ],
                 "parameters": {"framework": DEFAULT_FRAMEWORK,
-                               "model": DEFAULT_MODEL}
+                               "model": DEFAULT_MODEL},
+                "sources": ["MHC"]
             }
         }
