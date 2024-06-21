@@ -25,28 +25,17 @@ SOFTWARE.
 
 '''
 
-__version__ = "0.5.2"
+from harmony.schemas.requests.text import Instrument, Question
 
-# TODO: make these configurable at package level
-import os
 
-from .examples import example_instruments
-from .schemas import *
-from .util.instrument_helper import load_instrument_from_list
-from .util.model_downloader import download_models
+def load_instrument_from_list(question_texts: list, instrument_name: str = "My instrument") -> Instrument:
+    """
+    Read a list of strings and create an Instrument object.
+    :return: Single Instrument.
+    """
 
-if os.environ.get("HARMONY_NO_PARSING") is None or os.environ.get("HARMONY_NO_PARSING") == "":
-    from .parsing.text_parser import convert_text_to_instruments
-    from .parsing.excel_parser import convert_excel_to_instruments
-    from .parsing.pdf_parser import convert_pdf_to_instruments
-    from .parsing.wrapper_all_parsers import convert_files_to_instruments
-    from .parsing import *
-    from .util.file_helper import load_instruments_from_local_file
+    questions = []
+    for ctr, question_text in enumerate(question_texts):
+        questions.append(Question(question_text=question_text, question_no=str(ctr + 1)))
 
-if os.environ.get("HARMONY_NO_MATCHING") is None or os.environ.get("HARMONY_NO_MATCHING") == "":
-    from .matching.matcher import match_instruments_with_function
-
-    try:
-        from .matching.default_matcher import match_instruments
-    except ModuleNotFoundError:
-        print("Warning: transformers not available. To use transformers, run pip install sentence-transformers")
+    return Instrument(questions=questions, instrument_name=instrument_name)
