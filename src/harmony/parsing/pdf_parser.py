@@ -38,7 +38,8 @@ from harmony.schemas.requests.text import RawFile, Instrument
 re_initial_num = re.compile(r'(^\d+)')
 re_initial_num_dot = re.compile(r'(^\d+\.)')
 re_word = re.compile(r'(?i)(\b[\w\']+\b)')
-
+re_alpha = re.compile(r'(^[a-zA-Z]+)')
+re_bracket = re.compile(r'(?:\(|\))')
 import pathlib
 
 model_containing_folder = pathlib.Path(__file__).parent.resolve()
@@ -116,6 +117,7 @@ def convert_pdf_to_instruments(file: RawFile) -> Instrument:
         for token in tokens:
             is_number = len(re_initial_num.findall(token.group()))
             is_number_dot = len(re_initial_num_dot.findall(token.group()))
+            is_alpha = len(re_alpha.findall(token.group()))
 
             dist_to_newline = token.start()
             for c in range(token.start(), 1, -1):
@@ -129,14 +131,26 @@ def convert_pdf_to_instruments(file: RawFile) -> Instrument:
                     dist_to_question_mark = c - token.start()
                     break
 
+            is_capital = int(token.group()[0] != token.group()[0].lower())
+
             this_token_properties = {"length": len(token.group()), "is_number": is_number,
+                                     "is_alpha": is_alpha,
+                                     "is_capital": is_capital,
                                      "is_number_dot": is_number_dot,
                                      "dist_to_newline": dist_to_newline, "dist_to_question_mark": dist_to_question_mark,
                                      "char_index": token.start()}
 
             this_token_properties["prev_length"] = last_token_properties.get("length", 0)
+            this_token_properties["prev_is_alpha"] = last_token_properties.get("is_alpha", 0)
             this_token_properties["prev_is_number"] = last_token_properties.get("is_number", 0)
             this_token_properties["prev_is_number_dot"] = last_token_properties.get("is_number_dot", 0)
+            this_token_properties["prev_is_capital"] = last_token_properties.get("is_capital", 0)
+
+            this_token_properties["prev_prev_length"] = last_token_properties.get("prev_length", 0)
+            this_token_properties["prev_prev_is_alpha"] = last_token_properties.get("prev_is_alpha", 0)
+            this_token_properties["prev_prev_is_number"] = last_token_properties.get("prev_is_number", 0)
+            this_token_properties["prev_prev_is_number_dot"] = last_token_properties.get("prev_is_number_dot", 0)
+            this_token_properties["prev_prev_is_capital"] = last_token_properties.get("prev_is_capital", 0)
 
             token_texts.append(token.group())
 
