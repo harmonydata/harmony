@@ -24,12 +24,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 '''
+import pickle as pkl
+import re
 
-from harmony.parsing.text_parser import convert_text_to_instruments
+import numpy as np
+
+import harmony
 from harmony.parsing.util.tika_wrapper import parse_pdf_to_plain_text
 # from harmony.parsing.util.tesseract_wrapper import parse_image_pdf_to_plain_text
 # from harmony.parsing.util.camelot_wrapper import parse_pdf_to_tables
 from harmony.schemas.requests.text import RawFile, Instrument
+
+re_initial_num = re.compile(r'(^\d+)')
+re_initial_num_dot = re.compile(r'(^\d+\.)')
+re_word = re.compile(r'(?i)(\b[\w\']+\b)')
+
+import pathlib
+
+model_containing_folder = pathlib.Path(__file__).parent.resolve()
+
+with open(f"{model_containing_folder}/rf_table_model.pkl", "rb") as f:
+    rf_table_model = pkl.load(f)
+
+with open(f"{model_containing_folder}/crf_text_model.pkl", "rb") as f:
+    crf_text_model = pkl.load(f)
+
 
 def convert_pdf_to_instruments(file: RawFile) -> Instrument:
     # file is an object containing these properties:
@@ -38,8 +57,122 @@ def convert_pdf_to_instruments(file: RawFile) -> Instrument:
     # tables: list - this is a list of all the tables in the document. The front end has populated this field.
 
     if not file.text_content:
-        file.text_content = parse_pdf_to_plain_text(file.content) # call Tika to convert the PDF to plain text
+        file.text_content = parse_pdf_to_plain_text(file.content)  # call Tika to convert the PDF to plain text
 
     # TODO: New PDF parsing algorithm should go here, together with return statement.
 
-    return convert_text_to_instruments(file)
+    table_cell_texts = []
+    page_tables = file.tables
+
+    if len(page_tables) > 0:
+        for page_table in page_tables:
+            tables = page_table['tables']
+            for row in tables:
+                for item in row:
+                    if len(item.strip()) > 0:
+                        table_cell_texts.append(item)
+
+        X = []
+        for idx in range(len(table_cell_texts)):
+            t = table_cell_texts[idx]
+            features = [len(t),
+                        len(re_initial_num.findall(t)),
+                        len(re_initial_num_dot.findall(t))]
+            X.append(features)
+
+        print(len(X))
+        X = np.asarray(X)
+
+        y_pred = rf_table_model.predict(X)
+
+        questions_from_tables = []
+        for idx in range(len(table_cell_texts)):
+            if y_pred[idx] == 1:
+                questions_from_tables.append(table_cell_texts[idx])
+    else:
+        questions_from_tables = []
+
+    if True:  # text CRF model
+        questions_from_text = []
+        X = []
+
+        token_texts = []
+        token_properties = []
+
+        text = file.text_content
+        char_indices_of_newlines = set()
+        for idx, c in enumerate(text):
+            if c == "\n":
+                char_indices_of_newlines.add(idx)
+
+        char_indices_of_question_marks = set()
+        for idx, c in enumerate(text):
+            if c == "?":
+                char_indices_of_question_marks.add(idx)
+
+        tokens = list(re_word.finditer(text))
+
+        last_token_properties = {}
+
+        for token in tokens:
+            is_number = len(re_initial_num.findall(token.group()))
+            is_number_dot = len(re_initial_num_dot.findall(token.group()))
+
+            dist_to_newline = token.start()
+            for c in range(token.start(), 1, -1):
+                if c in char_indices_of_newlines:
+                    dist_to_newline = token.start() - c
+                    break
+
+            dist_to_question_mark = len(text) - token.start()
+            for c in range(token.start(), len(text)):
+                if c in char_indices_of_question_marks:
+                    dist_to_question_mark = c - token.start()
+                    break
+
+            this_token_properties = {"length": len(token.group()), "is_number": is_number,
+                                     "is_number_dot": is_number_dot,
+                                     "dist_to_newline": dist_to_newline, "dist_to_question_mark": dist_to_question_mark,
+                                     "char_index": token.start()}
+
+            this_token_properties["prev_length"] = last_token_properties.get("length", 0)
+            this_token_properties["prev_is_number"] = last_token_properties.get("is_number", 0)
+            this_token_properties["prev_is_number_dot"] = last_token_properties.get("is_number_dot", 0)
+
+            token_texts.append(token.group())
+
+            token_properties.append(this_token_properties)
+
+            last_token_properties = this_token_properties
+
+        X.append(token_properties)
+
+        y_pred = crf_text_model.predict(X)
+
+        last_token_category = "O"
+        for idx in range(len(X[0])):
+
+            if y_pred[0][idx] != "O":
+                if last_token_category == "O" or y_pred[0][idx] == "B":
+                    start_idx = tokens[idx].start()
+                    end_idx = len(text)
+                    for j in range(idx + 1, len(X[0])):
+                        if y_pred[0][j] == "O" or y_pred[0][j] == "B":
+                            end_idx = tokens[j - 1].end()
+                            break
+
+                    questions_from_text.append(text[start_idx:end_idx])
+
+            last_token_category = y_pred[0][idx]
+
+    if len(questions_from_text) > len(questions_from_tables):
+        instrument = harmony.create_instrument_from_list(questions_from_text)
+        print(instrument)
+        return [instrument]
+    elif len(questions_from_tables) > 0:
+        instrument = harmony.create_instrument_from_list(questions_from_tables)
+        return [instrument]
+    else:
+        return []
+
+    # return convert_text_to_instruments(file)
