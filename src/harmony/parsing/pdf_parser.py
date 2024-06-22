@@ -63,7 +63,7 @@ def convert_pdf_to_instruments(file: RawFile) -> Instrument:
 
     table_cell_texts = []
     page_tables = file.tables
-
+    questions_from_tables = []
     if len(page_tables) > 0:
         for page_table in page_tables:
             tables = page_table['tables']
@@ -80,17 +80,16 @@ def convert_pdf_to_instruments(file: RawFile) -> Instrument:
                         len(re_initial_num_dot.findall(t))]
             X.append(features)
 
-        print(len(X))
-        X = np.asarray(X)
+        if len(X) > 0:
+            X = np.asarray(X)
 
-        y_pred = rf_table_model.predict(X)
+            y_pred = rf_table_model.predict(X)
 
-        questions_from_tables = []
-        for idx in range(len(table_cell_texts)):
-            if y_pred[idx] == 1:
-                questions_from_tables.append(table_cell_texts[idx])
-    else:
-        questions_from_tables = []
+            questions_from_tables = []
+            for idx in range(len(table_cell_texts)):
+                if y_pred[idx] == 1:
+                    questions_from_tables.append(table_cell_texts[idx])
+
 
     if True:  # text CRF model
         questions_from_text = []
@@ -161,16 +160,20 @@ def convert_pdf_to_instruments(file: RawFile) -> Instrument:
                             end_idx = tokens[j - 1].end()
                             break
 
-                    questions_from_text.append(text[start_idx:end_idx])
+                    question_text = text[start_idx:end_idx]
+                    question_text = re.sub(r'\s+', ' ', question_text)
+                    question_text = question_text.strip()
+                    questions_from_text.append(question_text)
 
             last_token_category = y_pred[0][idx]
 
     if len(questions_from_text) > len(questions_from_tables):
-        instrument = harmony.create_instrument_from_list(questions_from_text)
+        print ("Source of parsing was text CRF")
+        instrument = harmony.create_instrument_from_list(questions_from_text, instrument_name=file.file_name, file_name=file.file_name)
         print(instrument)
         return [instrument]
     elif len(questions_from_tables) > 0:
-        instrument = harmony.create_instrument_from_list(questions_from_tables)
+        instrument = harmony.create_instrument_from_list(questions_from_tables, instrument_name=file.file_name, file_name=file.file_name)
         return [instrument]
     else:
         return []

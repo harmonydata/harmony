@@ -27,11 +27,12 @@ SOFTWARE.
 
 import base64
 import json
+import uuid
 
 from harmony.schemas.requests.text import Instrument, Question
 
 
-def create_instrument_from_list(question_texts: list, instrument_name: str = "My instrument") -> Instrument:
+def create_instrument_from_list(question_texts: list, instrument_name: str = "My instrument",file_name="My file") -> Instrument:
     """
     Read a list of strings and create an Instrument object.
     :return: Single Instrument.
@@ -41,7 +42,7 @@ def create_instrument_from_list(question_texts: list, instrument_name: str = "My
     for ctr, question_text in enumerate(question_texts):
         questions.append(Question(question_text=question_text, question_no=str(ctr + 1)))
 
-    return Instrument(questions=questions, instrument_name=instrument_name)
+    return Instrument(questions=questions, instrument_name=instrument_name, instrument_id = uuid.uuid4().hex, file_name=file_name, file_id = uuid.uuid4().hex)
 
 
 def import_instrument_into_harmony_web(instrument: Instrument, harmony_fe_base_url="https://harmonydata.ac.uk") -> str:
