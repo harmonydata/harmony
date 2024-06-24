@@ -1,4 +1,4 @@
-'''
+"""
 MIT License
 
 Copyright (c) 2023 Ulster University (https://www.ulster.ac.uk).
@@ -22,8 +22,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-'''
+"""
 
 from typing import List
 
@@ -101,7 +100,7 @@ class Instrument(BaseModel):
                                description="The ISO 639-2 (alpha-2) encoding of the instrument language")
     questions: List[Question] = Field(description="The items inside the instrument")
     closest_catalogue_instrument_matches: List[CatalogueInstrument] = Field(
-        None,
+        [],
         description="The closest instrument matches in the catalogue for the instrument, the first index "
                     "contains the best match etc"
     )
@@ -211,72 +210,3 @@ class MatchBody(BaseModel):
             }
         }
 
-
-class MatchCatalogueBody(BaseModel):
-    instruments: List[Instrument] = Field(description="Instruments to match.")
-    parameters: MatchParameters = Field(DEFAULT_MATCH_PARAMETERS, description="Parameters on how to match.")
-    sources: List[str] = Field(
-        default=[],
-        description="The instrument sources to use for matching. If empty, all instrument sources will be considered."
-    )
-
-    class Config:
-        schema_extra = {
-            "example": {
-                "instruments": [{
-                    "file_id": "fd60a9a64b1b4078a68f4bc06f20253c",
-                    "instrument_id": "7829ba96f48e4848abd97884911b6795",
-                    "instrument_name": "GAD-7 English",
-                    "file_name": "GAD-7 EN.pdf",
-                    "file_type": "pdf",
-                    "file_section": "GAD-7 English",
-                    "language": "en",
-                    "questions": [{"question_no": "1",
-                                   "question_intro": "Over the last two weeks, how often have you been bothered by the following problems?",
-                                   "question_text": "Feeling nervous, anxious, or on edge",
-                                   "options": ["Not at all", "Several days", "More than half the days",
-                                               "Nearly every day"],
-                                   "source_page": 0
-                                   },
-                                  {"question_no": "2",
-                                   "question_intro": "Over the last two weeks, how often have you been bothered by the following problems?",
-                                   "question_text": "Not being able to stop or control worrying",
-                                   "options": ["Not at all", "Several days", "More than half the days",
-                                               "Nearly every day"],
-                                   "source_page": 0
-                                   }
-
-                                  ]
-                },
-                    {
-                        "file_id": "fd60a9a64b1b4078a68f4bc06f20253c",
-                        "instrument_id": "7829ba96f48e4848abd97884911b6795",
-                        "instrument_name": "GAD-7 Portuguese",
-                        "file_name": "GAD-7 PT.pdf",
-                        "file_type": "pdf",
-                        "file_section": "GAD-7 Portuguese",
-                        "language": "en",
-                        "questions": [{"question_no": "1",
-                                       "question_intro": "Durante as últimas 2 semanas, com que freqüência você foi incomodado/a pelos problemas abaixo?",
-                                       "question_text": "Sentir-se nervoso/a, ansioso/a ou muito tenso/a",
-                                       "options": ["Nenhuma vez", "Vários dias", "Mais da metade dos dias",
-                                                   "Quase todos os dias"],
-                                       "source_page": 0
-                                       },
-                                      {"question_no": "2",
-                                       "question_intro": "Durante as últimas 2 semanas, com que freqüência você foi incomodado/a pelos problemas abaixo?",
-                                       "question_text": " Não ser capaz de impedir ou de controlar as preocupações",
-                                       "options": ["Nenhuma vez", "Vários dias", "Mais da metade dos dias",
-                                                   "Quase todos os dias"],
-                                       "source_page": 0
-                                       }
-
-                                      ]
-                    }
-
-                ],
-                "parameters": {"framework": DEFAULT_FRAMEWORK,
-                               "model": DEFAULT_MODEL},
-                "sources": ["MHC"]
-            }
-        }
