@@ -1,4 +1,4 @@
-'''
+"""
 MIT License
 
 Copyright (c) 2023 Ulster University (https://www.ulster.ac.uk).
@@ -22,13 +22,14 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-'''
+"""
 
 from typing import List
 
 from pydantic import BaseModel, Field
 
+from harmony.schemas.catalogue_instrument import CatalogueInstrument
+from harmony.schemas.catalogue_question import CatalogueQuestion
 from harmony.schemas.enums.file_types import FileType
 from harmony.schemas.enums.languages import Language
 
@@ -64,8 +65,13 @@ class Question(BaseModel):
     instrument_id: str = Field(None, description="Unique identifier for the instrument (UUID-4)")
     instrument_name: str = Field(None, description="Human readable name for the instrument")
     topics_auto: list = Field(None, description="Automated list of topics identified by model")
-    topics_strengths: dict = Field(None, description="Automated list of topics identified by model with strength of topic")
+    topics_strengths: dict = Field(
+        None, description="Automated list of topics identified by model with strength of topic"
+    )
     nearest_match_from_mhc_auto: dict = Field(None, description="Automatically identified nearest MHC match")
+    closest_catalogue_question_match: CatalogueQuestion = Field(
+        None, description="The closest question match in the catalogue for the question"
+    )
 
     class Config:
         schema_extra = {
@@ -92,7 +98,12 @@ class Instrument(BaseModel):
                            description="Optional metadata about the instrument (URL, citation, DOI, copyright holder)")
     language: Language = Field(Language.English,
                                description="The ISO 639-2 (alpha-2) encoding of the instrument language")
-    questions: List[Question] = Field(description="the items inside the instrument")
+    questions: List[Question] = Field(description="The items inside the instrument")
+    closest_catalogue_instrument_matches: List[CatalogueInstrument] = Field(
+        [],
+        description="The closest instrument matches in the catalogue for the instrument, the first index "
+                    "contains the best match etc"
+    )
 
     class Config:
         schema_extra = {
@@ -198,3 +209,4 @@ class MatchBody(BaseModel):
                                "model": DEFAULT_MODEL}
             }
         }
+
