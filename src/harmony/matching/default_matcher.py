@@ -60,8 +60,6 @@ def match_instruments(
     mhc_all_metadatas: List = [],
     mhc_embeddings: np.ndarray = np.zeros((0, 0)),
     texts_cached_vectors: dict[str, List[float]] = {},
-    include_catalogue_matches: bool = False,
-    catalogue_data: dict = {},
 ) -> tuple:
     return match_instruments_with_function(
         instruments=instruments,
@@ -71,6 +69,4 @@ def match_instruments(
         mhc_all_metadatas=mhc_all_metadatas,
         mhc_embeddings=mhc_embeddings,
         texts_cached_vectors=texts_cached_vectors,
-        include_catalogue_matches=include_catalogue_matches,
-        catalogue_data=catalogue_data,
     )

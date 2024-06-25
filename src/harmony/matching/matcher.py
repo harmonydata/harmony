@@ -441,8 +441,6 @@ def match_instruments_with_function(
         mhc_all_metadatas: List = [],
         mhc_embeddings: np.ndarray = np.zeros((0, 0)),
         texts_cached_vectors: dict[str, List[float]] = {},
-        include_catalogue_matches: bool = False,
-        catalogue_data: dict = {},
 ) -> tuple:
     """
     Match instruments.
@@ -453,11 +451,7 @@ def match_instruments_with_function(
     :param mhc_questions: MHC questions.
     :param mhc_all_metadatas: MHC metadatas.
     :param mhc_embeddings: MHC embeddings.
-    :param texts_cached_vectors: A dictionary of already cached vectors from texts (key is the text and value is the vector)
-    :param include_catalogue_matches: Include catalogue instrument matches in the result.
-    :param catalogue_data: The catalogue data.
-
-    :return: Index 0 contains a list of all the questions from the instruments (if include_catalogue_matches is True, each question now contains the best matched question from the catalogue). Index 1 contains similarity with polarity. Index 2 contains the query similarity. Index 3 contains a dict with the new text vectors to be cached. Index 4 contains a list of all instruments (if include_catalogue_matches is True, each instrument now contains a list of closest instrument matches). Index 5 contains a list of closest catalogue instrument matches for all the instruments (only if include_catalogue_matches is True).
+    :param texts_cached_vectors: A dictionary of already cached vectors from texts (key is the text and value is the vector).
     """
 
     all_questions: List[Question] = []
@@ -542,21 +536,9 @@ def match_instruments_with_function(
             for question in all_questions:
                 question.topics_auto = []
 
-    # Get catalogue matches
-    closest_catalogue_instrument_matches = []
-    if include_catalogue_matches:
-        instruments, closest_catalogue_instrument_matches = match_instruments_with_catalogue_instruments(
-            instruments=instruments,
-            catalogue_data=catalogue_data,
-            vectorisation_function=vectorisation_function,
-            texts_cached_vectors=texts_cached_vectors,
-        )
-
     return (
         all_questions,
         similarity_with_polarity,
         query_similarity,
-        new_vectors_dict,
-        instruments,
-        closest_catalogue_instrument_matches
+        new_vectors_dict
     )
