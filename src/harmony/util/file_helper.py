@@ -55,7 +55,7 @@ def load_instruments_from_local_file(file_name: str) -> List[Instrument]:
                 "rb") as f:
             file_as_bytes = f.read()
 
-        file_as_base64 = base64.b64encode(file_as_bytes).decode('ascii')
+        file_as_base64 = base64.urlsafe_b64encode(file_as_bytes).decode('ascii')
 
         harmony_file = RawFile(file_type=file_type, content="," + file_as_base64, file_id=uuid.uuid4().hex,
                                file_name=file_name)
