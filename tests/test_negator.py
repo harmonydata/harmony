@@ -37,7 +37,7 @@ class TestNegation(unittest.TestCase):
     def test_simple_example(self):
         text = "I never feel depressed"
         print(negate(text, "en"))
-        self.assertEqual("I  feel depressed", negate(text, "en"))
+        self.assertEqual("I feel depressed", negate(text, "en"))
 
     def test_simple_example_neg(self):
         text = "I feel depressed"
@@ -70,7 +70,7 @@ class TestNegation(unittest.TestCase):
 
     def test_simple_example_de(self):
         text = "Ich fühle mich nicht deprimiert"
-        self.assertEqual("Ich fühle mich  deprimiert", negate(text, "de"))
+        self.assertEqual("Ich fühle mich deprimiert", negate(text, "de"))
 
     def test_simple_example_de_neg(self):
         text = "Ich fühle mich deprimiert"
