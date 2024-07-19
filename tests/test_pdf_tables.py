@@ -55,12 +55,16 @@ pdf_non_empty_table = RawFile.parse_obj({
 
 class TestConvertPdfTables(unittest.TestCase):
 
-    def test_empty_pdf(self):
-        
-        self.assertEqual(0, len(convert_pdf_to_instruments(pdf_empty_table)))
+    pass
 
-    def test_two_questions(self):
-        self.assertEqual(2, len(convert_pdf_to_instruments(pdf_non_empty_table)[0].questions))
+    # Not using tables at the moment
+    #
+    # def test_empty_pdf(self):
+    #
+    #     self.assertEqual(0, len(convert_pdf_to_instruments(pdf_empty_table)))
+    #
+    # def test_two_questions(self):
+    #     self.assertEqual(2, len(convert_pdf_to_instruments(pdf_non_empty_table)[0].questions))
 
 
 if __name__ == '__main__':
