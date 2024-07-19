@@ -43,10 +43,11 @@ dependencies = [
     "langdetect==1.0.9; python_version <= '3.12'",
     "XlsxWriter==3.0.9; python_version <= '3.12'",
     "openpyxl==3.1.2; python_version <= '3.12'",
-    "spacy==3.5.3; python_version <= '3.12'",
     "wget==3.2; python_version <= '3.12'",
     "sentence-transformers==2.2.2; python_version <= '3.12'",
-    "numpy==1.26.4; python_version <= '3.12'"
+    "numpy==1.26.4; python_version <= '3.12'",
+    "sklearn-crfsuite==0.5.0; python_version <= '3.12'",
+    "scikit-learn; python_version <= '3.12'",
 ]
 
 [project.optional-dependencies]
