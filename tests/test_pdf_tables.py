@@ -35,7 +35,7 @@ from harmony.schemas.requests.text import RawFile
 from harmony import download_models
 
 
-pdf_empty_table = RawFile.parse_obj({
+pdf_empty_table = RawFile.model_validate({
     "file_id": "d39f31718513413fbfc620c6b6135d0c",
     "file_name": "GAD-7.pdf",
     "file_type": "pdf",
@@ -44,7 +44,7 @@ pdf_empty_table = RawFile.parse_obj({
     "content":""
 })
 
-pdf_non_empty_table = RawFile.parse_obj({
+pdf_non_empty_table = RawFile.model_validate({
     "file_id": "d39f31718513413fbfc620c6b6135d0c",
     "file_name": "GAD-7.pdf",
     "file_type": "pdf",

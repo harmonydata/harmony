@@ -52,7 +52,7 @@ def import_instrument_into_harmony_web(instrument: Instrument, harmony_fe_base_u
     @param harmony_fe_base_url: The base URL of the React app front end, defaulting to the web Harmony front end at harmonydata.ac.uk
     @return: a URL which you can click which will take you to the browser.
     """
-    instrument_serialised_as_json = json.dumps(instrument.dict())
+    instrument_serialised_as_json = json.dumps(instrument.model_dump())
     instrument_json_b64_encoded_bytes = base64.urlsafe_b64encode(instrument_serialised_as_json.encode('utf-8'))
     instrument_json_b64_encoded_str = instrument_json_b64_encoded_bytes.decode("utf-8")
 
