@@ -36,7 +36,7 @@ classifiers=[
 # core dependencies of harmony
 # this set should be kept minimal!
 dependencies = [
-    "pydantic==1.10.7; python_version <= '3.12'",
+    "pydantic==2.8.2; python_version <= '3.12'",
     "pandas==2.0.0; python_version <= '3.12'",
     "tika==2.6.0; python_version <= '3.12'",
     "lxml==4.9.2; python_version <= '3.12'",
