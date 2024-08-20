@@ -25,11 +25,58 @@ SOFTWARE.
 
 '''
 
-from harmony.parsing.text_parser import convert_text_to_instruments
+import pathlib
+import pickle as pkl
+import re
+
+import harmony
+from harmony.parsing.util.feature_extraction import convert_text_to_features
 from harmony.parsing.util.tika_wrapper import parse_pdf_to_plain_text
-# from harmony.parsing.util.tesseract_wrapper import parse_image_pdf_to_plain_text
-# from harmony.parsing.util.camelot_wrapper import parse_pdf_to_tables
 from harmony.schemas.requests.text import RawFile, Instrument
+
+model_containing_folder = pathlib.Path(__file__).parent.resolve()
+
+with open(f"{model_containing_folder}/20240719_pdf_question_extraction_sklearn_crf_model.pkl", "rb") as f:
+    crf_text_model = pkl.load(f)
+
+# Predict method is taken from the training repo. Use the training repo as the master copy of the predict method.
+# All training code is in https://github.com/harmonydata/pdf-questionnaire-extraction
+def predict(test_text):
+    token_texts, token_start_char_indices, token_end_char_indices, token_properties = convert_text_to_features(
+        test_text)
+
+    X = []
+    X.append(token_properties)
+
+    y_pred = crf_text_model.predict(X)
+
+    questions_from_text = []
+
+    tokens_already_used = set()
+
+    last_token_category = "O"
+
+    for idx in range(len(X[0])):
+
+        if y_pred[0][idx] != "O" and idx not in tokens_already_used:
+            if last_token_category == "O" or y_pred[0][idx] == "B":
+                start_idx = token_start_char_indices[idx]
+                end_idx = len(test_text)
+                for j in range(idx + 1, len(X[0])):
+                    if y_pred[0][j] == "O" or y_pred[0][j] == "B":
+                        end_idx = token_end_char_indices[j - 1]
+                        break
+                    tokens_already_used.add(j)
+
+                question_text = test_text[start_idx:end_idx]
+                question_text = re.sub(r'\s+', ' ', question_text)
+                question_text = question_text.strip()
+                questions_from_text.append(question_text)
+
+        last_token_category = y_pred[0][idx]
+
+    return questions_from_text
+
 
 def convert_pdf_to_instruments(file: RawFile) -> Instrument:
     # file is an object containing these properties:
@@ -38,8 +85,10 @@ def convert_pdf_to_instruments(file: RawFile) -> Instrument:
     # tables: list - this is a list of all the tables in the document. The front end has populated this field.
 
     if not file.text_content:
-        file.text_content = parse_pdf_to_plain_text(file.content) # call Tika to convert the PDF to plain text
+        file.text_content = parse_pdf_to_plain_text(file.content)  # call Tika to convert the PDF to plain text
 
-    # TODO: New PDF parsing algorithm should go here, together with return statement.
+    questions_from_text = predict(file.text_content)
 
-    return convert_text_to_instruments(file)
+    instrument = harmony.create_instrument_from_list(questions_from_text, instrument_name=file.file_name,
+                                                     file_name=file.file_name)
+    return [instrument]

@@ -29,8 +29,10 @@ __version__ = "0.5.2"
 
 # TODO: make these configurable at package level
 import os
-from .schemas import *
+
 from .examples import example_instruments
+from .schemas import *
+from .util.instrument_helper import create_instrument_from_list, import_instrument_into_harmony_web
 from .util.model_downloader import download_models
 
 if os.environ.get("HARMONY_NO_PARSING") is None or os.environ.get("HARMONY_NO_PARSING") == "":
@@ -43,7 +45,8 @@ if os.environ.get("HARMONY_NO_PARSING") is None or os.environ.get("HARMONY_NO_PA
 
 if os.environ.get("HARMONY_NO_MATCHING") is None or os.environ.get("HARMONY_NO_MATCHING") == "":
     from .matching.matcher import match_instruments_with_function
+
     try:
         from .matching.default_matcher import match_instruments
     except ModuleNotFoundError:
-        print ("Warning: transformers not available. To use transformers, run pip install sentence-transformers")
+        print("Warning: transformers not available. To use transformers, run pip install sentence-transformers")

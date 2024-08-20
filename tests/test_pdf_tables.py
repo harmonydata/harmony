@@ -25,22 +25,47 @@ SOFTWARE.
 
 '''
 
-from spacy.matcher import Matcher
+import sys
+import unittest
 
-from harmony.parsing.text_extraction.options_words import OPTIONS_WORDS
+sys.path.append("../src")
 
-def create_options_matcher(nlp):
-    options_matcher = Matcher(nlp.vocab)
-    patterns = []
+from harmony import convert_pdf_to_instruments
+from harmony.schemas.requests.text import RawFile
+from harmony import download_models
 
-    for doc in nlp.pipe(OPTIONS_WORDS):
-        pattern = []
-        for tok in doc:
-            if len(pattern) > 0:
-                pattern.append({"IS_SPACE": True, "OP": "*"})
-            pattern.append({"LOWER": tok.text.lower()})
-        patterns.append(pattern)
 
-    options_matcher.add("MWE", patterns)
+pdf_empty_table = RawFile.model_validate({
+    "file_id": "d39f31718513413fbfc620c6b6135d0c",
+    "file_name": "GAD-7.pdf",
+    "file_type": "pdf",
+    "tables": [],
+    "text_content":"aaa",
+    "content":""
+})
 
-    return options_matcher
+pdf_non_empty_table = RawFile.model_validate({
+    "file_id": "d39f31718513413fbfc620c6b6135d0c",
+    "file_name": "GAD-7.pdf",
+    "file_type": "pdf",
+   'tables': [["hello"]],
+    "text_content":"aaa",
+        "content":""
+})
+
+class TestConvertPdfTables(unittest.TestCase):
+
+    pass
+
+    # Not using tables at the moment
+    #
+    # def test_empty_pdf(self):
+    #
+    #     self.assertEqual(0, len(convert_pdf_to_instruments(pdf_empty_table)))
+    #
+    # def test_two_questions(self):
+    #     self.assertEqual(2, len(convert_pdf_to_instruments(pdf_non_empty_table)[0].questions))
+
+
+if __name__ == '__main__':
+    unittest.main()

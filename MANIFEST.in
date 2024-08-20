@@ -5,3 +5,4 @@ recursive-include tests test*.py
 include *.cff
 include *.ipynb
 include requirements.txt
+recursive-include src *.pkl

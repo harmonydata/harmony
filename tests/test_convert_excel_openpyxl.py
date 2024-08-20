@@ -33,7 +33,7 @@ sys.path.append("../src")
 from harmony import convert_excel_to_instruments
 from harmony.schemas.requests.text import RawFile
 
-xlsx_gad_7_2_questions = RawFile.parse_obj({
+xlsx_gad_7_2_questions = RawFile.model_validate({
     "file_id": "1d66bce4b80c4b0eaefe33f00cddedef",
     "file_name": "GAD-7.xlsx",
     "file_type": "xlsx",

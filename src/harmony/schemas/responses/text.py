@@ -1,4 +1,4 @@
-"""
+'''
 MIT License
 
 Copyright (c) 2023 Ulster University (https://www.ulster.ac.uk).
@@ -22,15 +22,15 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-"""
+
+'''
 
 from typing import List
-
-from pydantic import BaseModel, Field
 
 from harmony.schemas.catalogue_instrument import CatalogueInstrument
 from harmony.schemas.requests.text import Instrument
 from harmony.schemas.requests.text import Question
+from pydantic import BaseModel, Field, RootModel
 
 
 class MatchResponse(BaseModel):
@@ -49,8 +49,8 @@ class MatchResponse(BaseModel):
     )
 
 
-class InstrumentList(BaseModel):
-    __root__: List[Instrument]
+class InstrumentList(RootModel):
+    root: List[Instrument]
 
 
 class CacheResponse(BaseModel):
