@@ -43,7 +43,7 @@ questions_pt = [Question(
         question_text="Durante as últimas 2 semanas, com que freqüência você foi incomodado/a pelos problemas abaixo?")]
 instrument_pt = Instrument(questions=questions_pt, language="pt")
 
-instrument_1 = Instrument.parse_obj({
+instrument_1 = Instrument.model_validate({
     "file_id": "fd60a9a64b1b4078a68f4bc06f20253c",
     "instrument_id": "7829ba96f48e4848abd97884911b6795",
     "instrument_name": "GAD-7 English",
@@ -80,7 +80,7 @@ instrument_1 = Instrument.parse_obj({
 }
 )
 
-instrument_2 = Instrument.parse_obj({
+instrument_2 = Instrument.model_validate({
     "file_id": "fd60a9a64b1b4078a68f4bc06f20253c",
     "instrument_id": "7829ba96f48e4848abd97884911b6795",
     "instrument_name": "GAD-7 Portuguese",

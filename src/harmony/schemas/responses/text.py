@@ -29,7 +29,7 @@ from typing import List
 
 from harmony.schemas.requests.text import Instrument
 from harmony.schemas.requests.text import Question
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, RootModel
 
 
 class MatchResponse(BaseModel):
@@ -42,8 +42,8 @@ class MatchResponse(BaseModel):
     )
 
 
-class InstrumentList(BaseModel):
-    __root__: List[Instrument]
+class InstrumentList(RootModel):
+    root: List[Instrument]
 
 
 class CacheResponse(BaseModel):

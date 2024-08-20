@@ -34,7 +34,7 @@ from harmony import convert_pdf_to_instruments
 from harmony.schemas.requests.text import RawFile
 from harmony import download_models
 
-pdf_gad_7_2_questions = RawFile.parse_obj({
+pdf_gad_7_2_questions = RawFile.model_validate({
     "file_id": "d39f31718513413fbfc620c6b6135d0c",
     "file_name": "GAD-7.pdf",
     "file_type": "pdf",
