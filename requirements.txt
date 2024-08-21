@@ -1,5 +1,5 @@
 pydantic==2.8.2
-pandas==2.0.0
+pandas==2.2.2
 tika==2.6.0
 lxml==4.9.2
 langdetect==1.0.9
@@ -7,6 +7,6 @@ XlsxWriter==3.0.9
 openpyxl==3.1.2
 wget==3.2
 sentence-transformers==2.2.2
-numpy==1.26.4
+numpy==2.1.0
 sklearn-crfsuite==0.5.0
 scikit-learn==1.5.0

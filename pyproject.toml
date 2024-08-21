@@ -37,7 +37,7 @@ classifiers=[
 # this set should be kept minimal!
 dependencies = [
     "pydantic==2.8.2; python_version <= '3.12'",
-    "pandas==2.0.0; python_version <= '3.12'",
+    "pandas==2.2.2; python_version <= '3.12'",
     "tika==2.6.0; python_version <= '3.12'",
     "lxml==4.9.2; python_version <= '3.12'",
     "langdetect==1.0.9; python_version <= '3.12'",
@@ -45,7 +45,7 @@ dependencies = [
     "openpyxl==3.1.2; python_version <= '3.12'",
     "wget==3.2; python_version <= '3.12'",
     "sentence-transformers==2.2.2; python_version <= '3.12'",
-    "numpy==1.26.4; python_version <= '3.12'",
+    "numpy==2.1.0; python_version <= '3.12'",
     "sklearn-crfsuite==0.5.0; python_version <= '3.12'",
     "scikit-learn; python_version <= '3.12'",
 ]

@@ -29,7 +29,7 @@ from collections import Counter
 from typing import List, Callable
 
 import numpy as np
-from numpy import dot, mat, matmul, ndarray
+from numpy import dot, matmul, ndarray, matrix
 from numpy.linalg import norm
 
 from harmony.matching.negator import negate
@@ -44,8 +44,8 @@ from harmony.schemas.text_vector import TextVector
 
 def cosine_similarity(vec1: ndarray, vec2: ndarray) -> ndarray:
     dp = dot(vec1, vec2.T)
-    m1 = mat(norm(vec1, axis=1))
-    m2 = mat(norm(vec2.T, axis=0))
+    m1 = matrix(norm(vec1, axis=1))
+    m2 = matrix(norm(vec2.T, axis=0))
 
     return np.asarray(dp / matmul(m1.T, m2))
 
