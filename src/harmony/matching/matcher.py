@@ -379,16 +379,21 @@ def match_questions_with_catalogue_instruments(
             statistics.mean(cosine_similarities)
         )
 
+    instrument_idx_to_score = {}
+    for instrument_idx, average_sim in instrument_idx_to_cosine_similarities_average.items():
+        score = average_sim * (0.1+instrument_idx_to_top_matches_ct.get(instrument_idx, 0))
+        instrument_idx_to_score[instrument_idx] = score
+
     # Find the top 10 best instrument idx matches, index 0 containing the best match etc.
-    top_10_catalogue_instrument_idxs = sorted(
-        instrument_idx_to_cosine_similarities_average,
-        key=instrument_idx_to_cosine_similarities_average.get,
+    top_n_catalogue_instrument_idxs = sorted(
+        instrument_idx_to_score,
+        key=instrument_idx_to_score.get,
         reverse=True
-    )[:10]
+    )[:200]
 
     # Create a list of CatalogueInstrument for each top instrument
     top_instruments: List[CatalogueInstrument] = []
-    for top_catalogue_instrument_idx in top_10_catalogue_instrument_idxs:
+    for top_catalogue_instrument_idx in top_n_catalogue_instrument_idxs:
         top_catalogue_instrument = all_catalogue_instruments[top_catalogue_instrument_idx]
         num_questions_in_ref_instrument = (
             instrument_idx_to_total_num_question_items_present[
@@ -426,6 +431,7 @@ def match_questions_with_catalogue_instruments(
                 "info": info,
                 "num_matched_questions": num_top_match_questions,
                 "num_ref_instrument_questions": num_questions_in_ref_instrument,
+                "mean_cosine_similarity":  instrument_idx_to_cosine_similarities_average.get(top_catalogue_instrument_idx)
             },
         ))
 
