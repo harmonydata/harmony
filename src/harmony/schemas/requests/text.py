@@ -67,7 +67,7 @@ class Question(BaseModel):
     topics_auto: Optional[list] = Field(None, description="Automated list of topics identified by model")
     topics_strengths: Optional[dict] = Field(None, description="Automated list of topics identified by model with strength of topic")
     nearest_match_from_mhc_auto: Optional[dict] = Field(None, description="Automatically identified nearest MHC match")
-    closest_catalogue_question_match: CatalogueQuestion = Field(
+    closest_catalogue_question_match: Optional[CatalogueQuestion] = Field(
         None, description="The closest question match in the catalogue for the question"
     )
     model_config = ConfigDict(
