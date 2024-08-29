@@ -56,6 +56,6 @@ def import_instrument_into_harmony_web(instrument: Instrument, harmony_fe_base_u
     instrument_json_b64_encoded_bytes = base64.urlsafe_b64encode(instrument_serialised_as_json.encode('utf-8'))
     instrument_json_b64_encoded_str = instrument_json_b64_encoded_bytes.decode("utf-8")
 
-    url = f"{harmony_fe_base_url}/app/import/{instrument_json_b64_encoded_str}"
+    url = f"{harmony_fe_base_url}/app/#/import/{instrument_json_b64_encoded_str}"
 
     return url
