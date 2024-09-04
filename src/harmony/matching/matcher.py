@@ -466,7 +466,6 @@ def match_query_with_catalogue_instruments(
         "all_embeddings_concatenated"
     ]
     all_catalogue_instruments: List[dict] = catalogue_data["all_instruments"]
-    all_catalogue_questions: List[str] = catalogue_data["all_questions"]
 
     # No embeddings = nothing to find
     if len(all_catalogue_questions_embeddings_concatenated) == 0:
