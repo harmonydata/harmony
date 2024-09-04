@@ -70,6 +70,9 @@ class Question(BaseModel):
     closest_catalogue_question_match: Optional[CatalogueQuestion] = Field(
         None, description="The closest question match in the catalogue for the question"
     )
+    seen_in_catalogue_instruments: list[CatalogueInstrument] = Field(
+        default=None, description="The instruments from the catalogue were the question was seen in"
+    )
     model_config = ConfigDict(
         json_schema_extra={
             "example": {
@@ -97,7 +100,7 @@ class Instrument(BaseModel):
                                description="The ISO 639-2 (alpha-2) encoding of the instrument language")
     questions: List[Question] = Field(description="The items inside the instrument")
     closest_catalogue_instrument_matches: List[CatalogueInstrument] = Field(
-        [],
+        None,
         description="The closest instrument matches in the catalogue for the instrument, the first index "
                     "contains the best match etc"
     )
@@ -199,6 +202,17 @@ class MatchBody(BaseModel):
 
                 ],
                 "query": "anxiety",
+                "parameters": {"framework": DEFAULT_FRAMEWORK,
+                               "model": DEFAULT_MODEL}
+            }
+        })
+
+
+class SearchInstrumentsBody(BaseModel):
+    parameters: MatchParameters = Field(DEFAULT_MATCH_PARAMETERS, description="Parameters on how to search")
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
                 "parameters": {"framework": DEFAULT_FRAMEWORK,
                                "model": DEFAULT_MODEL}
             }

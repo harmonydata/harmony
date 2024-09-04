@@ -25,7 +25,8 @@ SOFTWARE.
 """
 
 import statistics
-from collections import Counter
+import heapq
+from collections import Counter, OrderedDict
 from typing import List, Callable
 
 import numpy as np
@@ -155,8 +156,8 @@ def match_instruments_with_catalogue_instruments(
     :param catalogue_data: The catalogue data.
     :param vectorisation_function: A function to vectorize a text.
     :param texts_cached_vectors: A dictionary of already cached vectors from texts (key is the text and value is the vector).
-
-    :return: Index 0 in the tuple contains the list of instruments that now each contain the best instrument matches from the catalog. Index 1 in the tuple contains a list of closest instrument matches from the catalog for all the instruments.
+    :return: Index 0 in the tuple contains the list of instruments that now each contain the best instrument matches from the catalog.
+        Index 1 in the tuple contains a list of closest instrument matches from the catalog for all the instruments.
     """
 
     # Gather all questions
@@ -206,8 +207,8 @@ def match_questions_with_catalogue_instruments(
 ) -> List[CatalogueInstrument]:
     """
     Match questions with catalogue instruments.
-    Each question will receive a list of closest instrument matches, and at the end one closest instrument match for
-    all questions is returned.
+    Each question from the list will receive the closest instrument match for it.
+    The closest instrument match for all questions is returned as a result of this function.
 
     :param questions: The questions.
     :param catalogue_data: The catalogue data.
@@ -436,6 +437,96 @@ def match_questions_with_catalogue_instruments(
         ))
 
     return top_instruments
+
+
+def match_query_with_catalogue_instruments(
+        query: str,
+        catalogue_data: dict,
+        vectorisation_function: Callable,
+        texts_cached_vectors: dict[str, List[float]],
+) -> dict[str, list | dict]:
+    """
+    Match a query with catalogue instruments.
+
+    :param query: The query.
+    :param catalogue_data: The catalogue data.
+    :param vectorisation_function: A function to vectorize a text.
+    :param texts_cached_vectors: A dictionary of already cached text vectors (text to vector).
+    :return: A dict containing the list of instruments (up to 100) and the new text vectors.
+        E.g. {"instruments": [...], "new_text_vectors": {...}}.
+    """
+
+    response = {"instruments": [], "new_text_vectors": {}}
+
+    # Catalogue data
+    catalogue_instrument_idx_to_catalogue_questions_idx: List[List[int]] = (
+        catalogue_data["instrument_idx_to_question_idx"]
+    )
+    all_catalogue_questions_embeddings_concatenated: np.ndarray = catalogue_data[
+        "all_embeddings_concatenated"
+    ]
+    all_catalogue_instruments: List[dict] = catalogue_data["all_instruments"]
+    all_catalogue_questions: List[str] = catalogue_data["all_questions"]
+
+    # No embeddings = nothing to find
+    if len(all_catalogue_questions_embeddings_concatenated) == 0:
+        return response
+
+    # Text vectors
+    text_vectors, new_text_vectors = create_full_text_vectors(
+        all_questions=[],
+        query=query,
+        vectorisation_function=vectorisation_function,
+        texts_cached_vectors=texts_cached_vectors,
+    )
+
+    # Get an array of dimensions
+    vectors = np.array([text_vectors[0].vector])
+
+    # Get a 2D array of 1 x (number of questions in catalogue)
+    catalogue_similarities = cosine_similarity(
+        vectors, all_catalogue_questions_embeddings_concatenated
+    )
+
+    # Get the catalogue questions similarities for the query
+    catalogue_questions_similarities_for_query = catalogue_similarities[0].tolist()
+
+    # Get indexes of top matching questions in the catalogue
+    # The first index contains the best match
+    top_n = 100
+    top_catalogue_questions_matches_idxs = [
+        catalogue_questions_similarities_for_query.index(i)
+        for i in heapq.nlargest(top_n, catalogue_questions_similarities_for_query)
+    ]
+
+    # A dict of matching instruments
+    # The key is the name of the instrument and the value is the instrument
+    instrument_matches: OrderedDict[str, Instrument] = OrderedDict()
+
+    # Find the matching instruments by looking for the instrument of the top catalogue questions matches indexes
+    # Loop through indexes of top matched catalogue question
+    for top_catalogue_question_match_idx in top_catalogue_questions_matches_idxs:
+        # Loop through instrument index with its question indexes
+        for catalogue_instrument_idx, catalogue_instrument_questions_idxs in enumerate(
+                catalogue_instrument_idx_to_catalogue_questions_idx
+        ):
+            # Check if the index of the top matched catalogue question is in the catalogue instrument's question indexes
+            if top_catalogue_question_match_idx in catalogue_instrument_questions_idxs:
+                catalogue_instrument = all_catalogue_instruments[
+                    catalogue_instrument_idx
+                ]
+
+                # Add the instrument to the dict if it wasn't already added
+                instrument_name = catalogue_instrument["instrument_name"]
+                if instrument_name not in instrument_matches:
+                    instrument_matches[instrument_name] = Instrument.model_validate(
+                        catalogue_instrument
+                    )
+
+    response["instruments"] = [x for x in instrument_matches.values()]
+    response["new_text_vectors"] = new_text_vectors
+
+    return response
 
 
 #

@@ -49,6 +49,10 @@ class MatchResponse(BaseModel):
     )
 
 
+class SearchInstrumentsResponse(BaseModel):
+    instruments: List[Instrument] = Field(description="A list of instruments")
+
+
 class InstrumentList(RootModel):
     root: List[Instrument]
 
