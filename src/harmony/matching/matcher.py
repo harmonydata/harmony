@@ -444,14 +444,16 @@ def match_query_with_catalogue_instruments(
         catalogue_data: dict,
         vectorisation_function: Callable,
         texts_cached_vectors: dict[str, List[float]],
+        max_results: int = 100,
 ) -> dict[str, list | dict]:
     """
-    Match a query with catalogue instruments.
+    Match query with catalogue instruments.
 
     :param query: The query.
     :param catalogue_data: The catalogue data.
     :param vectorisation_function: A function to vectorize a text.
     :param texts_cached_vectors: A dictionary of already cached text vectors (text to vector).
+    :param max_results: The max amount of instruments to return.
     :return: A dict containing the list of instruments (up to 100) and the new text vectors.
         E.g. {"instruments": [...], "new_text_vectors": {...}}.
     """
@@ -492,10 +494,9 @@ def match_query_with_catalogue_instruments(
 
     # Get indexes of top matching questions in the catalogue
     # The first index contains the best match
-    top_n = 100
     top_catalogue_questions_matches_idxs = [
         catalogue_questions_similarities_for_query.index(i)
-        for i in heapq.nlargest(top_n, catalogue_questions_similarities_for_query)
+        for i in heapq.nlargest(max_results, catalogue_questions_similarities_for_query)
     ]
 
     # A dict of matching instruments
