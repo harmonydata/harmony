@@ -154,13 +154,15 @@ export HARMONY_SENTENCE_TRANSFORMER_PATH=sentence-transformers/distiluse-base-mu
 Any word vector representation can be used by Harmony. The below example works for OpenAI's [text-embedding-ada-002](https://openai.com/blog/new-and-improved-embedding-model) model as of July 2023, provided you have create a paid OpenAI account. However, since LLMs are progressing rapidly, we have chosen not to integrate Harmony directly into the OpenAI client libraries, but instead allow you to pass Harmony any vectorisation function of your choice.
 
 ```
-import openai
 import numpy as np
 from harmony import match_instruments_with_function, example_instruments
+from openai import OpenAI
+
+client = OpenAI()
 model_name = "text-embedding-ada-002"
 def convert_texts_to_vector(texts):
-    vectors = openai.Embedding.create(input = texts, model=model_name)['data']
-    return np.asarray([vectors[i]["embedding"] for i in range(len(vectors))])
+    vectors = client.embeddings.create(input = texts, model=model_name).data
+    return np.asarray([vectors[i].embedding for i in range(len(vectors))])
 instruments = example_instruments["CES_D English"], example_instruments["GAD-7 Portuguese"]
 all_questions, similarity, query_similarity, new_vectors_dict = match_instruments_with_function(instruments, None, convert_texts_to_vector)
 ```
