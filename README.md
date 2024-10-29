@@ -119,6 +119,17 @@ As an alternative to downloading models, you can set environment variables so th
 * `HARMONY_NO_PARSING` - set to 1 to import a lightweight variant of Harmony which doesn't support PDF parsing.
 * `HARMONY_NO_MATCHING` - set to 1 to import a lightweight variant of Harmony which doesn't support matching.
 
+## Creating instruments from a list of strings
+
+You can also create instruments quickly from a list of strings
+
+```
+from harmony import create_instrument_from_list, match_instruments
+instrument1 = create_instrument_from_list(["I feel anxious", "I feel nervous"])
+instrument2 = create_instrument_from_list(["I feel afraid", "I feel worried"])
+all_questions, similarity, query_similarity, new_vectors_dict = match_instruments([instrument1, instrument2])
+```
+
 ## Loading instruments from PDFs
 
 If you have a local file, you can load it into a list of `Instrument` instances:
