@@ -47,10 +47,19 @@ else:
 model = SentenceTransformer(sentence_transformer_path)
 
 
-def convert_texts_to_vector(texts: List) -> ndarray:
-    embeddings = model.encode(sentences=texts, convert_to_numpy=True)
+def convert_texts_to_vector(texts: List, batch_size=50) -> ndarray:
+    embeddings = []
 
-    return embeddings
+    # Process texts in batches
+    for i in range(0, len(texts), batch_size):
+        batch = texts[i:i + batch_size]
+        batch_embeddings = model.encode(sentences=batch, convert_to_numpy=True)
+        embeddings.append(batch_embeddings)
+
+    # Concatenate all batch embeddings into a single NumPy array
+    return np.concatenate(embeddings, axis=0)
+
+
 
 
 def match_instruments(
@@ -59,12 +68,13 @@ def match_instruments(
     mhc_questions: List = [],
     mhc_all_metadatas: List = [],
     mhc_embeddings: np.ndarray = np.zeros((0, 0)),
-    texts_cached_vectors: dict[str, List[float]] = {},
+    texts_cached_vectors: dict[str, List[float]] = {},batch_size: int = 50,
+
 ) -> tuple:
     return match_instruments_with_function(
         instruments=instruments,
         query=query,
-        vectorisation_function=convert_texts_to_vector,
+        vectorisation_function=lambda texts: convert_texts_to_vector(texts, batch_size=batch_size),
         mhc_questions=mhc_questions,
         mhc_all_metadatas=mhc_all_metadatas,
         mhc_embeddings=mhc_embeddings,
