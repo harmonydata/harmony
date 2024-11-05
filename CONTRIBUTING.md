@@ -74,6 +74,11 @@ Since the API repo includes the Python library as a submodule, when you update t
 
 Finally, the app repo [https://github.com/harmonydata/app](https://github.com/harmonydata/app) is the React front end. Please check you can run this repo locally also before you start contributing. To point the front end repo to a local copy of your API repo, please change the file [.env](https://github.com/harmonydata/app/blob/master/.env) to point to `http://localhost:8000`.
 
+
+## Commits
+
+When you make a commit, if it is for issue `#54`, please put `#54` in the issue description. This way Github will track the commit and link it to the issue in the Github issues list.
+
 ## Pull requests
 
 If you'd like to contribute to this project, you can contact us at https://harmonydata.ac.uk/ or [make a pull request](https://github.com/harmonydata/harmony/pulls) on our Github repository. You can also raise an issue.
