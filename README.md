@@ -286,8 +286,7 @@ You can cite our validation paper:
 
 A BibTeX entry for LaTeX users is
 
-{{< rawhtml >}}
-<pre>
+```
 @article{mcelroy2024using,
   title={Using natural language processing to facilitate the harmonisation of mental health questionnaires: a validation study using real-world data},
   author={McElroy, Eoin and Wood, Thomas and Bond, Raymond and Mulvenna, Maurice and Shevlin, Mark and Ploubidis, George B and Hoffmann, Mauricio Scopel and Moltrecht, Bettina},
@@ -298,6 +297,4 @@ A BibTeX entry for LaTeX users is
   year={2024},
   publisher={Springer}
 }
-</pre>
-{{< /rawhtml >}}
-
+```
