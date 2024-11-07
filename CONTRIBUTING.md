@@ -62,6 +62,10 @@ Harmony is mostly coded in Python. We use [Pycharm IDE](https://www.jetbrains.co
 
 Please make sure all code you commit is linted using the [Pycharm default linter](https://www.reddit.com/r/pycharm/comments/mm77el/what_is_the_default_linter_in_pycharm/). If you use a different one (such as VS Code's linter, or pylint), this will make the code history hard to follow, so please be consistent.
 
+See the example screenshot below of Pycharm's formatter to format your code correctly:
+
+![Pycharm Linter](https://raw.githubusercontent.com/harmonydata/.github/main/profile/pycharm-lint.png)
+
 ## Unit tests and code stability
 
 Harmony uses the [pytest](http://doc.pytest.org/) framework for testing. For more info on this, see the [pytest documentation](http://docs.pytest.org/en/latest/contents.html). To be interpreted and run, all test files and test functions need to be prefixed with `test_`.
