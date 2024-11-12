@@ -47,18 +47,27 @@ else:
 model = SentenceTransformer(sentence_transformer_path)
 
 
-def convert_texts_to_vector(texts: List, batch_size=50) -> ndarray:
+def convert_texts_to_vector(texts: List, batch_size=50, max_batches=2000) -> ndarray:
+    if batch_size==0:
+        embeddings = model.encode(sentences=texts, convert_to_numpy=True)
+
+        return embeddings
+
     embeddings = []
+    batch_count = 0
+
 
     # Process texts in batches
     for i in range(0, len(texts), batch_size):
+        if batch_count >= max_batches:
+            break
         batch = texts[i:i + batch_size]
         batch_embeddings = model.encode(sentences=batch, convert_to_numpy=True)
         embeddings.append(batch_embeddings)
+        batch_count += 1
 
     # Concatenate all batch embeddings into a single NumPy array
     return np.concatenate(embeddings, axis=0)
-
 
 
 
@@ -68,13 +77,13 @@ def match_instruments(
     mhc_questions: List = [],
     mhc_all_metadatas: List = [],
     mhc_embeddings: np.ndarray = np.zeros((0, 0)),
-    texts_cached_vectors: dict[str, List[float]] = {},batch_size: int = 50,
+    texts_cached_vectors: dict[str, List[float]] = {},batch_size: int = 50, max_batches: int =2000,
 
 ) -> tuple:
     return match_instruments_with_function(
         instruments=instruments,
         query=query,
-        vectorisation_function=lambda texts: convert_texts_to_vector(texts, batch_size=batch_size),
+        vectorisation_function=lambda texts: convert_texts_to_vector(texts, batch_size=batch_size, max_batches=max_batches),
         mhc_questions=mhc_questions,
         mhc_all_metadatas=mhc_all_metadatas,
         mhc_embeddings=mhc_embeddings,
