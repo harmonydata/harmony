@@ -28,15 +28,14 @@ import os
 from typing import List
 
 import numpy as np
+from harmony import match_instruments_with_function
+from harmony.schemas.requests.text import Instrument
 from numpy import ndarray
 from sentence_transformers import SentenceTransformer
 
-from harmony import match_instruments_with_function
-from harmony.schemas.requests.text import Instrument
-
 if (
-    os.environ.get("HARMONY_SENTENCE_TRANSFORMER_PATH", None) is not None
-    and os.environ.get("HARMONY_SENTENCE_TRANSFORMER_PATH", None) != ""
+        os.environ.get("HARMONY_SENTENCE_TRANSFORMER_PATH", None) is not None
+        and os.environ.get("HARMONY_SENTENCE_TRANSFORMER_PATH", None) != ""
 ):
     sentence_transformer_path = os.environ["HARMONY_SENTENCE_TRANSFORMER_PATH"]
 else:
@@ -48,14 +47,13 @@ model = SentenceTransformer(sentence_transformer_path)
 
 
 def convert_texts_to_vector(texts: List, batch_size=50, max_batches=2000) -> ndarray:
-    if batch_size==0:
+    if batch_size == 0:
         embeddings = model.encode(sentences=texts, convert_to_numpy=True)
 
         return embeddings
 
     embeddings = []
     batch_count = 0
-
 
     # Process texts in batches
     for i in range(0, len(texts), batch_size):
@@ -70,20 +68,20 @@ def convert_texts_to_vector(texts: List, batch_size=50, max_batches=2000) -> nda
     return np.concatenate(embeddings, axis=0)
 
 
-
 def match_instruments(
-    instruments: List[Instrument],
-    query: str = None,
-    mhc_questions: List = [],
-    mhc_all_metadatas: List = [],
-    mhc_embeddings: np.ndarray = np.zeros((0, 0)),
-    texts_cached_vectors: dict[str, List[float]] = {},batch_size: int = 50, max_batches: int =2000,
+        instruments: List[Instrument],
+        query: str = None,
+        mhc_questions: List = [],
+        mhc_all_metadatas: List = [],
+        mhc_embeddings: np.ndarray = np.zeros((0, 0)),
+        texts_cached_vectors: dict[str, List[float]] = {}, batch_size: int = 50, max_batches: int = 2000,
 
 ) -> tuple:
     return match_instruments_with_function(
         instruments=instruments,
         query=query,
-        vectorisation_function=lambda texts: convert_texts_to_vector(texts, batch_size=batch_size, max_batches=max_batches),
+        vectorisation_function=lambda texts: convert_texts_to_vector(texts, batch_size=batch_size,
+                                                                     max_batches=max_batches),
         mhc_questions=mhc_questions,
         mhc_all_metadatas=mhc_all_metadatas,
         mhc_embeddings=mhc_embeddings,

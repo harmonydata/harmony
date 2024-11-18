@@ -29,8 +29,9 @@ import sys
 import unittest
 import numpy
 
-from src.harmony.matching.default_matcher import convert_texts_to_vector
+sys.path.append("../src")
 
+from harmony.matching.default_matcher import convert_texts_to_vector
 
 class createModel:
     def encode(self, sentences, convert_to_numpy=True):
