@@ -41,6 +41,9 @@ You can also download an R markdown notebook to run in R Studio: <a href="https:
 
 You can run the walkthrough R notebook in Google Colab with a single click: <a href="https://colab.research.google.com/github/harmonydata/experiments/blob/main/Harmony_R_example.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a> [View the PDF documentation of the R package on CRAN](https://cran.r-project.org/web/packages/harmonydata/harmonydata.pdf)
 
+# Looking for examples?
+
+Check out our examples repository at [https://github.com/harmonydata/harmony_examples](https://github.com/harmonydata/harmony_examples)
 
 
 <!-- badges: end -->
