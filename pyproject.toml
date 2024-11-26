@@ -55,6 +55,7 @@ dependencies = [
     "scikit-learn; python_version <= '3.13'",
     "scipy==1.14.1; python_version <= '3.13'",
     "huggingface-hub==0.25.0; python_version <= '3.13'",
+    "lxml==5.3.0; python_version <= '3.13'",
 ]
 
 [project.optional-dependencies]
