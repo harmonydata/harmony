@@ -44,7 +44,7 @@ dependencies = [
     "pydantic==2.8.2; python_version <= '3.13'",
     "pandas==2.2.2; python_version <= '3.13'",
     "tika==2.6.0; python_version <= '3.13'",
-    "lxml==4.9.2; python_version <= '3.13'",
+    "lxml==5.3.0; python_version <= '3.13'",
     "langdetect==1.0.9; python_version <= '3.13'",
     "XlsxWriter==3.0.9; python_version <= '3.13'",
     "openpyxl==3.1.2; python_version <= '3.13'",
@@ -55,7 +55,6 @@ dependencies = [
     "scikit-learn; python_version <= '3.13'",
     "scipy==1.14.1; python_version <= '3.13'",
     "huggingface-hub==0.25.0; python_version <= '3.13'",
-    "lxml==5.3.0; python_version <= '3.13'",
 ]
 
 [project.optional-dependencies]
