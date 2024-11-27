@@ -21,6 +21,6 @@ Provide details regarding the operating system, toolchain, and environment.
 2.
 3.
 
-## Expected Behavior
+## Expected Behaviour
 
-A description of the expected behavior.
+A description of the expected behaviour.

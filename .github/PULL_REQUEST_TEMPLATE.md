@@ -1,6 +1,6 @@
 ## Description
 
-Please include a summary of the change and which issue is fixed. Please also include relevant context. List any dependencies that are required for this change.
+Please include a summary of the change and which issue is fixed. Please also include relevant context. List any dependencies that are required for this change. Ideally we avoid introducing any new third party dependencies in `requirements.txt` and `pyproject.toml` unless absolutely necessary, because this makes the project more susceptible to breaking whenever a third party library is updated.
 
 #### Fixes # (issue)
 
@@ -20,6 +20,8 @@ Please describe the tests that you ran to verify your changes. Provide instructi
 - [ ] Test A
 - [ ] Test B
 
+Since the Harmony Python package is used by the Harmony API (which is itself used by the R library and the web app), we need to avoid making any changes that break the Harmony API. Please also run the Harmony API unit tests and check that the API still runs with your changes to the Python package: https://github.com/harmonydata/harmonyapi
+
 #### Test Configuration
 
 * Library version:
@@ -28,7 +30,7 @@ Please describe the tests that you ran to verify your changes. Provide instructi
 
 ## Checklist
 
-- [ ] My code follows the style guidelines of this project
+- [ ] My code follows the style guidelines of this project. I have applied a Linter (recommended: Pycharm's code formatter) to make my whitespace consistent with the rest of the project.
 - [ ] I have performed a self-review of my own code
 - [ ] I have commented my code, particularly in hard-to-understand areas
 - [ ] I have made corresponding changes to the documentation
@@ -37,3 +39,5 @@ Please describe the tests that you ran to verify your changes. Provide instructi
 - [ ] New and existing unit tests pass locally with my changes
 - [ ] Any dependent changes have been merged and published in downstream modules
 - [ ] I have checked my code and corrected any misspellings
+- [ ] The Harmony API is not broken by my change to the Harmony Python library
+- [ ] If I introduced a new feature, I documented it (e.g. making a script example in the [script examples repository](https://github.com/harmonydata/harmony_examples) so that people will know how to use it.
