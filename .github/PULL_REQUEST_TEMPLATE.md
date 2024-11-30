@@ -41,3 +41,5 @@ Since the Harmony Python package is used by the Harmony API (which is itself use
 - [ ] I have checked my code and corrected any misspellings
 - [ ] The Harmony API is not broken by my change to the Harmony Python library
 - [ ] If I introduced a new feature, I documented it (e.g. making a script example in the [script examples repository](https://github.com/harmonydata/harmony_examples) so that people will know how to use it.
+
+Optionally: feel free to paste your Discord username in this format: `discordapp.com/users/yourID` in your pull request description, then we can know to tag you in the Harmony Discord server when we announce the PR.
