@@ -42,6 +42,30 @@ from harmony.schemas.requests.text import (
 )
 from harmony.schemas.text_vector import TextVector
 
+import os
+
+
+def get_batch_size(default=50):
+    try:
+        batch_size = int(os.getenv("BATCH_SIZE", default))
+        return max(batch_size, 0)
+    except (ValueError, TypeError):
+        return default
+def process_items_in_batches(items, llm_function):
+    batch_size = get_batch_size()
+
+    if batch_size == 0:
+         return llm_function(items)
+
+
+    batches = [items[i:i + batch_size] for i in range(0, len(items), batch_size)]
+
+    results = []
+    for batch in batches:
+        batch_results = llm_function(batch)
+        results.extend(batch_results)
+    return results
+
 
 def cosine_similarity(vec1: ndarray, vec2: ndarray) -> ndarray:
     dp = dot(vec1, vec2.T)
@@ -127,8 +151,11 @@ def create_full_text_vectors(
     # Texts with no cached vector
     texts_not_cached = [x.text for x in text_vectors if not x.vector]
 
+
+
     # Get vectors for all texts not cached
-    new_vectors_list: List = vectorisation_function(texts_not_cached).tolist()
+    new_vectors_list: List = process_items_in_batches(texts_not_cached, vectorisation_function)
+
 
     # Create a dictionary with new vectors
     new_vectors_dict = {}
@@ -382,7 +409,7 @@ def match_questions_with_catalogue_instruments(
 
     instrument_idx_to_score = {}
     for instrument_idx, average_sim in instrument_idx_to_cosine_similarities_average.items():
-        score = average_sim * (0.1+instrument_idx_to_top_matches_ct.get(instrument_idx, 0))
+        score = average_sim * (0.1 + instrument_idx_to_top_matches_ct.get(instrument_idx, 0))
         instrument_idx_to_score[instrument_idx] = score
 
     # Find the top 10 best instrument idx matches, index 0 containing the best match etc.
@@ -432,7 +459,8 @@ def match_questions_with_catalogue_instruments(
                 "info": info,
                 "num_matched_questions": num_top_match_questions,
                 "num_ref_instrument_questions": num_questions_in_ref_instrument,
-                "mean_cosine_similarity":  instrument_idx_to_cosine_similarities_average.get(top_catalogue_instrument_idx)
+                "mean_cosine_similarity": instrument_idx_to_cosine_similarities_average.get(
+                    top_catalogue_instrument_idx)
             },
         ))
 
