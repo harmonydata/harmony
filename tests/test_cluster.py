@@ -49,3 +49,6 @@ class TestCluster(unittest.TestCase):
         clusters_out, score_out = cluster_questions(self.instruments, 2, True)
         assert(len(clusters_out) == 5)
         assert score_out
+
+if __name__ == '__main__':
+    unittest.main()
