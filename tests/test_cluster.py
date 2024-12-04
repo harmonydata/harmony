@@ -46,7 +46,7 @@ class TestCluster(unittest.TestCase):
         self.instruments = Instrument(questions=self.all_questions_real)
 
     def test_cluster(self):
-        clusters_out, score_out = cluster_questions(self.instruments, 2, True)
+        clusters_out, score_out = cluster_questions(self.instruments, 2, False)
         assert(len(clusters_out) == 5)
         assert score_out
 
