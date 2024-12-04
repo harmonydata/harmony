@@ -1,4 +1,5 @@
 import os
+import sys
 import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
@@ -40,13 +41,29 @@ def perform_kmeans(embeddings_in, num_clusters=5):
 
 
 def visualize_clusters(embeddings_in, kmeans_labels):
-    import matplotlib.pyplot as plt
-    pca = PCA(n_components=2)
-    reduced_embeddings = pca.fit_transform(embeddings_in)
-    plt.scatter(reduced_embeddings[:, 0], reduced_embeddings[:, 1], c=kmeans_labels, cmap='viridis', s=50)
-    plt.colorbar()
-    plt.title("Question Clusters")
-    plt.show()
+    try:
+        import matplotlib.pyplot as plt
+        pca = PCA(n_components=2)
+        reduced_embeddings = pca.fit_transform(embeddings_in)
+        plt.scatter(reduced_embeddings[:, 0], reduced_embeddings[:, 1], c=kmeans_labels, cmap='viridis', s=50)
+        plt.colorbar()
+        plt.title("Question Clusters")
+
+        for i, point in enumerate(reduced_embeddings):
+            plt.annotate(
+                str(i),  # Label each point with its question number
+                (point[0], point[1]),  # Coordinates from reduced_embeddings
+                fontsize=8,
+                ha="center"
+            )
+
+        plt.show()
+    except ImportError as e:
+        print(
+            "Matplotlib is not installed. Please install it using:\n"
+            "pip install matplotlib==3.7.0"
+        )
+        sys.exit(1)
 
 def cluster_questions(instrument_in, num_clusters: int, graph: bool):
     # convert instruments into a list of questions
