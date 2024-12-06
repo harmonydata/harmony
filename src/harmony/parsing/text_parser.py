@@ -39,14 +39,16 @@ from harmony.schemas.requests.text import RawFile, Instrument, Question
 re_question_text_column = re.compile(r'(?i)(?:question|text|pergunta)')
 re_number_column = re.compile(r'(?i)(?:number|\bno)')
 
+
 def remove_numbers(question_text):
-    # aemove formatted numbers from start of text
+    # remove formatted numbers from start of text
     cleaned_text = re.sub(r'^[\s\(]*\d+[\s\.\)\-]*', '', question_text)
-    
+
     # remove formatted numbers from end of text
     cleaned_text = re.sub(r'[\s\(]*\d+[\s\.\)\-]*$', '', cleaned_text)
-    
+
     return cleaned_text.strip()
+
 
 def convert_text_to_instruments(file: RawFile) -> List[Instrument]:
     if file.file_type == FileType.txt or file.file_type == FileType.csv:  # text files not binary
