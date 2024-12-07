@@ -46,18 +46,21 @@ def load_instruments_from_local_file(file_name: str) -> List[Instrument]:
         file_type = "xlsx"
     elif file_name.lower().endswith("docx"):
         file_type = "docx"
+    elif file_name.lower().endswith("html"):
+        file_type = "html"
     else:
         file_type = "txt"
 
-    if file_type == "pdf" or file_type == "xlsx" or file_type == "docx":
+    if file_type in ["pdf", "xlsx", "docx", "html"]:
         with open(
                 file_name,
                 "rb") as f:
             file_as_bytes = f.read()
 
-        file_as_base64 = base64.urlsafe_b64encode(file_as_bytes).decode('ascii')
+        file_as_base64 = base64.b64encode(file_as_bytes).decode('ascii')
+        print(f"File as Base64 (first 100 characters): {file_as_base64[:100]}")
 
-        harmony_file = RawFile(file_type=file_type, content="," + file_as_base64, file_id=uuid.uuid4().hex,
+        harmony_file = RawFile(file_type=file_type, content= file_as_base64, file_id=uuid.uuid4().hex,
                                file_name=file_name)
     else:
         with open(
