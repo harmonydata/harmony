@@ -82,6 +82,7 @@ You need a Windows, Linux or Mac system with
 * the requirements in [requirements.txt](./requirements.txt)
 * Java (if you want to extract items from PDFs)
 * [Apache Tika](https://tika.apache.org/download.html) (if you want to extract items from PDFs)
+* Install wkhtmltopdf if you want to use HTML inputs [More instructions here](https://pypi.org/project/pdfkit/)
 
 ## 🖥 Installing Harmony Python package
 

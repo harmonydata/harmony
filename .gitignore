@@ -131,3 +131,7 @@ dmypy.json
 .idea/
 
 src/log.txt
+*.html 
+*.pdf
+pdm.lock
+.pdm-python 

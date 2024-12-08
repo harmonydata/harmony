@@ -16,7 +16,7 @@ maintainers = [
 authors = [
     { name = "Thomas Wood", email = "thomas@fastdatascience.com" },
 ]
-requires-python = ">=3.6,<=3.13.0"
+requires-python = ">=3.11,<=3.13.0"
 classifiers=[
     # see https://pypi.org/classifiers/
     "Development Status :: 5 - Production/Stable",
@@ -55,6 +55,8 @@ dependencies = [
     "scikit-learn; python_version <= '3.13'",
     "scipy==1.14.1; python_version <= '3.13'",
     "huggingface-hub==0.25.0; python_version <= '3.13'",
+    "ipykernel>=6.29.5",
+    "pdfkit>=1.0.0",
 ]
 
 [project.optional-dependencies]

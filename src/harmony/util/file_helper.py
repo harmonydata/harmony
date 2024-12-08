@@ -28,12 +28,33 @@ SOFTWARE.
 import base64
 import uuid
 from typing import List
+import pdfkit
+
 
 from harmony.parsing.wrapper_all_parsers import convert_files_to_instruments
 from harmony.schemas.requests.text import Instrument
 from harmony.schemas.requests.text import RawFile
 
+def convert_html_to_pdf(file_name: str) -> RawFile:
+    try:
+        # Convert HTML to PDF
+        if file_name.startswith("http"):
+            pdf_content = pdfkit.from_url(file_name, False) 
+        else:
+            pdf_content = pdfkit.from_file(file_name, False)
 
+        file_as_base64 = base64.urlsafe_b64encode(pdf_content).decode("ascii")
+
+        return RawFile(
+            file_type="pdf",
+            content="," + file_as_base64,
+            file_id=uuid.uuid4().hex,
+            file_name=file_name,
+        )
+
+    except Exception as e:
+        print(f"Error during HTML conversion and parsing: {e}")
+        
 def load_instruments_from_local_file(file_name: str) -> List[Instrument]:
     """
     Open a local file (PDF, Excel, Word or TXT format) and parse it into a list of Instrument objects.
@@ -51,7 +72,7 @@ def load_instruments_from_local_file(file_name: str) -> List[Instrument]:
     else:
         file_type = "txt"
 
-    if file_type in ["pdf", "xlsx", "docx", "html"]:
+    if file_type in ["pdf", "xlsx", "docx"]:
         with open(
                 file_name,
                 "rb") as f:
@@ -60,8 +81,10 @@ def load_instruments_from_local_file(file_name: str) -> List[Instrument]:
         file_as_base64 = base64.b64encode(file_as_bytes).decode('ascii')
         print(f"File as Base64 (first 100 characters): {file_as_base64[:100]}")
 
-        harmony_file = RawFile(file_type=file_type, content= file_as_base64, file_id=uuid.uuid4().hex,
+        harmony_file = RawFile(file_type=file_type, content= "," + file_as_base64, file_id=uuid.uuid4().hex,
                                file_name=file_name)
+    elif file_type == "html":
+        harmony_file = convert_html_to_pdf(file_name)
     else:
         with open(
                 file_name,
