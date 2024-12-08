@@ -47,11 +47,11 @@ def parse_pdf_to_plain_text(contents: str) -> str:
     """
     print("Preparing data for Tika")
     content_type, content_string = contents.split(",")
-    file_in_bytes = base64.b64decode(content_string)
+    file_in_bytes = base64.urlsafe_b64decode(content_string)
 
     file = io.BytesIO(file_in_bytes)
     print("Calling Tika")
-    parsed = parser.from_buffer(file, xmlContent=True, requestOptions={'timeout': 300})
+    parsed = parser.from_buffer(file, xmlContent=True, requestOptions={"timeout": 300})
     print("Got response from Tika")
     parsed_xml = parsed["content"]
 
