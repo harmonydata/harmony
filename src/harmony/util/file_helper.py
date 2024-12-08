@@ -35,7 +35,11 @@ from harmony.parsing.wrapper_all_parsers import convert_files_to_instruments
 from harmony.schemas.requests.text import Instrument
 from harmony.schemas.requests.text import RawFile
 
+
 def convert_html_to_pdf(file_name: str) -> RawFile:
+    """
+    Convert html to pdf,
+    """
     try:
         # Convert HTML to PDF
         if file_name.startswith("http"):
