@@ -42,42 +42,6 @@ from harmony.schemas.requests.text import Instrument, Question
 from harmony.schemas.text_vector import TextVector
 
 
-BATCH_SIZE = int(os.getenv("BATCH_SIZE", 50))
-
-def batch_process(items, batch_size):
-    """
-    Process items in batches.
-    
-    Args:
-        items (list): List of items to be batched.
-        batch_size (int): Size of each batch.
-
-    Returns:
-        list: A list of batches, each batch being a list of items.
-    """
-    return [items[i:i + batch_size] for i in range(0, len(items), batch_size)]
-
-
-def vectorize_items_with_batching(items, vectorize_function, batch_size):
-    """
-    Vectorize items in batches.
-
-    Args:
-        items (list): List of items to be vectorized.
-        vectorize_function (callable): Function to compute vectors for a batch of items.
-        batch_size (int): Size of each batch.
-
-    Returns:
-        np.ndarray: Concatenated array of vectors for all items.
-    """
-    batches = batch_process(items, batch_size)
-    vectors = []
-    for batch in batches:
-        batch_vectors = vectorize_function(batch)
-        vectors.extend(batch_vectors)
-    return np.array(vectors)
-
-
 def cosine_similarity(vec1: ndarray, vec2: ndarray) -> ndarray:
     dp = dot(vec1, vec2.T)
     m1 = matrix(norm(vec1, axis=1))
@@ -128,6 +92,8 @@ def create_full_text_vectors(
         text_vectors = add_text_to_vec(query, texts_cached_vectors, text_vectors, False, True)
 
     texts_not_cached = [x.text for x in text_vectors if not x.vector]
+
+    # Get vectors for all texts not cached
     new_vectors_list: List = vectorisation_function(texts_not_cached).tolist()
 
     new_vectors_dict = {}
@@ -449,7 +415,7 @@ def match_questions_with_catalogue_instruments(
 
     instrument_idx_to_score = {}
     for instrument_idx, average_sim in instrument_idx_to_cosine_similarities_average.items():
-        score = average_sim * (0.1+instrument_idx_to_top_matches_ct.get(instrument_idx, 0))
+        score = average_sim * (0.1 + instrument_idx_to_top_matches_ct.get(instrument_idx, 0))
         instrument_idx_to_score[instrument_idx] = score
 
     # Find the top 10 best instrument idx matches, index 0 containing the best match etc.
@@ -499,7 +465,8 @@ def match_questions_with_catalogue_instruments(
                 "info": info,
                 "num_matched_questions": num_top_match_questions,
                 "num_ref_instrument_questions": num_questions_in_ref_instrument,
-                "mean_cosine_similarity":  instrument_idx_to_cosine_similarities_average.get(top_catalogue_instrument_idx)
+                "mean_cosine_similarity": instrument_idx_to_cosine_similarities_average.get(
+                    top_catalogue_instrument_idx)
             },
         ))
 

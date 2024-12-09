@@ -25,28 +25,39 @@ SOFTWARE.
 
 '''
 
-__version__ = "1.0.1"
+import sys
+import unittest
+import numpy
 
-# TODO: make these configurable at package level
-import os
+sys.path.append("../src")
 
-from .examples import example_instruments
-from .schemas import *
-from .util.instrument_helper import create_instrument_from_list, import_instrument_into_harmony_web
-from .util.model_downloader import download_models
+from harmony.matching.default_matcher import convert_texts_to_vector
 
-if os.environ.get("HARMONY_NO_PARSING") is None or os.environ.get("HARMONY_NO_PARSING") == "":
-    from .parsing.text_parser import convert_text_to_instruments
-    from .parsing.excel_parser import convert_excel_to_instruments
-    from .parsing.pdf_parser import convert_pdf_to_instruments
-    from .parsing.wrapper_all_parsers import convert_files_to_instruments
-    from .parsing import *
-    from .util.file_helper import load_instruments_from_local_file
+class createModel:
+    def encode(self, sentences, convert_to_numpy=True):
+        # Generate a dummy embedding with 768 dimensions for each sentence
+        return numpy.array([[1] * 768] * len(sentences))
 
-if os.environ.get("HARMONY_NO_MATCHING") is None or os.environ.get("HARMONY_NO_MATCHING") == "":
-    from .matching.matcher import match_instruments_with_function
 
-    try:
-        from .matching.default_matcher import match_instruments
-    except ModuleNotFoundError:
-        print("Warning: transformers not available. To use transformers, run pip install sentence-transformers")
+
+model = createModel()
+
+class TestBatching(unittest.TestCase):
+    def test_convert_texts_to_vector_with_batching(self):
+        # Create a list of 10 dummy texts
+        texts = ["text" + str(i) for i in range(10)]
+
+
+        batch_size = 5
+        max_batches = 2
+        embeddings = convert_texts_to_vector(texts, batch_size=batch_size, max_batches=max_batches)
+
+
+        self.assertEqual(embeddings.shape[0], 10)
+
+
+        self.assertEqual(embeddings.shape[1], 384)
+
+
+if __name__ == "__main__":
+    unittest.main()
