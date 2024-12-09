@@ -29,12 +29,18 @@ import base64
 import uuid
 from typing import List
 import pdfkit
+from bs4 import BeautifulSoup
 
 
 from harmony.parsing.wrapper_all_parsers import convert_files_to_instruments
 from harmony.schemas.requests.text import Instrument
 from harmony.schemas.requests.text import RawFile
 
+def extract_html_title(file_path):
+    with open(file_path, "r", encoding="utf-8") as f:
+        content = f.read()
+    soup = BeautifulSoup(content, "html.parser")
+    return soup.title.string.strip() if soup.title else "Untitled"
 
 def convert_html_to_pdf(file_name: str) -> RawFile:
     """
@@ -89,6 +95,8 @@ def load_instruments_from_local_file(file_name: str) -> List[Instrument]:
                                file_name=file_name)
     elif file_type == "html":
         harmony_file = convert_html_to_pdf(file_name)
+        title = extract_html_title(file_name)
+        harmony_file.file_name = title
     else:
         with open(
                 file_name,

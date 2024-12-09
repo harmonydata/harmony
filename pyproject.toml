@@ -57,12 +57,17 @@ dependencies = [
     "huggingface-hub==0.25.0; python_version <= '3.13'",
     "ipykernel>=6.29.5",
     "pdfkit>=1.0.0",
+    "transformers>=4.47.0",
+    "bs4>=0.0.2",
 ]
 
 [project.optional-dependencies]
 
 # dev - the developer dependency set, for contributors to harmony
-dev = ["check-manifest", "pytest"]
+dev = [
+    "check-manifest",
+    "pytest>=8.3.4",
+]
 
 [project.urls]
 "Documentation" = "https://harmonydata.ac.uk/"
