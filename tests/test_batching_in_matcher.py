@@ -67,14 +67,14 @@ class TestMatcherBatching(TestCase):
 
     @mock.patch.dict(os.environ, {}, clear=True)
     def test_default_batch_size(self):
-        """Test when BATCH_SIZE is not set, it defaults to 50."""
+        """Test when BATCH_SIZE is not set, it defaults to 1000."""
         items = [f"item{i}" for i in range(10)]
         results = process_items_in_batches(items, mock_llm_function)
         self.assertEqual(len(results), 10)
 
     @mock.patch.dict(os.environ, {"BATCH_SIZE": "invalid"})
     def test_invalid_batch_size(self):
-        """Test when BATCH_SIZE is invalid, it defaults to 50."""
+        """Test when BATCH_SIZE is invalid, it defaults to 1000."""
         items = [f"item{i}" for i in range(10)]
         results = process_items_in_batches(items, mock_llm_function)
         self.assertEqual(len(results), 10)

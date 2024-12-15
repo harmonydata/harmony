@@ -45,7 +45,8 @@ from harmony.schemas.text_vector import TextVector
 import os
 
 
-def get_batch_size(default=50):
+# This has been tested on 16 GB RAM production server, 1000 seems a safe number (TW, 15 Dec 2024)
+def get_batch_size(default=1000): 
     try:
         batch_size = int(os.getenv("BATCH_SIZE", default))
         return max(batch_size, 0)
