@@ -46,7 +46,7 @@ else:
 model = SentenceTransformer(sentence_transformer_path)
 
 
-def convert_texts_to_vector(texts: List, batch_size=50, max_batches=2000) -> ndarray:
+def convert_texts_to_vector(texts: List, batch_size=1000, max_batches=2000) -> ndarray:
     if batch_size == 0:
         embeddings = model.encode(sentences=texts, convert_to_numpy=True)
 
@@ -74,7 +74,7 @@ def match_instruments(
         mhc_questions: List = [],
         mhc_all_metadatas: List = [],
         mhc_embeddings: np.ndarray = np.zeros((0, 0)),
-        texts_cached_vectors: dict[str, List[float]] = {}, batch_size: int = 50, max_batches: int = 2000,
+        texts_cached_vectors: dict[str, List[float]] = {}, batch_size: int = 1000, max_batches: int = 2000,
 
 ) -> tuple:
     return match_instruments_with_function(
