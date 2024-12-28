@@ -25,11 +25,13 @@ SOFTWARE.
 
 '''
 
+
 class BaseHarmonyError(Exception):
     def __init__(self, message: str = None):
         self.status_code = 500
         self.detail = message or "Something went wrong"
         super().__init__(self.detail)
+
 
 class BadRequestError(BaseHarmonyError):
     def __init__(self, message: str = None):
@@ -37,11 +39,13 @@ class BadRequestError(BaseHarmonyError):
         self.detail = message or "Bad request data"
         super(Exception, self).__init__(self.detail)
 
+
 class SomethingWrongError(BaseHarmonyError):
     def __init__(self, message: str = None):
         self.status_code = 500
         self.detail = message or "Something went wrong"
         super(Exception, self).__init__(self.detail)
+
 
 class UnauthorizedError(BaseHarmonyError):
     def __init__(self, message: str = None):
@@ -49,17 +53,20 @@ class UnauthorizedError(BaseHarmonyError):
         self.detail = message or "Unauthorized"
         super(Exception, self).__init__(self.detail)
 
+
 class ForbiddenError(BaseHarmonyError):
     def __init__(self, message: str = None):
         self.status_code = 403
         self.detail = message or "Forbidden"
         super(Exception, self).__init__(self.detail)
 
+
 class ConflictError(BaseHarmonyError):
     def __init__(self, message: str = None):
         self.status_code = 409
         self.detail = message or "Conflict"
         super(Exception, self).__init__(self.detail)
+
 
 class ResourceNotFoundError(BaseHarmonyError):
     def __init__(self, message: str = None):

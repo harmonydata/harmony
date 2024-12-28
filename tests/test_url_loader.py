@@ -25,35 +25,36 @@ SOFTWARE.
 
 '''
 
+import requests
 import sys
 import unittest
-from unittest.mock import patch, MagicMock
 from datetime import datetime
-import requests
+from unittest.mock import patch, MagicMock
 
 sys.path.append("../src")
 
 from harmony.util.url_loader import (
-    URLDownloader, 
+    URLDownloader,
     load_instruments_from_url,
     MAX_FILE_SIZE,
     RATE_LIMIT_REQUESTS
 )
 from harmony.schemas.errors.base import (
     BadRequestError,
-    ForbiddenError, 
+    ForbiddenError,
     ConflictError,
     SomethingWrongError
 )
 from harmony.schemas.requests.text import FileType
 
+
 class TestURLLoader(unittest.TestCase):
     def setUp(self):
         self.downloader = URLDownloader()
         self.valid_url = "https://example.com/test.pdf"
-        
+
         self.downloader.rate_limit_storage.clear()
-        
+
         self.mock_response = MagicMock()
         self.mock_response.headers = {
             'content-type': 'application/pdf',
@@ -69,6 +70,7 @@ class TestURLLoader(unittest.TestCase):
 
         def mock_iter_content(chunk_size=None):
             yield b'test content'
+
         self.mock_response.iter_content = mock_iter_content
 
     def test_content_integrity(self):
@@ -85,7 +87,7 @@ class TestURLLoader(unittest.TestCase):
             "application/x-executable",
             "application/octet-stream"
         ]
-        
+
         for content_type in invalid_types:
             with self.subTest(content_type=content_type):
                 mock_response = MagicMock()
@@ -95,7 +97,7 @@ class TestURLLoader(unittest.TestCase):
                 mock_response.raw = self.mock_response.raw
                 mock_response.iter_content = self.mock_response.iter_content
                 mock_response.raise_for_status = lambda: None
-                
+
                 with patch('requests.Session.get', return_value=mock_response):
                     with self.assertRaises(BadRequestError) as cm:
                         self.downloader.download("https://example.com/test.unknown")
@@ -109,11 +111,11 @@ class TestURLLoader(unittest.TestCase):
         }
         mock_response.raw = self.mock_response.raw
         mock_response.iter_content = self.mock_response.iter_content
-        
+
         with patch('requests.Session.get', return_value=mock_response):
             with self.assertRaises(ForbiddenError):
                 self.downloader.download(self.valid_url)
-                
+
     def test_file_types(self):
         test_files = {
             'test.pdf': (FileType.pdf, 'application/pdf'),
@@ -122,7 +124,7 @@ class TestURLLoader(unittest.TestCase):
             'test.csv': (FileType.csv, 'text/csv'),
             'test.docx': (FileType.docx, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
         }
-        
+
         for filename, (file_type, mime_type) in test_files.items():
             with self.subTest(file_type=file_type):
                 url = f"https://example.com/{filename}"
@@ -134,31 +136,31 @@ class TestURLLoader(unittest.TestCase):
                 mock_response.raw = self.mock_response.raw
                 mock_response.content = b'test content'
                 mock_response.iter_content = lambda chunk_size: [b'test content']
-                
+
                 with patch('requests.Session.get', return_value=mock_response):
                     raw_file = self.downloader.download(url)
                     self.assertEqual(raw_file.file_type, file_type)
 
     def test_rate_limiting(self):
         self.downloader.rate_limit_storage.clear()
-        
+
         with patch('requests.Session.get', return_value=self.mock_response):
             # initial request
             self.downloader.download(self.valid_url)
-            
+
             # block after too many requests
             self.downloader.rate_limit_storage['example.com'] = [
                 datetime.now() for _ in range(RATE_LIMIT_REQUESTS)
             ]
-            
+
             with self.assertRaises(ConflictError):
                 self.downloader.download(self.valid_url)
 
     def test_successful_instrument_loading(self):
         self.downloader.rate_limit_storage.clear()
-        
+
         self.mock_response.iter_content = lambda chunk_size: [b'test content']
-        
+
         with patch('requests.Session.get', return_value=self.mock_response):
             instruments = load_instruments_from_url(self.valid_url)
             self.assertIsInstance(instruments, list)
@@ -169,7 +171,7 @@ class TestURLLoader(unittest.TestCase):
             requests.TooManyRedirects: ForbiddenError,
             requests.ConnectionError: SomethingWrongError
         }
-        
+
         for exception, expected_error in error_conditions.items():
             with self.subTest(error=exception.__name__):
                 with patch('requests.Session.get', side_effect=exception()):
@@ -178,19 +180,19 @@ class TestURLLoader(unittest.TestCase):
 
     def test_http_error_handling(self):
         error_codes = {
-            401: ForbiddenError, #unauthorized
-            403: ForbiddenError, #forbidden
-            429: ConflictError, #rate limit
-            500: SomethingWrongError, #server error
+            401: ForbiddenError,  # unauthorized
+            403: ForbiddenError,  # forbidden
+            429: ConflictError,  # rate limit
+            500: SomethingWrongError,  # server error
         }
-        
+
         for status_code, expected_error in error_codes.items():
             with self.subTest(status_code=status_code):
                 mock_response = MagicMock()
                 mock_response.raise_for_status.side_effect = requests.RequestException(
                     response=MagicMock(status_code=status_code)
                 )
-                
+
                 with patch('requests.Session.get', return_value=mock_response):
                     with self.assertRaises(expected_error):
                         self.downloader.download(self.valid_url)
@@ -206,7 +208,7 @@ class TestURLLoader(unittest.TestCase):
         mock_response.raw.connection.sock.getpeercert.return_value = {
             'notAfter': 'Jan 1 00:00:00 2020 GMT'
         }
-        
+
         with patch('requests.Session.get', return_value=mock_response):
             with self.assertRaises(ForbiddenError):
                 self.downloader.download(self.valid_url)
@@ -214,17 +216,18 @@ class TestURLLoader(unittest.TestCase):
     def test_url_validation(self):
         invalid_urls = [
             "not-a-url",
-            "http://example.com", #HTTP not allowed 
+            "http://example.com",  # HTTP not allowed
             "https://localhost",
             "https://127.0.0.1",
-            "https://example.com/../test.pdf", #path traversing
+            "https://example.com/../test.pdf",  # path traversing
             "https://example.com/test.pdf#fragment"
         ]
-        
+
         for url in invalid_urls:
             with self.subTest(url=url):
                 with self.assertRaises((BadRequestError, ForbiddenError)):
                     self.downloader.download(url)
+
 
 if __name__ == '__main__':
     unittest.main()
