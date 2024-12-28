@@ -25,14 +25,12 @@ SOFTWARE.
 
 '''
 
-from typing import List, Optional
-
-from pydantic import ConfigDict, BaseModel, Field
-
 from harmony.schemas.catalogue_instrument import CatalogueInstrument
 from harmony.schemas.catalogue_question import CatalogueQuestion
 from harmony.schemas.enums.file_types import FileType
 from harmony.schemas.enums.languages import Language
+from pydantic import ConfigDict, BaseModel, Field
+from typing import Any, Dict, List, Optional
 
 DEFAULT_FRAMEWORK = "huggingface"
 DEFAULT_MODEL = 'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2'
@@ -45,6 +43,7 @@ class RawFile(BaseModel):
     content: str = Field(description="The raw file contents")
     text_content: Optional[str] = Field(None, description="The plain text content")
     tables: list = Field([], description="The tables in the file")
+    metadata: Optional[Dict[str, Any]] = Field(default=None, description="Optional metadata about the file")
     model_config = ConfigDict(
         json_schema_extra={
             "example": {
@@ -65,7 +64,8 @@ class Question(BaseModel):
     instrument_id: Optional[str] = Field(None, description="Unique identifier for the instrument (UUID-4)")
     instrument_name: Optional[str] = Field(None, description="Human readable name for the instrument")
     topics_auto: Optional[list] = Field(None, description="Automated list of topics identified by model")
-    topics_strengths: Optional[dict] = Field(None, description="Automated list of topics identified by model with strength of topic")
+    topics_strengths: Optional[dict] = Field(None,
+                                             description="Automated list of topics identified by model with strength of topic")
     nearest_match_from_mhc_auto: Optional[dict] = Field(None, description="Automatically identified nearest MHC match")
     closest_catalogue_question_match: Optional[CatalogueQuestion] = Field(
         None, description="The closest question match in the catalogue for the question"
@@ -95,7 +95,7 @@ class Instrument(BaseModel):
     study: Optional[str] = Field(None, description="The study")
     sweep: Optional[str] = Field(None, description="The sweep")
     metadata: Optional[dict] = Field(None,
-                           description="Optional metadata about the instrument (URL, citation, DOI, copyright holder)")
+                                     description="Optional metadata about the instrument (URL, citation, DOI, copyright holder)")
     language: Language = Field(Language.English,
                                description="The ISO 639-2 (alpha-2) encoding of the instrument language")
     questions: List[Question] = Field(description="The items inside the instrument")
@@ -124,7 +124,7 @@ class Instrument(BaseModel):
                                "source_page": 0
                                }]
             }
-    })
+        })
 
 
 class MatchParameters(BaseModel):
