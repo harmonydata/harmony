@@ -25,34 +25,44 @@ SOFTWARE.
 
 '''
 
-from pydantic import BaseModel
+class BaseHarmonyError(Exception):
+    def __init__(self, message: str = None):
+        self.status_code = 500
+        self.detail = message or "Something went wrong"
+        super().__init__(self.detail)
 
+class BadRequestError(BaseHarmonyError):
+    def __init__(self, message: str = None):
+        self.status_code = 400
+        self.detail = message or "Bad request data"
+        super(Exception, self).__init__(self.detail)
 
-class BadRequestError(BaseModel):
-    status_code = 400
-    detail = "Bad request data"
+class SomethingWrongError(BaseHarmonyError):
+    def __init__(self, message: str = None):
+        self.status_code = 500
+        self.detail = message or "Something went wrong"
+        super(Exception, self).__init__(self.detail)
 
+class UnauthorizedError(BaseHarmonyError):
+    def __init__(self, message: str = None):
+        self.status_code = 401
+        self.detail = message or "Unauthorized"
+        super(Exception, self).__init__(self.detail)
 
-class SomethingWrongError(BaseModel):
-    status_code = 500
-    detail = "Something went wrong"
+class ForbiddenError(BaseHarmonyError):
+    def __init__(self, message: str = None):
+        self.status_code = 403
+        self.detail = message or "Forbidden"
+        super(Exception, self).__init__(self.detail)
 
+class ConflictError(BaseHarmonyError):
+    def __init__(self, message: str = None):
+        self.status_code = 409
+        self.detail = message or "Conflict"
+        super(Exception, self).__init__(self.detail)
 
-class UnauthorizedError(BaseModel):
-    status_code = 401
-    message = "Unauthorized"
-
-
-class ForbiddenError(BaseModel):
-    status_code = 403
-    message = "Forbidden"
-
-
-class ConflictError(BaseModel):
-    status_code = 409
-    message = "Conflict"
-
-
-class ResourceNotFoundError(BaseModel):
-    status_code = 404
-    message = "Resource not found"
+class ResourceNotFoundError(BaseHarmonyError):
+    def __init__(self, message: str = None):
+        self.status_code = 404
+        self.detail = message or "Resource not found"
+        super(Exception, self).__init__(self.detail)

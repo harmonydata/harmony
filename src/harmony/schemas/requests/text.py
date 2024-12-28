@@ -25,7 +25,7 @@ SOFTWARE.
 
 '''
 
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 from pydantic import ConfigDict, BaseModel, Field
 
@@ -45,6 +45,7 @@ class RawFile(BaseModel):
     content: str = Field(description="The raw file contents")
     text_content: Optional[str] = Field(None, description="The plain text content")
     tables: list = Field([], description="The tables in the file")
+    metadata: Optional[Dict[str, Any]] = Field(default=None, description="Optional metadata about the file")
     model_config = ConfigDict(
         json_schema_extra={
             "example": {
