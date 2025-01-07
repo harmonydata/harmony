@@ -76,7 +76,7 @@ def cosine_similarity(vec1: ndarray, vec2: ndarray) -> ndarray:
     return np.asarray(dp / matmul(m1.T, m2))
 
 
-def add_text_to_vec(text, texts_cached_vectors, text_vectors, is_negated_, is_query_):
+def add_text_to_vec(text, texts_cached_vectors, text_vectors, is_negated_, is_query_) -> list[TextVector]:
     if text not in texts_cached_vectors:
         text_vectors.append(
             TextVector(
@@ -96,7 +96,7 @@ def add_text_to_vec(text, texts_cached_vectors, text_vectors, is_negated_, is_qu
     return text_vectors
 
 
-def process_questions(questions, texts_cached_vectors):
+def process_questions(questions, texts_cached_vectors) -> list[TextVector]:
     text_vectors: List[TextVector] = []
     for question_text in questions:
         text_vectors = add_text_to_vec(question_text, texts_cached_vectors, text_vectors, False, False)
@@ -166,7 +166,8 @@ def create_full_text_vectors(
     # Add new vectors to all_texts
     for index, text_dict in enumerate(text_vectors):
         if not text_dict.vector:
-            text_vectors[index].vector = new_vectors_list.pop(0)
+            new_vector: ndarray = new_vectors_list.pop(0)
+            text_vectors[index].vector = new_vector.tolist()
 
     return text_vectors, new_vectors_dict
 
@@ -297,7 +298,7 @@ def match_questions_with_catalogue_instruments(
 
     # This dictionary will contain the index of the instrument and the cosine similarities to the top matched questions
     # in that instrument e.g. {50: [ ... ]}
-    instrument_idx_to_cosine_similarities_top_match: dict[int, [float]] = {}
+    instrument_idx_to_cosine_similarities_top_match: dict[int, list[float]] = {}
 
     # This keeps track of how many question items in total are contained in each instrument, irrespective of the
     # number of matches.
