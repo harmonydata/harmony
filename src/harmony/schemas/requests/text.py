@@ -25,6 +25,7 @@ SOFTWARE.
 
 '''
 
+import uuid
 from typing import List, Optional
 
 from pydantic import ConfigDict, BaseModel, Field
@@ -125,6 +126,15 @@ class Instrument(BaseModel):
                                }]
             }
     })
+
+    def model_post_init(self, ctx) -> None:
+        # Assign instrument ID if missing
+        if not self.instrument_id:
+            self.instrument_id = uuid.uuid4().hex
+
+        # Assign instrument ID to questions
+        for question in self.questions or []:
+            question.instrument_id = self.instrument_id
 
 
 class MatchParameters(BaseModel):
