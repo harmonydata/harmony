@@ -96,11 +96,14 @@ def add_text_to_vec(text, texts_cached_vectors, text_vectors, is_negated_, is_qu
     return text_vectors
 
 
-def process_questions(questions, texts_cached_vectors) -> list[TextVector]:
+def process_questions(questions: list, texts_cached_vectors: dict, is_negate: bool) -> list[TextVector]:
     text_vectors: List[TextVector] = []
     for question_text in questions:
         text_vectors = add_text_to_vec(question_text, texts_cached_vectors, text_vectors, False, False)
-        negated_text = negate(question_text, 'en')
+        if is_negate:
+            negated_text = negate(question_text, 'en')
+        else:
+            negated_text = question_text
         text_vectors = add_text_to_vec(negated_text, texts_cached_vectors, text_vectors, True, False)
     return text_vectors
 
@@ -137,13 +140,14 @@ def create_full_text_vectors(
         query: str | None,
         vectorisation_function: Callable,
         texts_cached_vectors: dict[str, list[float]],
+        is_negate: bool
 ) -> tuple[List[TextVector], dict]:
     """
     Create full text vectors.
     """
 
     # Create a list of text vectors
-    text_vectors = process_questions(all_questions, texts_cached_vectors)
+    text_vectors = process_questions(all_questions, texts_cached_vectors, is_negate=is_negate)
 
     # Add query
     if query:
@@ -177,6 +181,7 @@ def match_instruments_with_catalogue_instruments(
         catalogue_data: dict,
         vectorisation_function: Callable,
         texts_cached_vectors: dict[str, List[float]],
+        is_negate: bool = True
 ) -> tuple[List[Instrument], List[CatalogueInstrument]]:
     """
     Match instruments with catalogue instruments.
@@ -201,6 +206,7 @@ def match_instruments_with_catalogue_instruments(
         query=None,
         vectorisation_function=vectorisation_function,
         texts_cached_vectors=texts_cached_vectors,
+        is_negate=is_negate
     )
 
     # For each instrument, find the best instrument matches for it in the catalogue
@@ -475,6 +481,7 @@ def match_query_with_catalogue_instruments(
         vectorisation_function: Callable,
         texts_cached_vectors: dict[str, List[float]],
         max_results: int = 100,
+        is_negate: bool = True
 ) -> dict[str, list | dict]:
     """
     Match query with catalogue instruments.
@@ -509,6 +516,7 @@ def match_query_with_catalogue_instruments(
         query=query,
         vectorisation_function=vectorisation_function,
         texts_cached_vectors=texts_cached_vectors,
+        is_negate=is_negate
     )
 
     # Get an array of dimensions
@@ -568,6 +576,7 @@ def match_instruments_with_function(
         mhc_all_metadatas: List = [],
         mhc_embeddings: np.ndarray = np.zeros((0, 0)),
         texts_cached_vectors: dict[str, List[float]] = {},
+        is_negate: bool = True
 ) -> tuple:
     """
     Match instruments.
@@ -589,7 +598,8 @@ def match_instruments_with_function(
         all_questions=[q.question_text for q in all_questions],
         query=query,
         vectorisation_function=vectorisation_function,
-        texts_cached_vectors=texts_cached_vectors
+        texts_cached_vectors=texts_cached_vectors,
+        is_negate=is_negate
     )
 
     # get vectors for all original texts and vectors for negated texts
