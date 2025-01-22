@@ -33,7 +33,7 @@ import pandas as pd
 from harmony.schemas.requests.text import Question
 
 
-def find_groups(questions: List[Question], item_to_item_similarity_matrix: np.ndarray) -> pd.DataFrame:
+def find_groups(questions: List[Question], item_to_item_similarity_matrix: np.ndarray, threshold: float = None) -> pd.DataFrame:
     abs_similarities = np.abs(item_to_item_similarity_matrix)
 
     coord_to_sim = {}
@@ -45,10 +45,11 @@ def find_groups(questions: List[Question], item_to_item_similarity_matrix: np.nd
     vertices = set()
     for (y, x), sim in sorted(coord_to_sim.items(), key=operator.itemgetter(1), reverse=True):
         if x < y:
-            if x not in vertices or y not in vertices:
-                edges.add((x, y))
-                vertices.add(x)
-                vertices.add(y)
+            if threshold is None or sim >= threshold:
+                if x not in vertices or y not in vertices:
+                    edges.add((x, y))
+                    vertices.add(x)
+                    vertices.add(y)
 
     question_idx_to_group_idx = {}
     for x, y in edges:
