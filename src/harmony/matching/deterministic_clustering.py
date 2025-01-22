@@ -25,15 +25,18 @@ SOFTWARE.
 """
 
 import operator
+from collections import Counter
 from typing import List
 
 import numpy as np
 import pandas as pd
 
+from harmony import create_instrument_from_list
 from harmony.schemas.requests.text import Question
 
 
-def find_groups(questions: List[Question], item_to_item_similarity_matrix: np.ndarray, threshold: float = None) -> pd.DataFrame:
+def find_groups(questions: List[Question], item_to_item_similarity_matrix: np.ndarray,
+                threshold: float = None) -> pd.DataFrame:
     abs_similarities = np.abs(item_to_item_similarity_matrix)
 
     coord_to_sim = {}
@@ -41,6 +44,7 @@ def find_groups(questions: List[Question], item_to_item_similarity_matrix: np.nd
         for x in range(abs_similarities.shape[1]):
             coord_to_sim[(y, x)] = abs_similarities[y, x]
 
+    total_score = Counter()
     edges = set()
     vertices = set()
     for (y, x), sim in sorted(coord_to_sim.items(), key=operator.itemgetter(1), reverse=True):
@@ -50,6 +54,9 @@ def find_groups(questions: List[Question], item_to_item_similarity_matrix: np.nd
                     edges.add((x, y))
                     vertices.add(x)
                     vertices.add(y)
+
+                    total_score[x] += sim
+                    total_score[y] += sim
 
     question_idx_to_group_idx = {}
     for x, y in edges:
@@ -74,10 +81,23 @@ def find_groups(questions: List[Question], item_to_item_similarity_matrix: np.nd
     for group_no, group_idx in enumerate(sorted(all_groups)):
 
         this_cluster = {"group_no": group_no, "items": []}
+        candidate_scores = {}
+
         for q in question_idx_to_group_idx:
             if question_idx_to_group_idx[q] == group_idx:
                 this_cluster["items"].append(questions[q])
+                candidate_scores[q] = total_score.get(q, 0)
 
-        questions.append(this_cluster)
+        best_score = max(candidate_scores, key=candidate_scores.get)
+        this_cluster["centroid"] = questions[best_score]
+        clusters_to_return.append(this_cluster)
 
     return clusters_to_return
+
+
+if __name__ == "__main__":
+    questions = create_instrument_from_list(
+        ["Feeling nervous, anxious, or on edge", "Not being able to stop or control worrying"]).questions
+    item_to_item_similarity_matrix = np.eye(2) / 2 + np.ones((2, 2)) / 2
+    g = find_groups(questions, item_to_item_similarity_matrix)
+    print(g)
