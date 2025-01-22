@@ -31,24 +31,26 @@ import unittest
 sys.path.append("../src")
 
 from harmony.matching.cluster import cluster_questions
-from harmony import create_instrument_from_list, import_instrument_into_harmony_web
 from harmony.schemas.requests.text import Instrument, Question
 
 
 class TestCluster(unittest.TestCase):
     def setUp(self):
-        self. all_questions_real = [Question(question_no="1", question_text="Feeling nervous, anxious, or on edge"),
-                              Question(question_no="2", question_text="Not being able to stop or control worrying"),
-                              Question(question_no="3", question_text="Little interest or pleasure in doing things"),
-                              Question(question_no="4", question_text="Feeling down, depressed, or hopeless"),
-                              Question(question_no="5",
-                                       question_text="Trouble falling/staying asleep, sleeping too much"), ]
+        self.all_questions_real = [Question(question_no="1", question_text="Feeling nervous, anxious, or on edge"),
+                                   Question(question_no="2",
+                                            question_text="Not being able to stop or control worrying"),
+                                   Question(question_no="3",
+                                            question_text="Little interest or pleasure in doing things"),
+                                   Question(question_no="4", question_text="Feeling down, depressed, or hopeless"),
+                                   Question(question_no="5",
+                                            question_text="Trouble falling/staying asleep, sleeping too much"), ]
         self.instruments = Instrument(questions=self.all_questions_real)
 
     def test_cluster(self):
         clusters_out, score_out = cluster_questions(self.instruments, 2, False)
-        assert(len(clusters_out) == 5)
+        assert (len(clusters_out) == 5)
         assert score_out
+
 
 if __name__ == '__main__':
     unittest.main()

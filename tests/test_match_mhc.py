@@ -59,13 +59,13 @@ mhc_questions = [Question(question_text=t) for t in mhc_questions_as_text]
 class TestMatchMhc(unittest.TestCase):
 
     def test_single_instrument_simple(self):
-        all_questions, similarity_with_polarity, query_similarity, new_vectors_dict = match_instruments([instrument_en],
-                                                                                                        mhc_questions=mhc_questions,
-                                                                                                        mhc_embeddings=mhc_embeddings,
-                                                                                                        mhc_all_metadatas=mhc_metadata)
-        self.assertEqual(2, len(all_questions))
+        match_response = match_instruments([instrument_en],
+                                           mhc_questions=mhc_questions,
+                                           mhc_embeddings=mhc_embeddings,
+                                           mhc_all_metadatas=mhc_metadata)
+        self.assertEqual(2, len(match_response.questions))
 
-        topics = all_questions[0].topics_strengths
+        topics = match_response.questions[0].topics_strengths
         top_topic = list(topics)[0]
         self.assertEqual("alcohol use", top_topic)
         self.assertLess(0.1, topics[top_topic])
