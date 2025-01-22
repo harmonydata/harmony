@@ -25,24 +25,57 @@ SOFTWARE.
 """
 
 import pandas as pd
+import numpy as np
+import operator
 
-def generate_crosswalk_table(all_questions, similarity, threshold):
+def generate_crosswalk_table(instruments: list, item_to_item_similarity_matrix: np.ndarray, threshold: float, is_allow_within_instrument_matches =False, is_enforce_one_to_one: bool = False):
     matching_pairs = []
 
-    # iterate through all pairs of questions
-    for i, q1 in enumerate(all_questions):
-        for j, q2 in enumerate(all_questions):
-            # check for non-dupe and similarity above inputted threshold
-            if j > i and similarity[i, j] > threshold:
-                # add to list of matches
-                matching_pairs.append({
-                    'pair_name': f"{i}_{j}",
-                    'question1_no': q1.question_no,
-                    'question1_text': q1.question_text,
-                    'question2_no': q2.question_no,
-                    'question2_text': q2.question_text,
-                    'match_score': similarity[i, j]
-                })
+    all_questions = []
+    for instrument_idx, instrument in enumerate(instruments):
+        for question in instrument.questions:
+            all_questions.append((instrument_idx, question))
+
+    abs_similarities_between_instruments = np.abs(item_to_item_similarity_matrix)
+
+    coord_to_sim = {}
+    for question_2_idx in range(abs_similarities_between_instruments.shape[0]):
+        for question_1_idx in range(abs_similarities_between_instruments.shape[1]):
+            if question_2_idx > question_1_idx:
+                coord_to_sim[(question_2_idx,question_1_idx)] = abs_similarities_between_instruments[question_2_idx,question_1_idx]
+
+    best_matches = set()
+    is_used_x = set()
+    is_used_y = set()
+    for (question_2_idx,question_1_idx), sim in sorted(coord_to_sim.items(), key=operator.itemgetter(1), reverse=True):
+        if question_1_idx not in is_used_x and question_2_idx not in is_used_y and abs_similarities_between_instruments[(question_2_idx,question_1_idx)] >= threshold:
+
+            instrument_1_idx, question_1 = all_questions[question_1_idx]
+            instrument_2_idx, question_2 = all_questions[question_2_idx]
+
+            instrument_1 = instruments[instrument_1_idx]
+            instrument_2 = instruments[instrument_2_idx]
+
+            if not is_allow_within_instrument_matches and instrument_1_idx == instrument_2_idx:
+                continue
+
+            question_1_identifier = f"{instrument_1.instrument_name}_{question_1.question_no}"
+            question_2_identifier = f"{instrument_2.instrument_name}_{question_2.question_no}"
+
+            matching_pairs.append({
+                                'pair_name': f"{question_1_identifier}_{question_2_identifier}",
+                                'question1_id': question_1_identifier,
+                                'question1_text': question_1.question_text,
+                                'question2_id': question_2_identifier,
+                                'question2_text': question_2.question_text,
+                                'match_score': item_to_item_similarity_matrix[question_1_idx, question_2_idx]
+                            })
+
+            # best_matches.add((question_1_idx,question_2_idx))
+            if is_enforce_one_to_one:
+                is_used_x.add(question_1_idx)
+                is_used_y.add(question_2_idx)
+
 
     # convert list to dataframe
     return pd.DataFrame(matching_pairs)
