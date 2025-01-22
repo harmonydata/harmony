@@ -83,8 +83,8 @@ class TestGenerateCrosswalkTable(unittest.TestCase):
         self.assertTrue(result.empty)
 
     def test_generate_crosswalk_table_real(self):
-        all_questions, similarity_with_polarity, _, _ = match_instruments(self.instruments)
-        result = generate_crosswalk_table(self.instruments, similarity_with_polarity, self.threshold,
+        match_response = match_instruments(self.instruments)
+        result = generate_crosswalk_table(self.instruments, match_response.similarity_with_polarity, self.threshold,
                                           is_allow_within_instrument_matches=True)
         expected_matches = []
 
@@ -94,7 +94,7 @@ class TestGenerateCrosswalkTable(unittest.TestCase):
         self.assertEqual(len(result), len(expected_matches))
 
         lower_threshold = 0.5
-        result = generate_crosswalk_table(self.instruments, similarity_with_polarity, lower_threshold,
+        result = generate_crosswalk_table(self.instruments, match_response.similarity_with_polarity, lower_threshold,
                                           is_allow_within_instrument_matches=True)
 
         self.assertEqual(len(result), 1)
@@ -106,8 +106,9 @@ class TestGenerateCrosswalkTable(unittest.TestCase):
             ["Feeling afraid, as if something awful might happen", "Feeling nervous, anxious, or on edge"])
         instruments = [instrument_1, instrument_2]
 
-        all_questions, similarity_with_polarity, _, _ = match_instruments(instruments)
-        result = generate_crosswalk_table(instruments, similarity_with_polarity, 0, is_enforce_one_to_one=False)
+        match_response = match_instruments(instruments)
+        result = generate_crosswalk_table(instruments, match_response.similarity_with_polarity, 0,
+                                          is_enforce_one_to_one=False)
 
         self.assertEqual(2, len(result))
 
@@ -118,8 +119,9 @@ class TestGenerateCrosswalkTable(unittest.TestCase):
             ["Feeling afraid, as if something awful might happen", "Feeling nervous, anxious, or on edge"])
         instruments = [instrument_1, instrument_2]
 
-        all_questions, similarity_with_polarity, _, _ = match_instruments(instruments)
-        result = generate_crosswalk_table(instruments, similarity_with_polarity, 0, is_enforce_one_to_one=True)
+        match_response = match_instruments(instruments)
+        result = generate_crosswalk_table(instruments, match_response.similarity_with_polarity, 0,
+                                          is_enforce_one_to_one=True)
 
         self.assertEqual(1, len(result))
 

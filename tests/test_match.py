@@ -121,36 +121,36 @@ instrument_2 = Instrument.model_validate({
 class TestMatch(unittest.TestCase):
 
     def test_single_instrument_simple(self):
-        all_questions, similarity_with_polarity, query_similarity, new_vectors_dict = match_instruments([instrument_en])
-        self.assertEqual(2, len(all_questions))
-        self.assertEqual(2, len(similarity_with_polarity))
-        self.assertLess(0.99, similarity_with_polarity[0][0])
-        self.assertGreater(0.95, similarity_with_polarity[0][1])
-        self.assertLess(0.99, similarity_with_polarity[1][1])
-        self.assertGreater(0.95, similarity_with_polarity[1][0])
+        match_response = match_instruments([instrument_en])
+        self.assertEqual(2, len(match_response.questions))
+        self.assertEqual(2, len(match_response.similarity_with_polarity))
+        self.assertLess(0.99, match_response.similarity_with_polarity[0][0])
+        self.assertGreater(0.95, match_response.similarity_with_polarity[0][1])
+        self.assertLess(0.99, match_response.similarity_with_polarity[1][1])
+        self.assertGreater(0.95, match_response.similarity_with_polarity[1][0])
 
     def test_two_instruments_simple(self):
-        all_questions, similarity_with_polarity, query_similarity, new_vectors_dict = match_instruments(
+        match_response = match_instruments(
             [instrument_en, instrument_pt])
-        self.assertEqual(4, len(all_questions))
-        self.assertEqual(4, len(similarity_with_polarity))
-        self.assertLess(0.99, similarity_with_polarity[0][0])
+        self.assertEqual(4, len(match_response.questions))
+        self.assertEqual(4, len(match_response.similarity_with_polarity))
+        self.assertLess(0.99, match_response.similarity_with_polarity[0][0])
 
     def test_single_instrument_full_metadata(self):
-        all_questions, similarity_with_polarity, query_similarity, new_vectors_dict = match_instruments([instrument_1])
-        self.assertEqual(2, len(all_questions))
-        self.assertEqual(2, len(similarity_with_polarity))
-        self.assertLess(0.99, similarity_with_polarity[0][0])
-        self.assertGreater(0.95, similarity_with_polarity[0][1])
-        self.assertLess(0.99, similarity_with_polarity[1][1])
-        self.assertGreater(0.95, similarity_with_polarity[1][0])
+        match_response = match_instruments([instrument_1])
+        self.assertEqual(2, len(match_response.questions))
+        self.assertEqual(2, len(match_response.similarity_with_polarity))
+        self.assertLess(0.99, match_response.similarity_with_polarity[0][0])
+        self.assertGreater(0.95, match_response.similarity_with_polarity[0][1])
+        self.assertLess(0.99, match_response.similarity_with_polarity[1][1])
+        self.assertGreater(0.95, match_response.similarity_with_polarity[1][0])
 
     def test_two_instruments_full_metadata(self):
-        all_questions, similarity_with_polarity, query_similarity, new_vectors_dict = match_instruments(
+        match_response = match_instruments(
             [instrument_1, instrument_2])
-        self.assertEqual(4, len(all_questions))
-        self.assertEqual(4, len(similarity_with_polarity))
-        self.assertLess(0.99, similarity_with_polarity[0][0])
+        self.assertEqual(4, len(match_response.questions))
+        self.assertEqual(4, len(match_response.similarity_with_polarity))
+        self.assertLess(0.99, match_response.similarity_with_polarity[0][0])
 
 
 if __name__ == '__main__':

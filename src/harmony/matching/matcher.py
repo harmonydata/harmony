@@ -24,8 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import statistics
 import heapq
+import os
+import statistics
 from collections import Counter, OrderedDict
 from typing import List, Callable
 
@@ -33,6 +34,7 @@ import numpy as np
 from numpy import dot, matmul, ndarray, matrix
 from numpy.linalg import norm
 
+from harmony.matching.instrument_to_instrument_similarity import get_instrument_similarity
 from harmony.matching.negator import negate
 from harmony.schemas.catalogue_instrument import CatalogueInstrument
 from harmony.schemas.catalogue_question import CatalogueQuestion
@@ -40,24 +42,24 @@ from harmony.schemas.requests.text import (
     Instrument,
     Question,
 )
+from harmony.schemas.responses.text import HarmonyMatchResponse
 from harmony.schemas.text_vector import TextVector
-
-import os
 
 
 # This has been tested on 16 GB RAM production server, 1000 seems a safe number (TW, 15 Dec 2024)
-def get_batch_size(default=1000): 
+def get_batch_size(default=1000):
     try:
         batch_size = int(os.getenv("BATCH_SIZE", default))
         return max(batch_size, 0)
     except (ValueError, TypeError):
         return default
+
+
 def process_items_in_batches(items, llm_function):
     batch_size = get_batch_size()
 
     if batch_size == 0:
-         return llm_function(items)
-
+        return llm_function(items)
 
     batches = [items[i:i + batch_size] for i in range(0, len(items), batch_size)]
 
@@ -156,11 +158,8 @@ def create_full_text_vectors(
     # Texts with no cached vector
     texts_not_cached = [x.text for x in text_vectors if not x.vector]
 
-
-
     # Get vectors for all texts not cached
     new_vectors_list: List = process_items_in_batches(texts_not_cached, vectorisation_function)
-
 
     # Create a dictionary with new vectors
     new_vectors_dict = {}
@@ -577,7 +576,7 @@ def match_instruments_with_function(
         mhc_embeddings: np.ndarray = np.zeros((0, 0)),
         texts_cached_vectors: dict[str, List[float]] = {},
         is_negate: bool = True
-) -> tuple:
+) -> HarmonyMatchResponse:
     """
     Match instruments.
 
@@ -673,9 +672,17 @@ def match_instruments_with_function(
             for question in all_questions:
                 question.topics_auto = []
 
-    return (
-        all_questions,
-        similarity_with_polarity,
-        query_similarity,
-        new_vectors_dict
-    )
+    instrument_to_instrument_similarities = get_instrument_similarity(instruments, similarity_with_polarity)
+
+    return HarmonyMatchResponse(questions=all_questions,
+                                similarity_with_polarity=similarity_with_polarity,
+                                query_similarity=query_similarity,
+                                new_vectors_dict=new_vectors_dict,
+                                instrument_to_instrument_similarities=instrument_to_instrument_similarities)
+    # return (
+    #     all_questions,
+    #     similarity_with_polarity,
+    #     query_similarity,
+    #     new_vectors_dict,
+    #     instrument_to_instrument_similarities
+    # )

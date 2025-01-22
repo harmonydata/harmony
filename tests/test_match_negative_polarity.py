@@ -41,23 +41,23 @@ instrument_en = Instrument(questions=questions_en)
 class TestMatch(unittest.TestCase):
 
     def test_single_instrument_with_negation_on_as_default(self):
-        all_questions, similarity_with_polarity, query_similarity, new_vectors_dict = match_instruments([instrument_en])
-        self.assertEqual(2, len(all_questions))
-        self.assertEqual(2, len(similarity_with_polarity))
-        self.assertLess(0.99, similarity_with_polarity[0][0])
-        self.assertGreater(0, similarity_with_polarity[0][1])
-        self.assertLess(0.99, similarity_with_polarity[1][1])
-        self.assertGreater(0, similarity_with_polarity[1][0])
+        match_response = match_instruments([instrument_en])
+        self.assertEqual(2, len(match_response.questions))
+        self.assertEqual(2, len(match_response.similarity_with_polarity))
+        self.assertLess(0.99, match_response.similarity_with_polarity[0][0])
+        self.assertGreater(0, match_response.similarity_with_polarity[0][1])
+        self.assertLess(0.99, match_response.similarity_with_polarity[1][1])
+        self.assertGreater(0, match_response.similarity_with_polarity[1][0])
 
     def test_single_instrument_without_negation(self):
-        all_questions, similarity_with_polarity, query_similarity, new_vectors_dict = match_instruments([instrument_en],
-                                                                                                        is_negate=False)
-        self.assertEqual(2, len(all_questions))
-        self.assertEqual(2, len(similarity_with_polarity))
-        self.assertLess(0.99, similarity_with_polarity[0][0])
-        self.assertLess(0, similarity_with_polarity[0][1])
-        self.assertLess(0.99, similarity_with_polarity[1][1])
-        self.assertLess(0, similarity_with_polarity[1][0])
+        match_response = match_instruments([instrument_en],
+                                           is_negate=False)
+        self.assertEqual(2, len(match_response.questions))
+        self.assertEqual(2, len(match_response.similarity_with_polarity))
+        self.assertLess(0.99, match_response.similarity_with_polarity[0][0])
+        self.assertLess(0, match_response.similarity_with_polarity[0][1])
+        self.assertLess(0.99, match_response.similarity_with_polarity[1][1])
+        self.assertLess(0, match_response.similarity_with_polarity[1][0])
 
 
 if __name__ == '__main__':

@@ -1,11 +1,9 @@
-import sys
 import os
+import sys
 import unittest
-import numpy
 
 sys.path.append("../src")
 from unittest import TestCase, mock
-from harmony.matching.matcher import get_batch_size
 from harmony.matching.matcher import process_items_in_batches
 
 

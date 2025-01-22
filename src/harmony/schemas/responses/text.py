@@ -25,12 +25,25 @@ SOFTWARE.
 
 '''
 
-from typing import List
+from typing import List, Any
+
+import numpy as np
+from pydantic import BaseModel, Field, RootModel
 
 from harmony.schemas.catalogue_instrument import CatalogueInstrument
 from harmony.schemas.requests.text import Instrument
 from harmony.schemas.requests.text import Question
-from pydantic import BaseModel, Field, RootModel
+
+class InstrumentToInstrumentSimilarity(BaseModel):
+    instrument_1_idx: int = Field(
+        description="The index of the first instrument in the similarity pair in the list of instruments passed to Harmony (zero-indexed)")
+    instrument_2_idx: int = Field(
+        description="The index of the second instrument in the similarity pair in the list of instruments passed to Harmony (zero-indexed)")
+    instrument_1_name: str = Field(description="The name of the first instrument in the similarity pai")
+    instrument_2_name: str = Field(description="The name of the second instrument in the similarity pai")
+    precision: float = Field(description="The precision score of the match between Instrument 1 and Instrument 2")
+    recall: float = Field(description="The recall score of the match between Instrument 1 and Instrument 2")
+    f1: float = Field(description="The F1 score of the match between Instrument 1 and Instrument 2")
 
 
 class MatchResponse(BaseModel):
@@ -47,6 +60,9 @@ class MatchResponse(BaseModel):
         description="The closest catalogue instrument matches in the catalogue for all the instruments, "
                     "the first index contains the best match etc."
     )
+    instrument_to_instrument_similarities: List[InstrumentToInstrumentSimilarity] = Field(
+        None, description="A list of similarity values (precision, recall, F1) between instruments"
+    )
 
 
 class SearchInstrumentsResponse(BaseModel):
@@ -60,3 +76,21 @@ class InstrumentList(RootModel):
 class CacheResponse(BaseModel):
     instruments: List[Instrument] = Field(description="A list of instruments")
     vectors: List[dict] = Field(description="A list of vectors")
+
+
+
+# For use internally in the Python library but *not* the API because the NDarrays don't serialise
+class HarmonyMatchResponse(BaseModel):
+    questions: List[Question] = Field(
+        description="The questions which were matched, in an order matching the order of the matrix"
+    )
+    similarity_with_polarity: Any = Field(description="Matrix of cosine similarity matches")
+    query_similarity: Any = Field(
+        None, description="Similarity metric between query string and items"
+    )
+    new_vectors_dict: dict = Field(
+        None, description="Vectors for the cache. These should be stored by the Harmony API to reduce unnecessary calls to the LLM"
+    )
+    instrument_to_instrument_similarities: List[InstrumentToInstrumentSimilarity] = Field(
+        None, description="A list of similarity values (precision, recall, F1) between instruments"
+    )
