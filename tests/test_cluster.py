@@ -31,7 +31,7 @@ import unittest
 sys.path.append("../src")
 
 from harmony.matching.cluster import cluster_questions
-from harmony.schemas.requests.text import Instrument, Question
+from harmony.schemas.requests.text import Question
 
 
 class TestCluster(unittest.TestCase):
@@ -44,10 +44,9 @@ class TestCluster(unittest.TestCase):
                                    Question(question_no="4", question_text="Feeling down, depressed, or hopeless"),
                                    Question(question_no="5",
                                             question_text="Trouble falling/staying asleep, sleeping too much"), ]
-        self.instruments = Instrument(questions=self.all_questions_real)
 
     def test_cluster(self):
-        clusters_out, score_out = cluster_questions(self.instruments, 2, False)
+        clusters_out, score_out = cluster_questions(self.all_questions_real, 2, False)
         assert (len(clusters_out) == 5)
         assert score_out
 

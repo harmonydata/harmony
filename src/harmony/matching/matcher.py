@@ -34,7 +34,7 @@ import numpy as np
 from numpy import dot, matmul, ndarray, matrix
 from numpy.linalg import norm
 
-from harmony.matching.deterministic_clustering import find_clusters
+from harmony.matching.deterministic_clustering import find_clusters_deterministic
 from harmony.matching.instrument_to_instrument_similarity import get_instrument_similarity
 from harmony.matching.negator import negate
 from harmony.schemas.catalogue_instrument import CatalogueInstrument
@@ -675,7 +675,7 @@ def match_instruments_with_function(
 
     instrument_to_instrument_similarities = get_instrument_similarity(instruments, similarity_with_polarity)
 
-    clusters = find_clusters(all_questions, similarity_with_polarity)
+    clusters = find_clusters_deterministic(all_questions, similarity_with_polarity)
 
     return MatchResult(questions=all_questions,
                        similarity_with_polarity=similarity_with_polarity,

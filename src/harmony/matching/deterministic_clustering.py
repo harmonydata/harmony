@@ -34,8 +34,8 @@ from harmony.schemas.requests.text import Question
 from harmony.schemas.responses.text import HarmonyCluster
 
 
-def find_clusters(questions: List[Question], item_to_item_similarity_matrix: np.ndarray,
-                  threshold: float = None) -> List[HarmonyCluster]:
+def find_clusters_deterministic(questions: List[Question], item_to_item_similarity_matrix: np.ndarray,
+                                threshold: float = None) -> List[HarmonyCluster]:
     """
     Find all clusters in a set of n questions, given the n x n matrix of cosine similarities between them.
 

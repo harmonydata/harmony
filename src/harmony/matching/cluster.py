@@ -1,37 +1,13 @@
-import os
 import sys
-import numpy as np
+from typing import List
+
 import pandas as pd
 from sklearn.cluster import KMeans
-from sklearn.metrics import silhouette_score
 from sklearn.decomposition import PCA
-from sentence_transformers import SentenceTransformer
+from sklearn.metrics import silhouette_score
 
-if (
-    os.environ.get("HARMONY_SENTENCE_TRANSFORMER_PATH", None) is not None
-    and os.environ.get("HARMONY_SENTENCE_TRANSFORMER_PATH", None) != ""
-):
-    sentence_transformer_path = os.environ["HARMONY_SENTENCE_TRANSFORMER_PATH"]
-else:
-    sentence_transformer_path = (
-        "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
-    )
-
-model = SentenceTransformer(sentence_transformer_path)
-
-# questions_in should be a list of question strings
-def get_embeddings(questions_in):
-    # Generate embeddings using HuggingFace model
-    embedding_result = model.encode(questions_in, show_progress_bar=True)
-    questions_df = pd.DataFrame()
-
-    # Add embeddings to df and convert the embeddings to numpy arrays
-    questions_df["embedding"] = [embedding.tolist() for embedding in embedding_result]
-    questions_df["embedding"] = questions_df["embedding"].apply(np.array)
-
-    # Stack embeddings into a matrix
-    matrix = np.vstack(questions_df.embedding.values)
-    return matrix
+from harmony.matching.default_matcher import convert_texts_to_vector
+from harmony.schemas.requests.text import Question
 
 
 def perform_kmeans(embeddings_in, num_clusters=5):
@@ -65,12 +41,10 @@ def visualize_clusters(embeddings_in, kmeans_labels):
         )
         sys.exit(1)
 
-def cluster_questions(instrument_in, num_clusters: int, graph: bool):
-    # convert instruments into a list of questions
-    questions_list = []
-    for question in instrument_in.questions:
-        questions_list.append(question.question_text)
-    embedding_matrix = get_embeddings(questions_list)
+
+def cluster_questions(questions: List[Question], num_clusters: int, is_show_graph: bool):
+    questions_list = [question.question_text for question in questions]
+    embedding_matrix = convert_texts_to_vector(questions_list)
     kmeans_labels = perform_kmeans(embedding_matrix, num_clusters)
     df = pd.DataFrame({
         "question_text": questions_list,
@@ -83,7 +57,7 @@ def cluster_questions(instrument_in, num_clusters: int, graph: bool):
     else:
         sil_score = None
 
-    if graph:
+    if is_show_graph:
         visualize_clusters(embedding_matrix, kmeans_labels)
 
     return df, sil_score
