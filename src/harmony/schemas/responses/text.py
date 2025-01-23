@@ -50,8 +50,6 @@ class InstrumentToInstrumentSimilarity(BaseModel):
     f1: float = Field(description="The F1 score of the match between Instrument 1 and Instrument 2")
 
 
-
-
 class SearchInstrumentsResponse(BaseModel):
     instruments: List[Instrument] = Field(description="A list of instruments")
 
@@ -63,6 +61,19 @@ class InstrumentList(RootModel):
 class CacheResponse(BaseModel):
     instruments: List[Instrument] = Field(description="A list of instruments")
     vectors: List[dict] = Field(description="A list of vectors")
+
+
+class HarmonyCluster(BaseModel):
+    """
+    Defines a cluster of questionnaire items
+    """
+    cluster_id: int = Field(
+        description="The ID of this cluster")
+    centroid_id: int = Field(description="The ID of the central question in this cluster")
+    centroid: Question = Field(description="The central question", exclude=True, )
+    item_ids: List[int] = Field(description="The IDs of questions within this cluster")
+    items: List[Question] = Field(description="The questions within this cluster", exclude=True, )
+    text_description: str = Field(description="Text describing the cluster")
 
 
 class MatchResponse(BaseModel):
@@ -86,18 +97,8 @@ class MatchResponse(BaseModel):
     instrument_to_instrument_similarities: List[InstrumentToInstrumentSimilarity] = Field(
         None, description="A list of similarity values (precision, recall, F1) between instruments"
     )
+    clusters: List[HarmonyCluster] = Field(description="The clusters in the set of questions")
 
-class HarmonyCluster(BaseModel):
-    """
-    Defines a cluster of questionnaire items
-    """
-    cluster_id: int = Field(
-        description="The ID of this cluster")
-    centroid_id: int = Field(description="The ID of the central question in this cluster")
-    centroid: Question = Field(description="The central question", exclude=True,)
-    item_ids: List[int] = Field(description="The IDs of questions within this cluster")
-    items: List[Question] = Field(description="The questions within this cluster", exclude=True,)
-    text_description: str = Field(description="Text describing the cluster")
 
 class MatchResult(BaseModel):
     """
