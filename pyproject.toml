@@ -36,7 +36,11 @@ classifiers=[
     "Operating System :: OS Independent",
     "Topic :: Text Processing :: Linguistic",
     "Intended Audience :: Science/Research",
-    "Intended Audience :: Healthcare Industry"
+    "Intended Audience :: Healthcare Industry",
+    "Intended Audience :: Information Technology",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Sociology",
 ]
 # core dependencies of harmony
 # this set should be kept minimal!
