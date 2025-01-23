@@ -63,7 +63,7 @@ dependencies = [
 dev = ["check-manifest", "pytest"]
 
 [project.urls]
-"Documentation" = "https://harmonydata.ac.uk/"
+"Documentation" = "https://harmonydata.ac.uk/frequently-asked-questions/"
 "Bug Reports" = "https://github.com/harmonydata/harmony/issues"
 "Source Code" = "https://github.com/harmonydata/harmony"
 
