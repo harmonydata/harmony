@@ -29,14 +29,22 @@ from collections import Counter
 from typing import List
 
 import numpy as np
-import pandas as pd
 
-from harmony import create_instrument_from_list
 from harmony.schemas.requests.text import Question
+from harmony.schemas.responses.text import HarmonyCluster
 
 
-def find_groups(questions: List[Question], item_to_item_similarity_matrix: np.ndarray,
-                threshold: float = None) -> pd.DataFrame:
+def find_clusters(questions: List[Question], item_to_item_similarity_matrix: np.ndarray,
+                  threshold: float = None) -> List[HarmonyCluster]:
+    """
+    Find all clusters in a set of n questions, given the n x n matrix of cosine similarities between them.
+
+    This uses a deterministic clustering algorithm.
+    @param questions: The set of questions, length n - they don't have to be from the same instrument
+    @param item_to_item_similarity_matrix: The cosine similarity between the questions. The diagonal will be 1 and this matrix is symmetrical about the diagonal. You can have negative values in it, as we will work from the absolute values.
+    @param threshold: Minimum threshold of cosine similarity used for making a cluster
+    @return: A list of HarmonyCluster objects which each have a centroid, cluster members, and a description text.
+    """
     abs_similarities = np.abs(item_to_item_similarity_matrix)
 
     coord_to_sim = {}
@@ -44,6 +52,9 @@ def find_groups(questions: List[Question], item_to_item_similarity_matrix: np.nd
         for x in range(abs_similarities.shape[1]):
             coord_to_sim[(y, x)] = abs_similarities[y, x]
 
+    # Start with the closest cosine match and pair up the items in clusters ordering the edges in the graph by strong to weak.
+    # Each time a node is assigned to a cluster, we increment its score with its cosine similarity to its neighbours
+    # This boosts its chance of being chosen as the centroid.
     total_score = Counter()
     edges = set()
     vertices = set()
@@ -79,25 +90,22 @@ def find_groups(questions: List[Question], item_to_item_similarity_matrix: np.nd
 
     all_groups = set(question_idx_to_group_idx.values())
     for group_no, group_idx in enumerate(sorted(all_groups)):
-
-        this_cluster = {"group_no": group_no, "items": []}
         candidate_scores = {}
 
-        for q in question_idx_to_group_idx:
-            if question_idx_to_group_idx[q] == group_idx:
-                this_cluster["items"].append(questions[q])
-                candidate_scores[q] = total_score.get(q, 0)
+        items = []
+        item_ids = []
+        for question_idx in question_idx_to_group_idx:
+            if question_idx_to_group_idx[question_idx] == group_idx:
+                items.append(questions[question_idx])
+                item_ids.append(question_idx)
+                candidate_scores[question_idx] = total_score.get(question_idx, 0)
 
-        best_score = max(candidate_scores, key=candidate_scores.get)
-        this_cluster["centroid"] = questions[best_score]
+        best_question_idx = max(candidate_scores, key=candidate_scores.get)
+        text_description = questions[best_question_idx].question_text
+
+        this_cluster = HarmonyCluster(cluster_id=group_no, centroid_id=best_question_idx,
+                                      centroid=questions[best_question_idx], items=items, item_ids=item_ids,
+                                      text_description=text_description)
         clusters_to_return.append(this_cluster)
 
     return clusters_to_return
-
-
-if __name__ == "__main__":
-    questions = create_instrument_from_list(
-        ["Feeling nervous, anxious, or on edge", "Not being able to stop or control worrying"]).questions
-    item_to_item_similarity_matrix = np.eye(2) / 2 + np.ones((2, 2)) / 2
-    g = find_groups(questions, item_to_item_similarity_matrix)
-    print(g)

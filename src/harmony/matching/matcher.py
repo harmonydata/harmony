@@ -34,6 +34,7 @@ import numpy as np
 from numpy import dot, matmul, ndarray, matrix
 from numpy.linalg import norm
 
+from harmony.matching.deterministic_clustering import find_clusters
 from harmony.matching.instrument_to_instrument_similarity import get_instrument_similarity
 from harmony.matching.negator import negate
 from harmony.schemas.catalogue_instrument import CatalogueInstrument
@@ -42,7 +43,7 @@ from harmony.schemas.requests.text import (
     Instrument,
     Question,
 )
-from harmony.schemas.responses.text import HarmonyMatchResult
+from harmony.schemas.responses.text import MatchResult
 from harmony.schemas.text_vector import TextVector
 
 
@@ -576,7 +577,7 @@ def match_instruments_with_function(
         mhc_embeddings: np.ndarray = np.zeros((0, 0)),
         texts_cached_vectors: dict[str, List[float]] = {},
         is_negate: bool = True
-) -> HarmonyMatchResult:
+) -> MatchResult:
     """
     Match instruments.
 
@@ -674,15 +675,15 @@ def match_instruments_with_function(
 
     instrument_to_instrument_similarities = get_instrument_similarity(instruments, similarity_with_polarity)
 
-    return HarmonyMatchResult(questions=all_questions,
-                              similarity_with_polarity=similarity_with_polarity,
-                              query_similarity=query_similarity,
-                              new_vectors_dict=new_vectors_dict,
-                              instrument_to_instrument_similarities=instrument_to_instrument_similarities)
-    # return (
-    #     all_questions,
-    #     similarity_with_polarity,
-    #     query_similarity,
-    #     new_vectors_dict,
-    #     instrument_to_instrument_similarities
-    # )
+    clusters = find_clusters(all_questions, similarity_with_polarity)
+
+    import json
+    for c in clusters:
+        print(json.dumps(c.dict()))
+
+    return MatchResult(questions=all_questions,
+                       similarity_with_polarity=similarity_with_polarity,
+                       query_similarity=query_similarity,
+                       new_vectors_dict=new_vectors_dict,
+                       instrument_to_instrument_similarities=instrument_to_instrument_similarities,
+                       clusters=clusters)
