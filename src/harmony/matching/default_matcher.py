@@ -33,7 +33,7 @@ from harmony.schemas.requests.text import Instrument
 from numpy import ndarray
 from sentence_transformers import SentenceTransformer
 
-from harmony.schemas.responses.text import HarmonyMatchResponse
+from harmony.schemas.responses.text import HarmonyMatchResult
 
 if (
         os.environ.get("HARMONY_SENTENCE_TRANSFORMER_PATH", None) is not None
@@ -78,7 +78,7 @@ def match_instruments(
         mhc_embeddings: np.ndarray = np.zeros((0, 0)),
         texts_cached_vectors: dict[str, List[float]] = {}, batch_size: int = 1000, max_batches: int = 2000,
         is_negate: bool = True
-) -> HarmonyMatchResponse:
+) -> HarmonyMatchResult:
     return match_instruments_with_function(
         instruments=instruments,
         query=query,

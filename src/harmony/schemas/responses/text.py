@@ -80,7 +80,7 @@ class CacheResponse(BaseModel):
 
 
 # For use internally in the Python library but *not* the API because the NDarrays don't serialise
-class HarmonyMatchResponse(BaseModel):
+class HarmonyMatchResult(BaseModel):
     questions: List[Question] = Field(
         description="The questions which were matched, in an order matching the order of the matrix"
     )

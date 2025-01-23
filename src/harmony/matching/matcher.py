@@ -42,7 +42,7 @@ from harmony.schemas.requests.text import (
     Instrument,
     Question,
 )
-from harmony.schemas.responses.text import HarmonyMatchResponse
+from harmony.schemas.responses.text import HarmonyMatchResult
 from harmony.schemas.text_vector import TextVector
 
 
@@ -576,7 +576,7 @@ def match_instruments_with_function(
         mhc_embeddings: np.ndarray = np.zeros((0, 0)),
         texts_cached_vectors: dict[str, List[float]] = {},
         is_negate: bool = True
-) -> HarmonyMatchResponse:
+) -> HarmonyMatchResult:
     """
     Match instruments.
 
@@ -674,11 +674,11 @@ def match_instruments_with_function(
 
     instrument_to_instrument_similarities = get_instrument_similarity(instruments, similarity_with_polarity)
 
-    return HarmonyMatchResponse(questions=all_questions,
-                                similarity_with_polarity=similarity_with_polarity,
-                                query_similarity=query_similarity,
-                                new_vectors_dict=new_vectors_dict,
-                                instrument_to_instrument_similarities=instrument_to_instrument_similarities)
+    return HarmonyMatchResult(questions=all_questions,
+                              similarity_with_polarity=similarity_with_polarity,
+                              query_similarity=query_similarity,
+                              new_vectors_dict=new_vectors_dict,
+                              instrument_to_instrument_similarities=instrument_to_instrument_similarities)
     # return (
     #     all_questions,
     #     similarity_with_polarity,
