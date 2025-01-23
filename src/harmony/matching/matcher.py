@@ -677,10 +677,6 @@ def match_instruments_with_function(
 
     clusters = find_clusters(all_questions, similarity_with_polarity)
 
-    import json
-    for c in clusters:
-        print(json.dumps(c.dict()))
-
     return MatchResult(questions=all_questions,
                        similarity_with_polarity=similarity_with_polarity,
                        query_similarity=query_similarity,
