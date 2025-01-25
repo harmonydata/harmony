@@ -9,6 +9,10 @@ from sklearn.metrics import silhouette_score
 from harmony.matching.default_matcher import convert_texts_to_vector
 from harmony.schemas.requests.text import Question
 
+import numpy as np
+from sklearn.metrics.pairwise import cosine_similarity
+from harmony.matching.deterministic_clustering import find_clusters_deterministic
+
 
 def perform_kmeans(embeddings_in, num_clusters=5):
     kmeans = KMeans(n_clusters=num_clusters)
@@ -41,23 +45,64 @@ def visualize_clusters(embeddings_in, kmeans_labels):
         )
         sys.exit(1)
 
+def cluster_questions(questions: List[Question], num_clusters: int, is_show_graph: bool, algorithm: str = "kmeans"):
+    """
+    Cluster questions using the specified algorithm.
 
-def cluster_questions(questions: List[Question], num_clusters: int, is_show_graph: bool):
+    Parameters
+    ----------
+    questions : List[Question]
+        A list of Question objects to cluster.
+    num_clusters : int
+        The number of clusters to create (only applicable for kmeans).
+    is_show_graph : bool
+        Whether to visualize the clusters.
+    algorithm : str
+        The clustering algorithm to use. Options are "kmeans" (default) or "deterministic".
+
+    Returns
+    -------
+    df : pd.DataFrame
+        A DataFrame with the questions and their assigned cluster numbers.
+    sil_score : float or None
+        The silhouette score for the clustering (None if the algorithm does not calculate it).
+    """
     questions_list = [question.question_text for question in questions]
     embedding_matrix = convert_texts_to_vector(questions_list)
-    kmeans_labels = perform_kmeans(embedding_matrix, num_clusters)
-    df = pd.DataFrame({
-        "question_text": questions_list,
-        "cluster_number": kmeans_labels
-    })
 
-    # silhouette score requires at least 2 clusters
-    if num_clusters > 1:
-        sil_score = silhouette_score(embedding_matrix, kmeans_labels)
+    if algorithm == "kmeans":
+        kmeans_labels = perform_kmeans(embedding_matrix, num_clusters)
+        sil_score = silhouette_score(embedding_matrix, kmeans_labels) if num_clusters > 1 else None
+
+        if is_show_graph:
+            visualize_clusters(embedding_matrix, kmeans_labels)
+
+        df = pd.DataFrame({
+            "question_text": questions_list,
+            "cluster_number": kmeans_labels
+        })
+
+    elif algorithm == "deterministic":
+        similarity_matrix = cosine_similarity(embedding_matrix)
+
+        clusters = find_clusters_deterministic(questions, similarity_matrix)
+
+        cluster_labels = []
+        for question_idx in range(len(questions)):
+            for cluster in clusters:
+                if question_idx in cluster.item_ids:
+                    cluster_labels.append(cluster.cluster_id)
+                    break
+
+        sil_score = None  
+        df = pd.DataFrame({
+            "question_text": questions_list,
+            "cluster_number": cluster_labels
+        })
+
     else:
-        sil_score = None
-
-    if is_show_graph:
-        visualize_clusters(embedding_matrix, kmeans_labels)
+        raise ValueError(f"Unsupported algorithm '{algorithm}'. Please use 'kmeans' or 'deterministic'.")
 
     return df, sil_score
+
+
