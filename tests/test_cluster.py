@@ -46,9 +46,10 @@ class TestCluster(unittest.TestCase):
                                             question_text="Trouble falling/staying asleep, sleeping too much"), ]
 
     def test_cluster(self):
-        clusters_out, score_out = cluster_questions(self.all_questions_real, 2, False)
-        assert (len(clusters_out) == 5)
-        assert score_out
+        clusters_out, score_out, final_score = cluster_questions(self.all_questions_real, 2, False, "deterministic", True)
+        assert len(clusters_out) == 5
+        assert score_out is None  # deterministic does not return silhouette score
+        assert final_score is not None  # final score should be calculated
 
 
 if __name__ == '__main__':
