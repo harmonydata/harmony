@@ -13,6 +13,12 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from harmony.matching.deterministic_clustering import find_clusters_deterministic
 
+from sentence_transformers import SentenceTransformer
+
+
+# Initialize the semantic embedding model
+model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
+
 
 def perform_kmeans(embeddings_in, num_clusters=5):
     kmeans = KMeans(n_clusters=num_clusters)
@@ -41,14 +47,14 @@ def visualize_clusters(embeddings_in, kmeans_labels):
     except ImportError:
         print(
             "Matplotlib is not installed. Please install it using:\n"
-            "pip install matplotlib==3.7.0"
+            "pip install matplotlib"
         )
         sys.exit(1)
 
 
 def calculate_response_similarity(options1: List[str], options2: List[str]) -> float:
     """
-    Calculate the similarity score between two lists of response options.
+    Calculate the semantic similarity score between two lists of response options.
 
     Parameters
     ----------
@@ -65,19 +71,21 @@ def calculate_response_similarity(options1: List[str], options2: List[str]) -> f
     if not options1 or not options2:
         return 0.0  # No similarity if one of the options is empty.
 
-    # Normalize options by removing case and extra whitespace.
-    options1 = [option.strip().lower() for option in options1]
-    options2 = [option.strip().lower() for option in options2]
+    # 轉換選項為語義嵌入向量
+    embeddings1 = model.encode(options1)
+    embeddings2 = model.encode(options2)
 
-    # Calculate intersection and union of the two option sets.
-    intersection = set(options1) & set(options2)
-    union = set(options1) | set(options2)
+    # 計算語義相似性矩陣
+    similarity_matrix = cosine_similarity(embeddings1, embeddings2)
 
-    # Jaccard similarity.
-    return len(intersection) / len(union) if union else 0.0
+    # 對每個選項找出最相似的匹配並計算平均相似度
+    max_similarities = similarity_matrix.max(axis=1)
+    return max_similarities.mean()
+
 
 def cluster_questions(questions: List[Question], num_clusters: int, is_show_graph: bool, 
-                      algorithm: str = "kmeans", use_response_similarity: bool = False):
+                      algorithm: str = "kmeans", use_response_similarity: bool = False,
+                      question_similarity_weight: float = 0.5, response_similarity_weight: float = 0.5):
     """
     Cluster questions using the specified algorithm and optionally include response options similarity.
 
@@ -93,6 +101,10 @@ def cluster_questions(questions: List[Question], num_clusters: int, is_show_grap
         The clustering algorithm to use. Options are "kmeans" (default) or "deterministic".
     use_response_similarity : bool
         Whether to include response options similarity in the final similarity score.
+    question_similarity_weight : float
+        Weight for the question similarity score (default is 0.5).
+    response_similarity_weight : float
+        Weight for the response options similarity score (default is 0.5).
 
     Returns
     -------
@@ -103,9 +115,15 @@ def cluster_questions(questions: List[Question], num_clusters: int, is_show_grap
     final_score : float or None
         The combined similarity score of questions and response options (if enabled).
     """
+    # Validate weights
+    if not (0 <= question_similarity_weight <= 1 and 0 <= response_similarity_weight <= 1):
+        raise ValueError("Weights must be between 0 and 1.")
+    if abs(question_similarity_weight + response_similarity_weight - 1.0) > 1e-6:
+        raise ValueError("The sum of question_similarity_weight and response_similarity_weight must equal 1.")
+
     # Initialize variables
-    final_score = None  # Default value if not calculated
-    similarity_matrix = None  # For compatibility across algorithms
+    final_score = None
+    similarity_matrix = None
 
     questions_list = [question.question_text for question in questions]
     embedding_matrix = convert_texts_to_vector(questions_list)
@@ -146,20 +164,6 @@ def cluster_questions(questions: List[Question], num_clusters: int, is_show_grap
 
     # Calculate response options similarity if enabled
     if use_response_similarity:
-        def calculate_response_similarity(options1: List[str], options2: List[str]) -> float:
-            """
-            Calculate the similarity score between two lists of response options using Jaccard similarity.
-            """
-            if not options1 or not options2:
-                return 0.0  # No similarity if one of the options is empty.
-
-            options1 = [option.strip().lower() for option in options1]
-            options2 = [option.strip().lower() for option in options2]
-
-            intersection = set(options1) & set(options2)
-            union = set(options1) | set(options2)
-            return len(intersection) / len(union) if union else 0.0
-
         response_similarities = []
         for i, question1 in enumerate(questions):
             for j, question2 in enumerate(questions):
@@ -170,7 +174,9 @@ def cluster_questions(questions: List[Question], num_clusters: int, is_show_grap
         # Combine question similarity and response similarity
         question_similarity_score = np.mean(similarity_matrix) if similarity_matrix is not None else 0.0
         response_similarity_score = np.mean(response_similarities) if response_similarities else 0.0
-        
-        final_score = 0.5 * question_similarity_score + 0.5 * response_similarity_score
+
+        # Use adjustable weights for final score calculation
+        final_score = (question_similarity_weight * question_similarity_score +
+                       response_similarity_weight * response_similarity_score)
 
     return df, sil_score, final_score if use_response_similarity else None
