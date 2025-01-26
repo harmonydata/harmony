@@ -14,6 +14,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from harmony.matching.deterministic_clustering import find_clusters_deterministic
 
 from sentence_transformers import SentenceTransformer
+from scipy.optimize import linear_sum_assignment
 
 
 # Initialize the semantic embedding model
@@ -51,10 +52,10 @@ def visualize_clusters(embeddings_in, kmeans_labels):
         )
         sys.exit(1)
 
-
 def calculate_response_similarity(options1: List[str], options2: List[str]) -> float:
     """
-    Calculate the semantic similarity score between two lists of response options.
+    Calculate the semantic similarity score between two lists of response options,
+    ensuring that each option in options1 matches to a unique option in options2.
 
     Parameters
     ----------
@@ -71,16 +72,16 @@ def calculate_response_similarity(options1: List[str], options2: List[str]) -> f
     if not options1 or not options2:
         return 0.0  # No similarity if one of the options is empty.
 
-    # 轉換選項為語義嵌入向量
+    # Convert options to semantic embeddings
     embeddings1 = model.encode(options1)
     embeddings2 = model.encode(options2)
 
-    # 計算語義相似性矩陣
     similarity_matrix = cosine_similarity(embeddings1, embeddings2)
+    row_indices, col_indices = linear_sum_assignment(-similarity_matrix)  # Negate to maximize similarity
+    matched_similarities = similarity_matrix[row_indices, col_indices]
 
-    # 對每個選項找出最相似的匹配並計算平均相似度
-    max_similarities = similarity_matrix.max(axis=1)
-    return max_similarities.mean()
+    return matched_similarities.mean()
+
 
 
 def cluster_questions(questions: List[Question], num_clusters: int, is_show_graph: bool, 
