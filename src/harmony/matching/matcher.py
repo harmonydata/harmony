@@ -668,7 +668,7 @@ def match_instruments_with_function(
                         instrument_to_category[instrument_id].append(topic)
 
             for question in all_questions:
-                question.topics_auto = instrument_to_category[question.instrument_id]
+                question.topics_auto = instrument_to_category.get(question.instrument_id, [])
         else:
             for question in all_questions:
                 question.topics_auto = []
