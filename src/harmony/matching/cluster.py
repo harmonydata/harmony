@@ -104,5 +104,3 @@ def cluster_questions(questions: List[Question], num_clusters: int, is_show_grap
         raise ValueError(f"Unsupported algorithm '{algorithm}'. Please use 'kmeans' or 'deterministic'.")
 
     return df, sil_score
-
-
