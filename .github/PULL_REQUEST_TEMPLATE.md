@@ -30,6 +30,7 @@ Since the Harmony Python package is used by the Harmony API (which is itself use
 
 ## Checklist
 
+- [ ] My PR is for one issue, rather than for multiple unrelated fixes.
 - [ ] My code follows the style guidelines of this project. I have applied a Linter (recommended: Pycharm's code formatter) to make my whitespace consistent with the rest of the project.
 - [ ] I have performed a self-review of my own code
 - [ ] I have commented my code, particularly in hard-to-understand areas
