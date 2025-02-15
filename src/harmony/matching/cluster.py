@@ -28,7 +28,7 @@ class ClusteringFunction(Protocol):
     ) -> tuple[pd.DataFrame, float | None]: ...
 
 
-def _perform_kmeans(embeddings_in: np.ndarray, num_clusters: int = 5) -> np.ndarray:
+def perform_kmeans(embeddings_in: np.ndarray, num_clusters: int = 5) -> np.ndarray:
     """Perform kmeans on the embeddings.
 
     Parameters
@@ -49,7 +49,7 @@ def _perform_kmeans(embeddings_in: np.ndarray, num_clusters: int = 5) -> np.ndar
     return kmeans_labels
 
 
-def _visualize_clusters(embeddings_in: np.ndarray, kmeans_labels: np.ndarray) -> None:
+def visualize_clusters(embeddings_in: np.ndarray, kmeans_labels: np.ndarray) -> None:
     """Visualize the clusters from the kmeans algorithm.
 
     Uses principal components analysis to map the embeddings dimensions to
@@ -99,14 +99,14 @@ def _visualize_clusters(embeddings_in: np.ndarray, kmeans_labels: np.ndarray) ->
         sys.exit(1)
 
 
-def _kmeans_cluster_questions(
+def kmeans_cluster_questions(
     embedding_matrix: np.ndarray,
     questions: list[Question],
     questions_list: list[str],
     num_clusters: int,
     is_show_graph: bool,
 ) -> tuple[pd.DataFrame, float | None]:
-    kmeans_labels = _perform_kmeans(embedding_matrix, num_clusters)
+    kmeans_labels = perform_kmeans(embedding_matrix, num_clusters)
     sil_score = (
         float(silhouette_score(embedding_matrix, kmeans_labels))
         if num_clusters > 1
@@ -114,7 +114,7 @@ def _kmeans_cluster_questions(
     )
 
     if is_show_graph:
-        _visualize_clusters(embedding_matrix, kmeans_labels)
+        visualize_clusters(embedding_matrix, kmeans_labels)
 
     df = pd.DataFrame(
         {"question_text": questions_list, "cluster_number": kmeans_labels}
@@ -122,7 +122,7 @@ def _kmeans_cluster_questions(
     return df, sil_score
 
 
-def _deterministic_cluster_questions(
+def deterministic_cluster_questions(
     embedding_matrix: np.ndarray,
     questions: list[Question],
     questions_list: list[str],
@@ -147,15 +147,15 @@ def _deterministic_cluster_questions(
     return df, sil_score
 
 
-def _get_cluster_questions_algorithm(
+def get_cluster_questions_algorithm(
     algorithm: ClusterAlgorithm,
 ) -> Callable[
     [np.ndarray, list[Question], list[str], int, bool],
     tuple[pd.DataFrame, float | None],
 ]:
     if algorithm == ClusterAlgorithm.KMEANS:
-        return _kmeans_cluster_questions
-    return _deterministic_cluster_questions
+        return kmeans_cluster_questions
+    return deterministic_cluster_questions
 
 
 def cluster_questions(
@@ -187,7 +187,7 @@ def cluster_questions(
     """
     questions_list = [question.question_text for question in questions]
     embedding_matrix = convert_texts_to_vector(questions_list)
-    cluster_questions_algorithm = _get_cluster_questions_algorithm(algorithm)
+    cluster_questions_algorithm = get_cluster_questions_algorithm(algorithm)
     df, sil_score = cluster_questions_algorithm(
         embedding_matrix, questions, questions_list, num_clusters, is_show_graph
     )

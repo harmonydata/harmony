@@ -34,5 +34,5 @@ class ClusterAlgorithm(str, Enum):
     DETERMINISTIC = "deterministic"
 
     def __getattr__(self, name):
-        raise AttributeError(f"Unsported algorithm {name}. Valid options are: 
-                             {', '.join([item.name for item in self.__class__])}")
+        raise AttributeError(f"Unsported algorithm {name}. Valid options are: "
+                             f"{', '.join([item.name for item in self.__class__])}")
