@@ -35,6 +35,7 @@ from numpy import dot, matmul, ndarray, matrix
 from numpy.linalg import norm
 
 from harmony.matching.deterministic_clustering import find_clusters_deterministic
+from harmony.matching.affinity_propagation_clustering import cluster_questions_affinity_propagation
 from harmony.matching.instrument_to_instrument_similarity import get_instrument_similarity
 from harmony.matching.negator import negate
 from harmony.schemas.catalogue_instrument import CatalogueInstrument
@@ -576,7 +577,11 @@ def match_instruments_with_function(
         mhc_all_metadatas: List = [],
         mhc_embeddings: np.ndarray = np.zeros((0, 0)),
         texts_cached_vectors: dict[str, List[float]] = {},
-        is_negate: bool = True
+        is_negate: bool = True,
+        clustering_algorithm: str = "affinity_propagation",
+        top_k_topics: int = 5,
+        languages: List[str] = ["english"],
+        additional_stopwords: List[str] = None
 ) -> MatchResult:
     """
     Match instruments.
@@ -588,6 +593,10 @@ def match_instruments_with_function(
     :param mhc_all_metadatas: MHC metadatas.
     :param mhc_embeddings: MHC embeddings.
     :param texts_cached_vectors: A dictionary of already cached vectors from texts (key is the text and value is the vector).
+    :param clustering_algorithm: {"affinity_propagation", "deterministic"}: The clustering algorithm to use to cluster the questions.
+    :top_k_topics: int: The number of topics to assign to each cluster.
+    :languages: List[str]: The languages of the questions. Used for topic assignment.
+    :additional_stopwords: List[str]: Words to exclude from the topic names.
     """
 
     all_questions: List[Question] = []
@@ -675,7 +684,21 @@ def match_instruments_with_function(
 
     instrument_to_instrument_similarities = get_instrument_similarity(instruments, similarity_with_polarity)
 
-    clusters = find_clusters_deterministic(all_questions, similarity_with_polarity)
+    cluster_func = None
+    if clustering_algorithm == "affinity_propagation":
+        cluster_func = cluster_questions_affinity_propagation
+    elif clustering_algorithm == "deterministic":
+        cluster_func = find_clusters_deterministic
+    else:
+        raise Exception("Invalid clustering function, must be in {\"affinity_propagation\", \"deterministic\"}")
+
+    clusters = cluster_func(
+        all_questions,
+        similarity_with_polarity,
+        top_k_topics=top_k_topics,
+        languages=languages,
+        additional_stopwords=additional_stopwords
+    )
 
     return MatchResult(questions=all_questions,
                        similarity_with_polarity=similarity_with_polarity,

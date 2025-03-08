@@ -73,7 +73,8 @@ class HarmonyCluster(BaseModel):
     centroid: Question = Field(description="The central question", exclude=True, )
     item_ids: List[int] = Field(description="The IDs of questions within this cluster")
     items: List[Question] = Field(description="The questions within this cluster", exclude=True, )
-    text_description: str = Field(description="Text describing the cluster")
+    text_description: str = Field(description="Text describing the cluster"),
+    keywords: List[str] = Field(description="Cluster keywords/topics that best summarise the cluster")
 
 
 class MatchResponse(BaseModel):

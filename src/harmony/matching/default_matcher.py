@@ -77,7 +77,12 @@ def match_instruments(
         mhc_all_metadatas: List = [],
         mhc_embeddings: np.ndarray = np.zeros((0, 0)),
         texts_cached_vectors: dict[str, List[float]] = {}, batch_size: int = 1000, max_batches: int = 2000,
-        is_negate: bool = True
+        is_negate: bool = True,
+        clustering_algorithm: str = "affinity_propagation",
+        top_k_topics: int = 5,
+        languages: List[str] = ["english"],
+        additional_stopwords: List[str] = None
+
 ) -> MatchResult:
     return match_instruments_with_function(
         instruments=instruments,
@@ -88,5 +93,9 @@ def match_instruments(
         mhc_all_metadatas=mhc_all_metadatas,
         mhc_embeddings=mhc_embeddings,
         texts_cached_vectors=texts_cached_vectors,
-        is_negate = is_negate
+        is_negate = is_negate,
+        clustering_algorithm = clustering_algorithm,
+        top_k_topics = top_k_topics,
+        languages = languages,
+        additional_stopwords = additional_stopwords
     )

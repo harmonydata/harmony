@@ -31,54 +31,16 @@ import numpy as np
 from harmony.schemas.requests.text import Question
 from harmony.schemas.responses.text import HarmonyCluster
 
-from collections import Counter
-from typing import List
-from sentence_transformers import SentenceTransformer
-from sklearn.metrics.pairwise import cosine_similarity
-from harmony.schemas.requests.text import Question
-from harmony.schemas.responses.text import HarmonyCluster
-
-# Initialize a Sentence Transformer model
-model = SentenceTransformer("all-MiniLM-L6-v2") 
-
-def generate_semantic_keywords(cluster_items: List[Question], top_k: int = 5) -> List[str]:
-    """
-    Generate representative keywords for a cluster using Sentence Transformers embeddings.
-
-    Parameters
-    ----------
-    cluster_items : List[Question]
-        The list of questions in the cluster.
-    top_k : int
-        Number of top keywords to extract.
-
-    Returns
-    -------
-    List[str]
-        A list of top keywords representing the cluster.
-    """
-    texts = [item.question_text for item in cluster_items]
-    if not texts:
-        return []
-
-    # Generate embeddings for all texts
-    embeddings = model.encode(texts)
-
-    # Compute average embedding for the cluster
-    cluster_embedding = embeddings.mean(axis=0, keepdims=True)
-
-    # Calculate cosine similarity of each text to the cluster embedding
-    similarities = cosine_similarity(cluster_embedding, embeddings)[0]
-
-    # Rank texts based on similarity and select top_k
-    top_indices = similarities.argsort()[-top_k:][::-1]  # Sort in descending order
-    keywords = [texts[idx] for idx in top_indices]
-
-    return keywords
+from harmony.matching.generate_cluster_topics import generate_cluster_topics
 
 
 def find_clusters_deterministic(
-    questions: List[Question], item_to_item_similarity_matrix: np.ndarray, threshold: float = 0.5
+    questions: List[Question],
+    item_to_item_similarity_matrix: np.ndarray,
+    threshold: float = 0.5,
+    top_k_topics: int = 5,
+    languages: List[str] = ["english"],
+    additional_stopwords: List[str] = None
 ) -> List[HarmonyCluster]:
     """
     deterministic clustering using Sentence Transformers for cluster keywords.
@@ -87,10 +49,21 @@ def find_clusters_deterministic(
     ----------
     questions : List[Question]
         The set of questions to cluster.
+        
     item_to_item_similarity_matrix : np.ndarray
         The cosine similarity matrix for the questions.
+
     threshold : float
         Minimum similarity score required to cluster two items together.
+
+    top_k_topics: int
+        The number of topics to assign to each cluster.
+
+    languages: List[str]
+        The languages of the questions. Used for topic assignment.
+
+    additional_stopwords: List[str]
+        Words to exclude from the topic names.
 
     Returns
     -------
@@ -152,9 +125,6 @@ def find_clusters_deterministic(
         best_question_idx = max(candidate_scores, key=candidate_scores.get)
         text_description = questions[best_question_idx].question_text
 
-        # Generate semantic-based keywords
-        cluster_keywords = generate_semantic_keywords(items)
-
         # Create HarmonyCluster object
         cluster = HarmonyCluster(
             cluster_id=group_no,
@@ -163,8 +133,13 @@ def find_clusters_deterministic(
             items=items,
             item_ids=item_ids,
             text_description=text_description,
-            keywords=cluster_keywords,
+            keywords=[],
         )
         clusters_to_return.append(cluster)
+
+        # generate cluster topics
+        cluster_topics = generate_cluster_topics(clusters_to_return, top_k_topics, languages, additional_stopwords)
+        for cluster, topics in zip(clusters_to_return, cluster_topics):
+            cluster.keywords = topics
 
     return clusters_to_return
