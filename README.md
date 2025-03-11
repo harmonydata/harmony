@@ -104,7 +104,10 @@ harmony.download_models()
 
 ```
 instruments = harmony.example_instruments["CES_D English"], harmony.example_instruments["GAD-7 Portuguese"]
-questions, similarity, query_similarity, new_vectors_dict = harmony.match_instruments(instruments)
+match_response = harmony.match_instruments(instruments)
+
+questions = match_response.questions
+similarity = match_response.similarity_with_polarity
 ```
 
 ## How to load a PDF, Excel or Word into an instrument
