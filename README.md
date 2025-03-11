@@ -130,7 +130,8 @@ You can also create instruments quickly from a list of strings
 from harmony import create_instrument_from_list, match_instruments
 instrument1 = create_instrument_from_list(["I feel anxious", "I feel nervous"])
 instrument2 = create_instrument_from_list(["I feel afraid", "I feel worried"])
-all_questions, similarity, query_similarity, new_vectors_dict = match_instruments([instrument1, instrument2])
+
+match_response = match_instruments([instrument1, instrument2])
 ```
 
 ## Loading instruments from PDFs
@@ -148,12 +149,12 @@ Once you have some instruments, you can match them with each other with a call t
 
 ```
 from harmony import match_instruments
-all_questions, similarity, query_similarity, new_vectors_dict = match_instruments(instruments)
+match_response = match_instruments(instruments)
 ```
 
-* `all_questions` is a list of the questions passed to Harmony, in order.
-* `similarity` is the similarity matrix returned by Harmony.
-* `query_similarity` is the degree of similarity of each item to an optional query passed as argument to `match_instruments`.
+* `match_response.questions` is a list of the questions passed to Harmony, in order.
+* `match_response.similarity_with_polarity` is the similarity matrix returned by Harmony.
+* `match_response.query_similarity` is the degree of similarity of each item to an optional query passed as argument to `match_instruments`.
 
 ## ⇗⇗ Using a different vectorisation function
 
@@ -178,7 +179,7 @@ def convert_texts_to_vector(texts):
     vectors = client.embeddings.create(input = texts, model=model_name).data
     return np.asarray([vectors[i].embedding for i in range(len(vectors))])
 instruments = example_instruments["CES_D English"], example_instruments["GAD-7 Portuguese"]
-all_questions, similarity, query_similarity, new_vectors_dict = match_instruments_with_function(instruments, None, convert_texts_to_vector)
+match_response = match_instruments_with_function(instruments, None, convert_texts_to_vector)
 ```
  
 ## 💻 Do you want to run Harmony in your browser locally?
