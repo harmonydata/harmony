@@ -80,14 +80,15 @@ def cluster_questions_affinity_propagation(
     assert np.array_equal(item_to_item_similarity_matrix, item_to_item_similarity_matrix.T)
 
     # assert that the similarity matrix is -1 <= x <= 1
-    assert np.all(item_to_item_similarity_matrix >= -1.)
-    assert np.all(item_to_item_similarity_matrix <= 1.)
+    assert np.all(np.round(item_to_item_similarity_matrix, 3) >= -1.)
+    assert np.all(np.round(item_to_item_similarity_matrix, 3) <= 1.)
 
     # assert that the similarity matrix has 1s on its diagonals
     assert np.allclose(np.diag(item_to_item_similarity_matrix), 1.)
 
-    # assert that the entries of the similarity matrix are floats
-    assert item_to_item_similarity_matrix.dtype == np.float64
+    # ensure that the entries of the similarity matrix are floats
+    if item_to_item_similarity_matrix.dtype != np.float64:
+        item_to_item_similarity_matrix = item_to_item_similarity_matrix.astype(np.float64)
 
 
     affinity_propagation = AffinityPropagation(affinity='precomputed', random_state=1, max_iter=10, convergence_iter=5)
