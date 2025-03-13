@@ -65,14 +65,47 @@ def cluster_questions_affinity_propagation(
         A list of HarmonyCluster objects representing the clusters.
     """
     
-    affinity_propagation = AffinityPropagation(affinity='precomputed', random_state=1)
+    # assert that the number of questions is greater than 0
+    assert len(questions) > 0
+
+    # assert that the similarity matrix is not empty
+    assert item_to_item_similarity_matrix.size > 0
+
+    # assert that the number of questions is equal to the number of rows in the similarity matrix
+    assert len(questions) == item_to_item_similarity_matrix.shape[0]
+
+    # assert that the number of questions is equal to the number of columns in the similarity matrix
+    assert len(questions) == item_to_item_similarity_matrix.shape[1]
+
+    # assert that the number of questions is equal to the number of rows and columns in the similarity matrix
+    assert len(questions) == item_to_item_similarity_matrix.shape[0]
+    assert len(questions) == item_to_item_similarity_matrix.shape[1]
+
+    # assert that the similarity matrix is square
+    assert item_to_item_similarity_matrix.shape[0] == item_to_item_similarity_matrix.shape[1]
+
+    # assert that the similarity matrix is symmetric
+    assert np.array_equal(item_to_item_similarity_matrix, item_to_item_similarity_matrix.T)
+
+    # assert that the similarity matrix is -1 <= x <= 1
+    assert np.all(item_to_item_similarity_matrix >= -1.)
+    assert np.all(item_to_item_similarity_matrix <= 1.)
+
+    # assert that the similarity matrix has 1s on its diagonals
+    assert np.allclose(np.diag(item_to_item_similarity_matrix), 1.)
+
+    # assert that the entries of the similarity matrix are floats
+    assert item_to_item_similarity_matrix.dtype == np.float64
+
+
+    affinity_propagation = AffinityPropagation(affinity='precomputed', random_state=1, max_iter=10, convergence_iter=5)
     affinity_propagation.fit(np.abs(item_to_item_similarity_matrix))
 
     exemplars = affinity_propagation.cluster_centers_indices_
     labels = affinity_propagation.labels_
 
     clusters = []
-
+    
     for i, exemplar in enumerate(exemplars):
         clusters.append(
             HarmonyCluster(
@@ -86,7 +119,22 @@ def cluster_questions_affinity_propagation(
             )
         )
 
+    cluster_ids = set([cluster.cluster_id for cluster in clusters])
     for i, label in enumerate(labels):
+        if label not in cluster_ids:
+            clusters.append(
+                HarmonyCluster(
+                    cluster_id=label,
+                    centroid_id=i,
+                    centroid=questions[i],
+                    items=[],
+                    item_ids=[],
+                    text_description=questions[i].question_text,
+                    keywords=[]
+                )
+            )
+            cluster_ids.add(label)
+
         clusters[label].items.append(questions[i])
         clusters[label].item_ids.append(i)
 

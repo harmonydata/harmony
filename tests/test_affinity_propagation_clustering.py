@@ -27,15 +27,50 @@ SOFTWARE.
 
 import sys
 import unittest
+import numpy as np
 
 sys.path.append("../src")
 
-class TestAffinityPropagationClustering(unittest.TestCase):
-    def test1(self):
-        self.assertEqual(1, 1)
+from harmony.matching.affinity_propagation_clustering import cluster_questions_affinity_propagation
+from harmony.schemas.requests.text import Question
 
-    def test2(self):
-        self.assertEqual(1, 1)
+class TestAffinityPropagationClustering(unittest.TestCase):
+    def setUp(self):
+        self.questions = [
+            Question(question_text="What is the capital of France?"),
+            Question(question_text="What is the capital of Germany?"),
+            Question(question_text="What is the capital of Spain?"),
+            Question(question_text="What is the capital of Italy?")
+        ]
+
+    def test_1_cluster(self):
+        clusters = cluster_questions_affinity_propagation(
+            self.questions,
+            item_to_item_similarity_matrix=np.array([
+                [1., 1., 1., 1.], 
+                [1., 1., 1., 1.],
+                [1., 1., 1., 1.],
+                [1., 1., 1., 1.]
+            ]))
+        self.assertEqual(len(clusters), 1)
+
+    def test_3_clusters(self):
+        clusters = cluster_questions_affinity_propagation(
+            self.questions,
+            item_to_item_similarity_matrix=np.array([
+                [1., 1., 1., 0.], 
+                [1., 1., 1., 0.],
+                [1., 1., 1., 0.],
+                [0., 0., 0., 1.]
+            ]))
+        self.assertEqual(len(clusters), 3)
+
+    def test_cluster_identity(self):
+        clusters = cluster_questions_affinity_propagation(
+            self.questions,
+            item_to_item_similarity_matrix=np.eye(4))
+        self.assertEqual(len(clusters), 1)
+
 
 if __name__ == '__main__':
     unittest.main()
