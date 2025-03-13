@@ -79,7 +79,7 @@ def find_clusters_deterministic(
     assert item_to_item_similarity_matrix.shape[0] == item_to_item_similarity_matrix.shape[1]
 
     # assert that the similarity matrix is symmetric
-    assert np.array_equal(item_to_item_similarity_matrix, item_to_item_similarity_matrix.T)
+    assert np.allclose(item_to_item_similarity_matrix, item_to_item_similarity_matrix.T)
 
     # assert that the similarity matrix is -1 <= x <= 1
     assert np.all(np.round(item_to_item_similarity_matrix, 3) >= -1.)
