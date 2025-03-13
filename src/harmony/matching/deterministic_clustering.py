@@ -39,8 +39,7 @@ def find_clusters_deterministic(
     item_to_item_similarity_matrix: np.ndarray,
     threshold: float = 0.5,
     top_k_topics: int = 5,
-    languages: List[str] = ["english"],
-    additional_stopwords: List[str] = None
+    languages: List[str] = ["english"]
 ) -> List[HarmonyCluster]:
     """
     deterministic clustering using Sentence Transformers for cluster keywords.
@@ -61,9 +60,6 @@ def find_clusters_deterministic(
 
     languages: List[str]
         The languages of the questions. Used for topic assignment.
-
-    additional_stopwords: List[str]
-        Words to exclude from the topic names.
 
     Returns
     -------
@@ -172,7 +168,7 @@ def find_clusters_deterministic(
         clusters_to_return.append(cluster)
 
         # generate cluster topics
-        cluster_topics = generate_cluster_topics(clusters_to_return, top_k_topics, languages, additional_stopwords)
+        cluster_topics = generate_cluster_topics(clusters_to_return, top_k_topics, languages)
         for cluster, topics in zip(clusters_to_return, cluster_topics):
             cluster.keywords = topics
 

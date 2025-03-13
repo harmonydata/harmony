@@ -580,8 +580,7 @@ def match_instruments_with_function(
         is_negate: bool = True,
         clustering_algorithm: str = "affinity_propagation",
         top_k_topics: int = 5,
-        languages: List[str] = ["english"],
-        additional_stopwords: List[str] = None
+        languages: List[str] = ["english"]
 ) -> MatchResult:
     """
     Match instruments.
@@ -596,7 +595,6 @@ def match_instruments_with_function(
     :param clustering_algorithm: {"affinity_propagation", "deterministic"}: The clustering algorithm to use to cluster the questions.
     :top_k_topics: int: The number of topics to assign to each cluster.
     :languages: List[str]: The languages of the questions. Used for topic assignment.
-    :additional_stopwords: List[str]: Words to exclude from the topic names.
     """
 
     all_questions: List[Question] = []
@@ -696,8 +694,7 @@ def match_instruments_with_function(
         all_questions,
         similarity_with_polarity,
         top_k_topics=top_k_topics,
-        languages=languages,
-        additional_stopwords=additional_stopwords
+        languages=languages
     )
 
     return MatchResult(questions=all_questions,

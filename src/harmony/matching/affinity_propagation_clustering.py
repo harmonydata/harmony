@@ -36,8 +36,7 @@ def cluster_questions_affinity_propagation(
         questions: List[Question],
         item_to_item_similarity_matrix: np.ndarray,
         top_k_topics: int = 5,
-        languages: List[str] = ["english"],
-        additional_stopwords: List[str] = None,
+        languages: List[str] = ["english"]
     ) -> List[HarmonyCluster]:
     """
     Affinity Propagation Clustering using the cosine similarity matrix.
@@ -55,9 +54,6 @@ def cluster_questions_affinity_propagation(
 
     languages: List[str]
         The languages of the questions. Used for topic assignment.
-
-    additional_stopwords: List[str]
-        Words to exclude from the topic names.
 
     Returns
     -------
@@ -138,7 +134,7 @@ def cluster_questions_affinity_propagation(
         clusters[label].items.append(questions[i])
         clusters[label].item_ids.append(i)
 
-    cluster_topics = generate_cluster_topics(clusters, top_k_topics, languages, additional_stopwords)
+    cluster_topics = generate_cluster_topics(clusters, top_k_topics, languages)
     for cluster, topics in zip(clusters, cluster_topics):
         cluster.keywords = topics
 

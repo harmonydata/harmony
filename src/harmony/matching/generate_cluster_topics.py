@@ -38,8 +38,7 @@ from harmony.schemas.responses.text import HarmonyCluster
 def generate_cluster_topics(
         clusters: List[HarmonyCluster],
         top_k_topics: int = 5,
-        languages: List[str] = ["english"],
-        additional_stopwords: List[str] = None
+        languages: List[str] = ["english"]
     ) -> List[List[str]]:
     """
     CHANGE THIS
@@ -55,9 +54,6 @@ def generate_cluster_topics(
 
     languages: List[str]
         The languages of the questions. Used for topic assignment.
-
-    additional_stopwords: List[str]
-        Words to exclude from the topic names.
 
     Returns
     -------
@@ -108,11 +104,6 @@ def generate_cluster_topics(
     stops = set()
     for language in languages:
         stops = stops.union(nltk.corpus.stopwords.words(language))
-    
-    # add any additional stopwords
-    if not additional_stopwords is None:
-        for word in additional_stopwords:
-            stops.add(word)
 
     # get class predictions
     vectoriser = model.named_steps['countvectorizer']
