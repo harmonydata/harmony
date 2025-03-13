@@ -34,8 +34,7 @@ import numpy as np
 
 def cluster_questions_affinity_propagation(
         questions: List[Question],
-        item_to_item_similarity_matrix: np.ndarray,
-        top_k_topics: int = 5
+        item_to_item_similarity_matrix: np.ndarray
     ) -> List[HarmonyCluster]:
     """
     Affinity Propagation Clustering using the cosine similarity matrix.
@@ -47,9 +46,6 @@ def cluster_questions_affinity_propagation(
 
     item_to_item_similarity_matrix : np.ndarray
         The cosine similarity matrix for the questions.
-
-    top_k_topics: int
-        The number of topics to assign to each cluster.
 
     Returns
     -------
@@ -131,7 +127,7 @@ def cluster_questions_affinity_propagation(
         clusters[label].items.append(questions[i])
         clusters[label].item_ids.append(i)
 
-    cluster_topics = generate_cluster_topics(clusters, top_k_topics)
+    cluster_topics = generate_cluster_topics(clusters, top_k_topics=5)
     for cluster, topics in zip(clusters, cluster_topics):
         cluster.keywords = topics
 

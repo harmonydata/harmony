@@ -690,8 +690,7 @@ def match_instruments_with_function(
 
     clusters = cluster_func(
         all_questions,
-        similarity_with_polarity,
-        top_k_topics=top_k_topics
+        similarity_with_polarity
     )
 
     return MatchResult(questions=all_questions,

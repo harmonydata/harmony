@@ -37,8 +37,7 @@ from harmony.matching.generate_cluster_topics import generate_cluster_topics
 def find_clusters_deterministic(
     questions: List[Question],
     item_to_item_similarity_matrix: np.ndarray,
-    threshold: float = 0.5,
-    top_k_topics: int = 5
+    threshold: float = 0.5
 ) -> List[HarmonyCluster]:
     """
     deterministic clustering using Sentence Transformers for cluster keywords.
@@ -53,9 +52,6 @@ def find_clusters_deterministic(
 
     threshold : float
         Minimum similarity score required to cluster two items together.
-
-    top_k_topics: int
-        The number of topics to assign to each cluster.
 
     Returns
     -------
@@ -165,7 +161,7 @@ def find_clusters_deterministic(
         clusters_to_return.append(cluster)
 
         # generate cluster topics
-        cluster_topics = generate_cluster_topics(clusters_to_return, top_k_topics)
+        cluster_topics = generate_cluster_topics(clusters_to_return, top_k_topics=5)
         for cluster, topics in zip(clusters_to_return, cluster_topics):
             cluster.keywords = topics
 

@@ -30,7 +30,7 @@ import unittest
 
 sys.path.append("../src")
 
-import harmony
+from harmony import match_instruments, example_instruments
 from harmony.matching.generate_cluster_topics import generate_cluster_topics
 from harmony.matching.affinity_propagation_clustering import cluster_questions_affinity_propagation
 
@@ -39,16 +39,15 @@ DetectorFactory.seed = 0
 
 class TestGenerateClusterTopics(unittest.TestCase):
     def setUp(self):
-        self.gad_en = harmony.example_instruments["GAD-7 English"]
-        self.gad_pt = harmony.example_instruments["GAD-7 Portuguese"]
+        self.gad_en = example_instruments["GAD-7 English"]
+        self.gad_pt = example_instruments["GAD-7 Portuguese"]
 
     def test_topics_english(self):
-        match_response = harmony.match_instruments([self.gad_en])
+        match_response = match_instruments([self.gad_en])
 
         clusters = cluster_questions_affinity_propagation(
             match_response.questions,
-            match_response.similarity_with_polarity,
-            top_k_topics=5
+            match_response.similarity_with_polarity
         )
         topics = generate_cluster_topics(clusters)
 
@@ -64,12 +63,11 @@ class TestGenerateClusterTopics(unittest.TestCase):
         self.assertEqual(len(topics), len(clusters))
 
     def test_topics_portuguese(self):
-        match_response = harmony.match_instruments([self.gad_pt])
+        match_response = match_instruments([self.gad_pt])
 
         clusters = cluster_questions_affinity_propagation(
             match_response.questions,
-            match_response.similarity_with_polarity,
-            top_k_topics=5
+            match_response.similarity_with_polarity
         )
         topics = generate_cluster_topics(clusters)
 
@@ -83,12 +81,11 @@ class TestGenerateClusterTopics(unittest.TestCase):
         self.assertEqual(len(topics), len(clusters))
 
     def test_topics_english_portuguese(self):
-        match_response = harmony.match_instruments([self.gad_en, self.gad_pt])
+        match_response = match_instruments([self.gad_en, self.gad_pt])
 
         clusters = cluster_questions_affinity_propagation(
             match_response.questions,
-            match_response.similarity_with_polarity,
-            top_k_topics=5
+            match_response.similarity_with_polarity
         )
         topics = generate_cluster_topics(clusters)
 
