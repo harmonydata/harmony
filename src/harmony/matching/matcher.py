@@ -579,8 +579,7 @@ def match_instruments_with_function(
         texts_cached_vectors: dict[str, List[float]] = {},
         is_negate: bool = True,
         clustering_algorithm: str = "affinity_propagation",
-        top_k_topics: int = 5,
-        languages: List[str] = ["en"]
+        top_k_topics: int = 5
 ) -> MatchResult:
     """
     Match instruments.
@@ -594,7 +593,6 @@ def match_instruments_with_function(
     :param texts_cached_vectors: A dictionary of already cached vectors from texts (key is the text and value is the vector).
     :param clustering_algorithm: {"affinity_propagation", "deterministic"}: The clustering algorithm to use to cluster the questions.
     :top_k_topics: int: The number of topics to assign to each cluster.
-    :languages: List[str]: The languages of the questions. Used for topic assignment.
     """
 
     all_questions: List[Question] = []
@@ -693,8 +691,7 @@ def match_instruments_with_function(
     clusters = cluster_func(
         all_questions,
         similarity_with_polarity,
-        top_k_topics=top_k_topics,
-        languages=languages
+        top_k_topics=top_k_topics
     )
 
     return MatchResult(questions=all_questions,

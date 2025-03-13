@@ -33,11 +33,13 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import make_pipeline
 from harmony.schemas.responses.text import HarmonyCluster
 
+from langdetect import detect, DetectorFactory
+DetectorFactory.seed = 0
+
 
 def generate_cluster_topics(
         clusters: List[HarmonyCluster],
         top_k_topics: int = 5,
-        languages: List[str] = ["en"]
     ) -> List[List[str]]:
     """
     CHANGE THIS
@@ -50,9 +52,6 @@ def generate_cluster_topics(
 
     top_k_topics: int
         The number of topics to assign to each cluster.
-
-    languages: List[str]
-        The languages of the questions. Used for topic assignment.
 
     Returns
     -------
@@ -92,6 +91,16 @@ def generate_cluster_topics(
             y.append(cluster_id)
 
     model.fit(X, y)
+
+    # detect langauge of the questions
+    languages = set()
+    for cluster in clusters:
+        for item in cluster.items:
+            try:
+                lang = detect(item.question_text)
+                languages.add(lang)
+            except:
+                pass
 
     # add the stopwords for each language
     stops = set()
