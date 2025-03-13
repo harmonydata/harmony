@@ -30,12 +30,83 @@ import unittest
 
 sys.path.append("../src")
 
-class TestGenerateClusterTopics(unittest.TestCase):
-    def test1(self):
-        self.assertEqual(1, 1)
+import harmony
+from harmony.matching.generate_cluster_topics import generate_cluster_topics
+from harmony.matching.affinity_propagation_clustering import cluster_questions_affinity_propagation
 
-    def test2(self):
-        self.assertEqual(1, 1)
+class TestGenerateClusterTopics(unittest.TestCase):
+    def test_topics_english(self):
+        match_response = harmony.match_instruments([
+            harmony.example_instruments["GAD-7 English"]
+        ])
+
+        clusters = cluster_questions_affinity_propagation(
+            match_response.questions,
+            match_response.similarity_with_polarity,
+            top_k_topics=5,
+            languages=["en"]
+        )
+        topics = generate_cluster_topics(clusters)
+
+        self.assertEqual(
+            topics, 
+            [
+                ['feeling', 'easily', 'annoyed', 'irritable', 'becoming'],
+                ['worrying', 'much', 'different'],
+                ['relaxing', 'trouble', 'restless', 'sit'],
+                ['people', 'problems']
+            ]    
+        )
+        self.assertEqual(len(topics), len(clusters))
+
+    def test_topics_portuguese(self):
+        match_response = harmony.match_instruments([
+            harmony.example_instruments["GAD-7 Portuguese"]
+        ])
+
+        clusters = cluster_questions_affinity_propagation(
+            match_response.questions,
+            match_response.similarity_with_polarity,
+            top_k_topics=5,
+            languages=["pt"]
+        )
+        topics = generate_cluster_topics(clusters)
+
+        self.assertEqual(
+            topics, 
+            [
+                ['de', 'preocupar', 'diversas', 'coisas', 'com'], 
+                ['ficar', 'relaxar', 'para', 'dificuldade', 'aborrecido']
+            ]    
+        )
+        self.assertEqual(len(topics), len(clusters))
+
+    def test_topics_english_portuguese(self):
+        match_response = harmony.match_instruments([
+            harmony.example_instruments["GAD-7 English"],
+            harmony.example_instruments["GAD-7 Portuguese"]
+        ])
+
+        clusters = cluster_questions_affinity_propagation(
+            match_response.questions,
+            match_response.similarity_with_polarity,
+            top_k_topics=5,
+            languages=["en", "pt"]
+        )
+        topics = generate_cluster_topics(clusters)
+
+        self.assertEqual(
+            topics, 
+            [
+                ['edge', 'anxious', 'nervous', 'nervoso'], 
+                ['de', 'worrying', 'diversas', 'coisas', 'preocupar'], 
+                ['trouble', 'relaxing', 'dificuldade', 'para', 'relaxar'], 
+                ['irritado', 'aborrecido', 'facilmente', 'easily', 'annoyed'],
+                ['medo', 'acontecer', 'como', 'algo', 'fosse'], 
+                ['made', 'home']
+            ]   
+        )
+        self.assertEqual(len(topics), len(clusters))
 
 if __name__ == '__main__':
     unittest.main()
