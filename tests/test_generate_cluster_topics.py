@@ -44,63 +44,30 @@ class TestGenerateClusterTopics(unittest.TestCase):
 
     def test_topics_english(self):
         match_response = match_instruments([self.gad_en])
-
-        clusters = cluster_questions_affinity_propagation(
-            match_response.questions,
-            match_response.similarity_with_polarity
-        )
-        topics = generate_cluster_topics(clusters)
-
-        self.assertEqual(
-            topics, 
-            [
-                ['feeling', 'easily', 'annoyed', 'irritable', 'becoming'],
-                ['worrying', 'much', 'different'],
-                ['relaxing', 'trouble', 'restless', 'sit'],
-                ['people', 'problems']
-            ]    
-        )
-        self.assertEqual(len(topics), len(clusters))
-
+        clusters = cluster_questions_affinity_propagation(match_response.questions, match_response.similarity_with_polarity)
+        
+        self.assertEqual(clusters[0].keywords, ['feeling', 'easily', 'annoyed', 'irritable', 'becoming'])
+        self.assertEqual(clusters[1].keywords, ['worrying', 'much', 'different'])
+        self.assertEqual(clusters[2].keywords, ['relaxing', 'trouble', 'restless', 'sit'])
+        self.assertEqual(clusters[3].keywords, ['people', 'problems'])
+        
     def test_topics_portuguese(self):
         match_response = match_instruments([self.gad_pt])
+        clusters = cluster_questions_affinity_propagation(match_response.questions, match_response.similarity_with_polarity)
 
-        clusters = cluster_questions_affinity_propagation(
-            match_response.questions,
-            match_response.similarity_with_polarity
-        )
-        topics = generate_cluster_topics(clusters)
-
-        self.assertEqual(
-            topics, 
-            [
-                ['preocupar', 'diversas', 'coisas'], 
-                ['ficar', 'relaxar', 'dificuldade', 'aborrecido']
-            ]    
-        )
-        self.assertEqual(len(topics), len(clusters))
+        self.assertEqual(clusters[0].keywords, ['preocupar', 'diversas', 'coisas'])
+        self.assertEqual(clusters[1].keywords, ['ficar', 'relaxar', 'dificuldade', 'aborrecido'])
 
     def test_topics_english_portuguese(self):
         match_response = match_instruments([self.gad_en, self.gad_pt])
+        clusters = cluster_questions_affinity_propagation(match_response.questions, match_response.similarity_with_polarity)
 
-        clusters = cluster_questions_affinity_propagation(
-            match_response.questions,
-            match_response.similarity_with_polarity
-        )
-        topics = generate_cluster_topics(clusters)
-
-        self.assertEqual(
-            topics, 
-            [
-                ['edge', 'anxious', 'nervous', 'nervoso'], 
-                ['worrying', 'diversas', 'coisas', 'preocupar'], 
-                ['trouble', 'relaxing', 'dificuldade', 'relaxar'], 
-                ['irritado', 'aborrecido', 'facilmente', 'easily', 'annoyed'],
-                ['medo', 'acontecer', 'algo'], 
-                ['made', 'home']
-            ]   
-        )
-        self.assertEqual(len(topics), len(clusters))
+        self.assertEqual(clusters[0].keywords, ['edge', 'anxious', 'nervous', 'nervoso'])
+        self.assertEqual(clusters[1].keywords, ['worrying', 'diversas', 'coisas', 'preocupar'])
+        self.assertEqual(clusters[2].keywords, ['trouble', 'relaxing', 'dificuldade', 'relaxar'])
+        self.assertEqual(clusters[3].keywords, ['irritado', 'aborrecido', 'facilmente', 'easily', 'annoyed'])
+        self.assertEqual(clusters[4].keywords, ['medo', 'acontecer', 'algo'])
+        self.assertEqual(clusters[5].keywords, ['made', 'home'])
 
     def test_langdetect_english_portuguese(self):
         for question in self.gad_en.questions:
