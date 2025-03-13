@@ -25,7 +25,6 @@ SOFTWARE.
 """
 import re
 import numpy as np
-import nltk
 
 from collections import Counter
 from typing import List
@@ -38,7 +37,7 @@ from harmony.schemas.responses.text import HarmonyCluster
 def generate_cluster_topics(
         clusters: List[HarmonyCluster],
         top_k_topics: int = 5,
-        languages: List[str] = ["english"]
+        languages: List[str] = ["en"]
     ) -> List[List[str]]:
     """
     CHANGE THIS
@@ -94,16 +93,11 @@ def generate_cluster_topics(
 
     model.fit(X, y)
 
-    # check if the stopwords exist already, if not download them
-    try:
-        nltk.data.find("corpora/stopwords.zip")
-    except LookupError:
-        nltk.download("stopwords")
-
     # add the stopwords for each language
     stops = set()
     for language in languages:
-        stops = stops.union(nltk.corpus.stopwords.words(language))
+        with open(f"src/harmony/stopwords/{language}", "r") as f:
+            stops = stops.union(f.read().splitlines())
 
     # get class predictions
     vectoriser = model.named_steps['countvectorizer']

@@ -80,7 +80,7 @@ def match_instruments(
         is_negate: bool = True,
         clustering_algorithm: str = "affinity_propagation",
         top_k_topics: int = 5,
-        languages: List[str] = ["english"]
+        languages: List[str] = ["en"]
 ) -> MatchResult:
     return match_instruments_with_function(
         instruments=instruments,

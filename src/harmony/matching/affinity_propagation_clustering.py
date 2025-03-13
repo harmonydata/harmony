@@ -36,7 +36,7 @@ def cluster_questions_affinity_propagation(
         questions: List[Question],
         item_to_item_similarity_matrix: np.ndarray,
         top_k_topics: int = 5,
-        languages: List[str] = ["english"]
+        languages: List[str] = ["en"]
     ) -> List[HarmonyCluster]:
     """
     Affinity Propagation Clustering using the cosine similarity matrix.

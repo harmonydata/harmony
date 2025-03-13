@@ -39,7 +39,7 @@ def find_clusters_deterministic(
     item_to_item_similarity_matrix: np.ndarray,
     threshold: float = 0.5,
     top_k_topics: int = 5,
-    languages: List[str] = ["english"]
+    languages: List[str] = ["en"]
 ) -> List[HarmonyCluster]:
     """
     deterministic clustering using Sentence Transformers for cluster keywords.
