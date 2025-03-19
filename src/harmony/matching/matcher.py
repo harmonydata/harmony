@@ -47,6 +47,8 @@ from harmony.schemas.requests.text import (
 from harmony.schemas.responses.text import MatchResult
 from harmony.schemas.text_vector import TextVector
 
+from harmony.matching.kmeans_clustering import cluster_questions_kmeans_from_embeddings
+
 
 # This has been tested on 16 GB RAM production server, 1000 seems a safe number (TW, 15 Dec 2024)
 def get_batch_size(default=1000):
@@ -579,7 +581,6 @@ def match_instruments_with_function(
         texts_cached_vectors: dict[str, List[float]] = {},
         is_negate: bool = True,
         clustering_algorithm: str = "affinity_propagation",
-        top_k_topics: int = 5
 ) -> MatchResult:
     """
     Match instruments.
@@ -680,18 +681,28 @@ def match_instruments_with_function(
 
     instrument_to_instrument_similarities = get_instrument_similarity(instruments, similarity_with_polarity)
 
-    cluster_func = None
+    # clustering_algorithm = "kmeans"
     if clustering_algorithm == "affinity_propagation":
-        cluster_func = cluster_questions_affinity_propagation
+        clusters = cluster_questions_affinity_propagation(
+            all_questions,
+            similarity_with_polarity
+        )
+
     elif clustering_algorithm == "deterministic":
-        cluster_func = find_clusters_deterministic
+        clusters = find_clusters_deterministic(
+            all_questions,
+            similarity_with_polarity
+        )
+    elif clustering_algorithm == "kmeans":
+        # TODO: num_clusters_for_kmeans should be user defined
+        num_clusters_for_kmeans = int(np.floor(len(all_questions) / 2))
+        clusters = cluster_questions_kmeans_from_embeddings(
+            all_questions,
+            vectors_pos,
+            num_clusters_for_kmeans
+        )
     else:
         raise Exception("Invalid clustering function, must be in {\"affinity_propagation\", \"deterministic\"}")
-
-    clusters = cluster_func(
-        all_questions,
-        similarity_with_polarity
-    )
 
     return MatchResult(questions=all_questions,
                        similarity_with_polarity=similarity_with_polarity,

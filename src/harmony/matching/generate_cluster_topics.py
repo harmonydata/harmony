@@ -32,10 +32,22 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import make_pipeline
 from harmony.schemas.responses.text import HarmonyCluster
-
+import pathlib
 from langdetect import detect, DetectorFactory
+import os
 DetectorFactory.seed = 0
 
+
+folder_containing_this_file = pathlib.Path(__file__).parent.resolve()
+
+stopwords_folder = f"{folder_containing_this_file}/../stopwords/"
+
+stopwords_files = os.listdir(stopwords_folder)
+
+lang_to_stopwords = {}
+for stopwords_file in stopwords_files:
+    with open(stopwords_folder + stopwords_file, "r", encoding="utf-8") as f:
+        lang_to_stopwords[stopwords_file] =set(f.read().splitlines())
 
 def generate_cluster_topics(
         clusters: List[HarmonyCluster],
@@ -105,8 +117,8 @@ def generate_cluster_topics(
     # add the stopwords for each language
     stops = set()
     for language in languages:
-        with open(f"src/harmony/stopwords/{language}", "r") as f:
-            stops = stops.union(f.read().splitlines())
+        if language in lang_to_stopwords:
+            stops = stops.union(lang_to_stopwords[language])
 
     # get class predictions
     vectoriser = model.named_steps['countvectorizer']

@@ -8,6 +8,7 @@ from sklearn.metrics import silhouette_score
 
 from harmony.matching.default_matcher import convert_texts_to_vector
 from harmony.schemas.requests.text import Question
+from harmony.schemas.responses.text import HarmonyCluster
 
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
@@ -44,6 +45,7 @@ def visualize_clusters(embeddings_in, kmeans_labels):
             "pip install matplotlib==3.7.0"
         )
         sys.exit(1)
+
 
 def cluster_questions(questions: List[Question], num_clusters: int, is_show_graph: bool, algorithm: str = "kmeans"):
     """
