@@ -47,15 +47,14 @@ stopwords_files = os.listdir(stopwords_folder)
 lang_to_stopwords = {}
 for stopwords_file in stopwords_files:
     with open(stopwords_folder + stopwords_file, "r", encoding="utf-8") as f:
-        lang_to_stopwords[stopwords_file] =set(f.read().splitlines())
+        lang_to_stopwords[stopwords_file] = set(f.read().splitlines())
 
 def generate_cluster_topics(
         clusters: List[HarmonyCluster],
         top_k_topics: int = 5,
     ) -> List[List[str]]:
     """
-    CHANGE THIS
-    Generate representative keywords for a cluster using Sentence Transformers embeddings.
+    Generate representative keywords/topics for clusters.
 
     Parameters
     ----------
