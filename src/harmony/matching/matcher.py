@@ -581,6 +581,7 @@ def match_instruments_with_function(
         texts_cached_vectors: dict[str, List[float]] = {},
         is_negate: bool = True,
         clustering_algorithm: str = "affinity_propagation",
+        num_clusters_for_kmeans: int = None
 ) -> MatchResult:
     """
     Match instruments.
@@ -593,7 +594,7 @@ def match_instruments_with_function(
     :param mhc_embeddings: MHC embeddings.
     :param texts_cached_vectors: A dictionary of already cached vectors from texts (key is the text and value is the vector).
     :param clustering_algorithm: {"affinity_propagation", "deterministic"}: The clustering algorithm to use to cluster the questions.
-    :top_k_topics: int: The number of topics to assign to each cluster.
+    :num_clusters_for_kmeans: The number of clusters to use for K-Means Clustering. Defaults to the square root of the number of questions.
     """
 
     all_questions: List[Question] = []
@@ -681,7 +682,6 @@ def match_instruments_with_function(
 
     instrument_to_instrument_similarities = get_instrument_similarity(instruments, similarity_with_polarity)
 
-    # clustering_algorithm = "kmeans"
     if clustering_algorithm == "affinity_propagation":
         clusters = cluster_questions_affinity_propagation(
             all_questions,
@@ -694,15 +694,16 @@ def match_instruments_with_function(
             similarity_with_polarity
         )
     elif clustering_algorithm == "kmeans":
-        # TODO: num_clusters_for_kmeans should be user defined
-        num_clusters_for_kmeans = int(np.floor(len(all_questions) / 2))
+        if num_clusters_for_kmeans is None:
+            num_clusters_for_kmeans = int(np.floor(np.sqrt(len(all_questions))))
+
         clusters = cluster_questions_kmeans_from_embeddings(
             all_questions,
             vectors_pos,
             num_clusters_for_kmeans
         )
     else:
-        raise Exception("Invalid clustering function, must be in {\"affinity_propagation\", \"deterministic\"}")
+        raise Exception("Invalid clustering function, must be in {\"affinity_propagation\", \"deterministic\" , \"kmeans\"}")
 
     return MatchResult(questions=all_questions,
                        similarity_with_polarity=similarity_with_polarity,

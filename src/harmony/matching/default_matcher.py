@@ -78,7 +78,8 @@ def match_instruments(
         mhc_embeddings: np.ndarray = np.zeros((0, 0)),
         texts_cached_vectors: dict[str, List[float]] = {}, batch_size: int = 1000, max_batches: int = 2000,
         is_negate: bool = True,
-        clustering_algorithm: str = "affinity_propagation"
+        clustering_algorithm: str = "affinity_propagation",
+        num_clusters_for_kmeans: int = None
 ) -> MatchResult:
     return match_instruments_with_function(
         instruments=instruments,
@@ -90,5 +91,6 @@ def match_instruments(
         mhc_embeddings=mhc_embeddings,
         texts_cached_vectors=texts_cached_vectors,
         is_negate = is_negate,
-        clustering_algorithm = clustering_algorithm
+        clustering_algorithm = clustering_algorithm,
+        num_clusters_for_kmeans = num_clusters_for_kmeans
     )

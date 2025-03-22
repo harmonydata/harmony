@@ -6,6 +6,7 @@ from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 from sklearn.metrics import silhouette_score
 
+from harmony.matching.generate_cluster_topics import generate_cluster_topics
 from harmony.schemas.requests.text import Question
 from harmony.schemas.responses.text import HarmonyCluster
 
@@ -21,7 +22,6 @@ def perform_kmeans(embeddings_in, num_clusters=5):
 
 
 def cluster_questions_kmeans_from_embeddings(questions: List[Question], embedding_matrix, num_clusters):
-    # TODO: find out what value we should set for num_clusters
     kmeans_labels = perform_kmeans(embedding_matrix, num_clusters)
     # TODO: find out what this was for and do we need it?
     # sil_score = silhouette_score(embedding_matrix, kmeans_labels) if num_clusters > 1 else None
@@ -54,5 +54,10 @@ def cluster_questions_kmeans_from_embeddings(questions: List[Question], embeddin
             keywords=[],
         )
         clusters_to_return.append(cluster)
+
+
+    cluster_topics = generate_cluster_topics(clusters_to_return, top_k_topics=5)
+    for cluster, topics in zip(clusters_to_return, cluster_topics):
+        cluster.keywords = topics
 
     return clusters_to_return
