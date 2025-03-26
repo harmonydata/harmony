@@ -49,6 +49,8 @@ from harmony.schemas.text_vector import TextVector
 
 from harmony.matching.kmeans_clustering import cluster_questions_kmeans_from_embeddings
 
+from harmony.schemas.enums.clustering_algorithms import ClusteringAlgorithm
+
 
 # This has been tested on 16 GB RAM production server, 1000 seems a safe number (TW, 15 Dec 2024)
 def get_batch_size(default=1000):
@@ -580,7 +582,7 @@ def match_instruments_with_function(
         mhc_embeddings: np.ndarray = np.zeros((0, 0)),
         texts_cached_vectors: dict[str, List[float]] = {},
         is_negate: bool = True,
-        clustering_algorithm: str = "affinity_propagation",
+        clustering_algorithm: ClusteringAlgorithm = ClusteringAlgorithm.affinity_propagation,
         num_clusters_for_kmeans: int = None
 ) -> MatchResult:
     """
@@ -682,18 +684,18 @@ def match_instruments_with_function(
 
     instrument_to_instrument_similarities = get_instrument_similarity(instruments, similarity_with_polarity)
 
-    if clustering_algorithm == "affinity_propagation":
+    if clustering_algorithm == ClusteringAlgorithm.affinity_propagation:
         clusters = cluster_questions_affinity_propagation(
             all_questions,
             similarity_with_polarity
         )
 
-    elif clustering_algorithm == "deterministic":
+    elif clustering_algorithm == ClusteringAlgorithm.deterministic:
         clusters = find_clusters_deterministic(
             all_questions,
             similarity_with_polarity
         )
-    elif clustering_algorithm == "kmeans":
+    elif clustering_algorithm == ClusteringAlgorithm.kmeans:
         if num_clusters_for_kmeans is None:
             num_clusters_for_kmeans = int(np.floor(np.sqrt(len(all_questions))))
 
