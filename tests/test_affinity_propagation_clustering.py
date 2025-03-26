@@ -27,12 +27,14 @@ SOFTWARE.
 
 import sys
 import unittest
+
 import numpy as np
 
 sys.path.append("../src")
 
 from harmony.matching.affinity_propagation_clustering import cluster_questions_affinity_propagation
 from harmony.schemas.requests.text import Question
+
 
 class TestAffinityPropagationClustering(unittest.TestCase):
     def setUp(self):
@@ -47,7 +49,7 @@ class TestAffinityPropagationClustering(unittest.TestCase):
         clusters = cluster_questions_affinity_propagation(
             self.questions,
             item_to_item_similarity_matrix=np.array([
-                [1., 1., 1., 1.], 
+                [1., 1., 1., 1.],
                 [1., 1., 1., 1.],
                 [1., 1., 1., 1.],
                 [1., 1., 1., 1.]
@@ -58,7 +60,7 @@ class TestAffinityPropagationClustering(unittest.TestCase):
         clusters = cluster_questions_affinity_propagation(
             self.questions,
             item_to_item_similarity_matrix=np.array([
-                [1., 1., 1., 0.], 
+                [1., 1., 1., 0.],
                 [1., 1., 1., 0.],
                 [1., 1., 1., 0.],
                 [0., 0., 0., 1.]

@@ -24,18 +24,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 from typing import List
-from sklearn.cluster import AffinityPropagation
-from harmony.schemas.responses.text import HarmonyCluster
-from harmony.schemas.requests.text import Question
-from harmony.matching.generate_cluster_topics import generate_cluster_topics
 
 import numpy as np
+from harmony.matching.generate_cluster_topics import generate_cluster_topics
+from harmony.schemas.requests.text import Question
+from harmony.schemas.responses.text import HarmonyCluster
+from sklearn.cluster import AffinityPropagation
 
 
 def cluster_questions_affinity_propagation(
         questions: List[Question],
         item_to_item_similarity_matrix: np.ndarray
-    ) -> List[HarmonyCluster]:
+) -> List[HarmonyCluster]:
     """
     Affinity Propagation Clustering using the cosine similarity matrix.
 
@@ -52,7 +52,7 @@ def cluster_questions_affinity_propagation(
     List[HarmonyCluster]
         A list of HarmonyCluster objects representing the clusters.
     """
-    
+
     # assert that the number of questions is greater than 0
     assert len(questions) > 0
 
@@ -86,7 +86,6 @@ def cluster_questions_affinity_propagation(
     if item_to_item_similarity_matrix.dtype != np.float64:
         item_to_item_similarity_matrix = item_to_item_similarity_matrix.astype(np.float64)
 
-
     affinity_propagation = AffinityPropagation(affinity='precomputed', random_state=1, max_iter=10, convergence_iter=5)
     affinity_propagation.fit(np.abs(item_to_item_similarity_matrix))
 
@@ -94,7 +93,7 @@ def cluster_questions_affinity_propagation(
     labels = affinity_propagation.labels_
 
     clusters = []
-    
+
     for i, exemplar in enumerate(exemplars):
         clusters.append(
             HarmonyCluster(

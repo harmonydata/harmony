@@ -27,29 +27,31 @@ SOFTWARE.
 
 import sys
 import unittest
-import numpy as np
 
+import numpy as np
 from harmony.matching.cluster import cluster_questions, perform_kmeans
 from harmony.schemas.requests.text import Question
 
 sys.path.append("../src")
 
+
 class TestCluster(unittest.TestCase):
     """Test class for the cluster.py module."""
+
     def setUp(self):
         self.all_questions_real = [Question(question_no="1",
                                             question_text="Feeling nervous, anxious, or on edge"),
                                    Question(question_no="2",
                                             question_text="Not being able to stop or control "
-                                            "worrying"),
+                                                          "worrying"),
                                    Question(question_no="3",
                                             question_text="Little interest or pleasure in doing "
-                                            "things"),
+                                                          "things"),
                                    Question(question_no="4", question_text="Feeling down, "
-                                            "depressed or hopeless"),
+                                                                           "depressed or hopeless"),
                                    Question(question_no="5",
                                             question_text="Trouble falling/staying asleep, "
-                                            "sleeping too much"), ]
+                                                          "sleeping too much"), ]
 
     def test_cluster(self):
         """Test the entire cluster module."""
@@ -63,7 +65,7 @@ class TestCluster(unittest.TestCase):
         mock_kmeans_instance = unittest.mock.Mock()
         mock_kmeans.return_value = mock_kmeans_instance
         mock_kmeans_instance.fit_predict.return_value = np.array([0, 1, 0, 2, 1])
-        test_embeddings = np.array([[1,2], [3,4], [1,3], [7,8], [4,5]])
+        test_embeddings = np.array([[1, 2], [3, 4], [1, 3], [7, 8], [4, 5]])
 
         result = perform_kmeans(test_embeddings, num_clusters=3)
 

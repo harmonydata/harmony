@@ -35,7 +35,9 @@ from harmony.matching.generate_cluster_topics import generate_cluster_topics
 from harmony.matching.affinity_propagation_clustering import cluster_questions_affinity_propagation
 
 from langdetect import detect, DetectorFactory
+
 DetectorFactory.seed = 0
+
 
 class TestGenerateClusterTopics(unittest.TestCase):
     def setUp(self):
@@ -44,7 +46,8 @@ class TestGenerateClusterTopics(unittest.TestCase):
 
     def test_topics_english(self):
         match_response = match_instruments([self.gad_en])
-        clusters = cluster_questions_affinity_propagation(match_response.questions, match_response.similarity_with_polarity)
+        clusters = cluster_questions_affinity_propagation(match_response.questions,
+                                                          match_response.similarity_with_polarity)
 
         self.assertLess(1, len(clusters[0].keywords))
         self.assertLess(1, len(clusters[1].keywords))
@@ -60,11 +63,11 @@ class TestGenerateClusterTopics(unittest.TestCase):
         # self.assertEqual(set(clusters[1].keywords), set(['worrying', 'much', 'different']))
         # self.assertEqual(set(clusters[2].keywords), set(['trouble', 'relaxing', 'hard', 'restless']))
         # self.assertEqual(set(clusters[3].keywords), set(['along', 'care', 'checked']))
-        
+
     def test_topics_portuguese(self):
         match_response = match_instruments([self.gad_pt])
-        clusters = cluster_questions_affinity_propagation(match_response.questions, match_response.similarity_with_polarity)
-
+        clusters = cluster_questions_affinity_propagation(match_response.questions,
+                                                          match_response.similarity_with_polarity)
 
         self.assertLess(1, len(clusters[0].keywords))
         self.assertLess(1, len(clusters[1].keywords))
@@ -77,7 +80,8 @@ class TestGenerateClusterTopics(unittest.TestCase):
 
     def test_topics_english_portuguese(self):
         match_response = match_instruments([self.gad_en, self.gad_pt])
-        clusters = cluster_questions_affinity_propagation(match_response.questions, match_response.similarity_with_polarity)
+        clusters = cluster_questions_affinity_propagation(match_response.questions,
+                                                          match_response.similarity_with_polarity)
 
         self.assertLess(1, len(clusters[0].keywords))
         self.assertLess(1, len(clusters[1].keywords))
@@ -101,7 +105,7 @@ class TestGenerateClusterTopics(unittest.TestCase):
             try:
                 lang = detect(question.question_text)
             except:
-                pass    
+                pass
 
             self.assertEqual(lang, "en")
 
@@ -109,9 +113,10 @@ class TestGenerateClusterTopics(unittest.TestCase):
             try:
                 lang = detect(question.question_text)
             except:
-                pass    
+                pass
 
             self.assertEqual(lang, "pt")
+
 
 if __name__ == '__main__':
     unittest.main()
