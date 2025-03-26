@@ -35,6 +35,7 @@ from numpy import dot, matmul, ndarray, matrix
 from numpy.linalg import norm
 
 from harmony.matching.deterministic_clustering import find_clusters_deterministic
+from harmony.matching.affinity_propagation_clustering import cluster_questions_affinity_propagation
 from harmony.matching.instrument_to_instrument_similarity import get_instrument_similarity
 from harmony.matching.negator import negate
 from harmony.schemas.catalogue_instrument import CatalogueInstrument
@@ -45,6 +46,8 @@ from harmony.schemas.requests.text import (
 )
 from harmony.schemas.responses.text import MatchResult
 from harmony.schemas.text_vector import TextVector
+
+from harmony.matching.kmeans_clustering import cluster_questions_kmeans_from_embeddings
 
 
 # This has been tested on 16 GB RAM production server, 1000 seems a safe number (TW, 15 Dec 2024)
@@ -576,7 +579,9 @@ def match_instruments_with_function(
         mhc_all_metadatas: List = [],
         mhc_embeddings: np.ndarray = np.zeros((0, 0)),
         texts_cached_vectors: dict[str, List[float]] = {},
-        is_negate: bool = True
+        is_negate: bool = True,
+        clustering_algorithm: str = "affinity_propagation",
+        num_clusters_for_kmeans: int = None
 ) -> MatchResult:
     """
     Match instruments.
@@ -588,6 +593,8 @@ def match_instruments_with_function(
     :param mhc_all_metadatas: MHC metadatas.
     :param mhc_embeddings: MHC embeddings.
     :param texts_cached_vectors: A dictionary of already cached vectors from texts (key is the text and value is the vector).
+    :param clustering_algorithm: {"affinity_propagation", "deterministic"}: The clustering algorithm to use to cluster the questions.
+    :num_clusters_for_kmeans: The number of clusters to use for K-Means Clustering. Defaults to the square root of the number of questions.
     """
 
     all_questions: List[Question] = []
@@ -675,7 +682,28 @@ def match_instruments_with_function(
 
     instrument_to_instrument_similarities = get_instrument_similarity(instruments, similarity_with_polarity)
 
-    clusters = find_clusters_deterministic(all_questions, similarity_with_polarity)
+    if clustering_algorithm == "affinity_propagation":
+        clusters = cluster_questions_affinity_propagation(
+            all_questions,
+            similarity_with_polarity
+        )
+
+    elif clustering_algorithm == "deterministic":
+        clusters = find_clusters_deterministic(
+            all_questions,
+            similarity_with_polarity
+        )
+    elif clustering_algorithm == "kmeans":
+        if num_clusters_for_kmeans is None:
+            num_clusters_for_kmeans = int(np.floor(np.sqrt(len(all_questions))))
+
+        clusters = cluster_questions_kmeans_from_embeddings(
+            all_questions,
+            vectors_pos,
+            num_clusters_for_kmeans
+        )
+    else:
+        raise Exception("Invalid clustering function, must be in {\"affinity_propagation\", \"deterministic\" , \"kmeans\"}")
 
     return MatchResult(questions=all_questions,
                        similarity_with_polarity=similarity_with_polarity,

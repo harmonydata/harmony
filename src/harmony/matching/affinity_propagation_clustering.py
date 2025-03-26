@@ -23,35 +23,29 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
-from collections import Counter
 from typing import List
 
 import numpy as np
-
+from harmony.matching.generate_cluster_topics import generate_cluster_topics
 from harmony.schemas.requests.text import Question
 from harmony.schemas.responses.text import HarmonyCluster
+from sklearn.cluster import AffinityPropagation
 
-from harmony.matching.generate_cluster_topics import generate_cluster_topics
 
-
-def find_clusters_deterministic(
-    questions: List[Question],
-    item_to_item_similarity_matrix: np.ndarray,
-    threshold: float = 0.5
+def cluster_questions_affinity_propagation(
+        questions: List[Question],
+        item_to_item_similarity_matrix: np.ndarray
 ) -> List[HarmonyCluster]:
     """
-    deterministic clustering using Sentence Transformers for cluster keywords.
+    Affinity Propagation Clustering using the cosine similarity matrix.
 
     Parameters
     ----------
     questions : List[Question]
         The set of questions to cluster.
-        
+
     item_to_item_similarity_matrix : np.ndarray
         The cosine similarity matrix for the questions.
-
-    threshold : float
-        Minimum similarity score required to cluster two items together.
 
     Returns
     -------
@@ -91,78 +85,49 @@ def find_clusters_deterministic(
     # ensure that the entries of the similarity matrix are floats
     if item_to_item_similarity_matrix.dtype != np.float64:
         item_to_item_similarity_matrix = item_to_item_similarity_matrix.astype(np.float64)
-    
 
-    abs_similarities = np.abs(item_to_item_similarity_matrix)
+    affinity_propagation = AffinityPropagation(affinity='precomputed', random_state=1, max_iter=10, convergence_iter=5)
+    affinity_propagation.fit(np.abs(item_to_item_similarity_matrix))
 
-    coord_to_sim = {
-        (y, x): abs_similarities[y, x]
-        for y in range(abs_similarities.shape[0])
-        for x in range(abs_similarities.shape[1])
-    }
+    exemplars = affinity_propagation.cluster_centers_indices_
+    labels = affinity_propagation.labels_
 
-    total_score = Counter()
-    edges = set()
-    vertices = set()
+    clusters = []
 
-    for (y, x), sim in sorted(coord_to_sim.items(), key=lambda x: x[1], reverse=True):
-        if x < y and sim >= threshold:
-            if x not in vertices or y not in vertices:
-                edges.add((x, y))
-                vertices.add(x)
-                vertices.add(y)
-                total_score[x] += sim
-                total_score[y] += sim
-
-    question_idx_to_group_idx = {}
-    for x, y in edges:
-        if x not in question_idx_to_group_idx and y not in question_idx_to_group_idx:
-            group_idx = min(x, y)
-            question_idx_to_group_idx[x] = group_idx
-            question_idx_to_group_idx[y] = group_idx
-        elif x in question_idx_to_group_idx and y not in question_idx_to_group_idx:
-            group_idx = question_idx_to_group_idx[x]
-            question_idx_to_group_idx[y] = group_idx
-        elif y in question_idx_to_group_idx and x not in question_idx_to_group_idx:
-            group_idx = question_idx_to_group_idx[y]
-            question_idx_to_group_idx[x] = group_idx
-
-    for idx in range(len(questions)):
-        if idx not in question_idx_to_group_idx:
-            question_idx_to_group_idx[idx] = idx
-
-    clusters_to_return = []
-    all_groups = set(question_idx_to_group_idx.values())
-    for group_no, group_idx in enumerate(sorted(all_groups)):
-        items = []
-        item_ids = []
-        candidate_scores = {}
-
-        for question_idx in question_idx_to_group_idx:
-            if question_idx_to_group_idx[question_idx] == group_idx:
-                items.append(questions[question_idx])
-                item_ids.append(question_idx)
-                candidate_scores[question_idx] = total_score.get(question_idx, 0)
-
-        # Determine centroid
-        best_question_idx = max(candidate_scores, key=candidate_scores.get)
-        text_description = questions[best_question_idx].question_text
-
-        # Create HarmonyCluster object
-        cluster = HarmonyCluster(
-            cluster_id=group_no,
-            centroid_id=best_question_idx,
-            centroid=questions[best_question_idx],
-            items=items,
-            item_ids=item_ids,
-            text_description=text_description,
-            keywords=[],
+    for i, exemplar in enumerate(exemplars):
+        clusters.append(
+            HarmonyCluster(
+                cluster_id=i,
+                centroid_id=exemplar,
+                centroid=questions[exemplar],
+                items=[],
+                item_ids=[],
+                text_description=questions[exemplar].question_text,
+                keywords=[]
+            )
         )
-        clusters_to_return.append(cluster)
 
-        # generate cluster topics
-        cluster_topics = generate_cluster_topics(clusters_to_return, top_k_topics=5)
-        for cluster, topics in zip(clusters_to_return, cluster_topics):
-            cluster.keywords = topics
+    cluster_ids = set([cluster.cluster_id for cluster in clusters])
+    for i, label in enumerate(labels):
+        if label not in cluster_ids:
+            clusters.append(
+                HarmonyCluster(
+                    cluster_id=label,
+                    centroid_id=i,
+                    centroid=questions[i],
+                    items=[],
+                    item_ids=[],
+                    text_description=questions[i].question_text,
+                    keywords=[]
+                )
+            )
+            cluster_ids.add(label)
 
-    return clusters_to_return
+        clusters[label].items.append(questions[i])
+        clusters[label].item_ids.append(i)
+
+    cluster_topics = generate_cluster_topics(clusters, top_k_topics=5)
+    for cluster, topics in zip(clusters, cluster_topics):
+        cluster.keywords = topics
+
+    return clusters

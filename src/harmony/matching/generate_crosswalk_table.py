@@ -45,6 +45,25 @@ def generate_crosswalk_table(instruments: List[Instrument], item_to_item_similar
     @param is_enforce_one_to_one: Defaults to False.  If this is set to True, we force all variables in the crosswalk table to be matched with exactly one other variable.
     @return: A crosswalk table as a DataFrame.
     """
+
+    # assert that the similarity matrix is square
+    assert item_to_item_similarity_matrix.shape[0] == item_to_item_similarity_matrix.shape[1]
+
+    # assert that the similarity matrix is symmetric
+    assert np.allclose(item_to_item_similarity_matrix, item_to_item_similarity_matrix.T)
+
+    # assert that the similarity matrix is -1 <= x <= 1
+    assert np.all(np.round(item_to_item_similarity_matrix, 3) >= -1.)
+    assert np.all(np.round(item_to_item_similarity_matrix, 3) <= 1.)
+
+    # assert that the similarity matrix has 1s on its diagonals
+    assert np.allclose(np.diag(item_to_item_similarity_matrix), 1.)
+
+    # ensure that the entries of the similarity matrix are floats
+    if item_to_item_similarity_matrix.dtype != np.float64:
+        item_to_item_similarity_matrix = item_to_item_similarity_matrix.astype(np.float64)
+
+
     matching_pairs = []
 
     all_questions = []
