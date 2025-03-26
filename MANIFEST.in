@@ -6,3 +6,4 @@ include *.cff
 include *.ipynb
 include requirements.txt
 recursive-include src *.pkl
+recursive-include src/harmony/stopwords
