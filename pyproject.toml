@@ -53,12 +53,12 @@ dependencies = [
     "XlsxWriter==3.0.9; python_version <= '3.13'",
     "openpyxl==3.1.2; python_version <= '3.13'",
     "wget==3.2; python_version <= '3.13'",
-    "sentence-transformers==3.0.0; python_version <= '3.13'",
+    "sentence-transformers==3.4.1; python_version <= '3.13'",
     "numpy==1.26.4; python_version <= '3.13'",
     "sklearn-crfsuite==0.5.0; python_version <= '3.13'",
     "scikit-learn; python_version <= '3.13'",
     "scipy==1.14.1; python_version <= '3.13'",
-    "huggingface-hub==0.25.0; python_version <= '3.13'",
+    "huggingface-hub==0.29.3; python_version <= '3.13'",
 ]
 
 [project.optional-dependencies]
