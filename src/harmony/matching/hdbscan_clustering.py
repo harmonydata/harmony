@@ -1,13 +1,12 @@
-import sys
 from typing import List
 
-
-from sklearn.cluster import HDBSCAN
 import numpy as np
+from sklearn.cluster import HDBSCAN
 
 from harmony.matching.generate_cluster_topics import generate_cluster_topics
 from harmony.schemas.requests.text import Question
 from harmony.schemas.responses.text import HarmonyCluster
+
 
 def perform_hdbscan(embeddings_in: np.ndarray, min_cluster_size=2):
     """
@@ -34,6 +33,7 @@ def perform_hdbscan(embeddings_in: np.ndarray, min_cluster_size=2):
 
     return hdbscan_model
 
+
 def cluster_questions_hdbscan_from_embeddings(questions: List[Question], embedding_matrix, min_cluster_size):
     """
     Cluster questions with HDBSCAN
@@ -57,19 +57,47 @@ def cluster_questions_hdbscan_from_embeddings(questions: List[Question], embeddi
 
     hdbscan = perform_hdbscan(embedding_matrix, min_cluster_size)
     cluster_labels = hdbscan.labels_
-    clusters = np.array([1, 2, 3, 2, 1, 3])  # Cluster assignments
-    probabilities = np.array(hdbscan.probabilities_)  # Probability/confidence for each datapoint
+    probabilities = np.array(hdbscan.probabilities_)  # Probability/confidence for each datapoint.
 
-    # Find the highest probability index for each cluster. For HDBSCAN, these are the "centroids".
+    # Create dict with a key for each cluster, storing each datapoint's index in the labels list
+    # along with its corresponding probability and Question
+    cluster_indices = {}
+    for i, val in enumerate(cluster_labels):
+        if val not in cluster_indices:
+            cluster_indices[val] = []
+        cluster_indices[val].append((i, probabilities[i], questions[i]))
+
+    # Find the index of the highest probability datapoint for each cluster. For HDBSCAN, these are the "centroids".
     cluster_centroids = {
-        cluster: np.argmax(probabilities[clusters == cluster])
-        for cluster in cluster_labels
+        cluster: max(cluster_indices[cluster], key=lambda x: x[1])[0]
+        for cluster in cluster_indices.keys()
     }
 
-    centroid_questions = [questions[i] for i in cluster_centroids.values()]
+    clusters_to_return = []
+    for cluster_id, cluster_data in cluster_indices.items():
+        centroid_id = cluster_centroids[cluster_id]
+        # Retrieve centroid question
+        centroid_question = None
+        for ind, _, question in cluster_data:
+            if ind == centroid_id:
+                centroid_question = question
+                break
 
-    for centroid in cluster_centroids:
-        # Create HarmonyCluster object
-        # Confused about what to put here currently
+        cluster = HarmonyCluster(
+            cluster_id=cluster_id,
+            centroid_id=centroid_id,
+            centroid=centroid_question,
+            item_ids=[ind for ind, _, _ in cluster_data],
+            items=[question for _, _, question in cluster_data],
+            text_description=centroid_question.question_text,
+            keywords=[],
+        )
+
+        clusters_to_return.append(cluster)
+
+        # generate cluster topics
+        cluster_topics = generate_cluster_topics(clusters_to_return, top_k_topics=5)
+        for cluster, topics in zip(clusters_to_return, cluster_topics):
+            cluster.keywords = topics
 
     return clusters_to_return
