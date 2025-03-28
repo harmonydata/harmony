@@ -28,8 +28,10 @@ def perform_hdbscan(embeddings_in: np.ndarray, min_cluster_size=5):
        HDBSCAN : hdbscan.HDBSCAN
            A fitted HDBSCAN model.
        """
+
     # Ensure min_cluster_size is not greater than the dataset length
     min_cluster_size = min([embeddings_in.shape[0], min_cluster_size])
+
     hdbscan = HDBSCAN(min_cluster_size=min_cluster_size)
     hdbscan_model = hdbscan.fit(embeddings_in)
 
@@ -63,8 +65,8 @@ def cluster_questions_hdbscan_from_embeddings(questions: List[Question], embeddi
     cluster_labels = hdbscan.labels_
     probabilities = np.array(hdbscan.probabilities_)  # Probability/confidence for each datapoint.
 
-    # Create dict with a key for each cluster, storing each datapoint's index in the labels list
-    # along with its corresponding probability and Question
+    # Create dict with a key for each cluster, with each key storing a list of datapoint's
+    # index in the labels list, its corresponding probability, and Question
     cluster_indices = {}
     for i, val in enumerate(cluster_labels):
         if val not in cluster_indices:
@@ -77,9 +79,11 @@ def cluster_questions_hdbscan_from_embeddings(questions: List[Question], embeddi
         for cluster in cluster_indices.keys()
     }
 
+    # Build HarmonyClusters, extract relevant data
     clusters_to_return = []
     for cluster_id, cluster_data in cluster_indices.items():
         centroid_id = cluster_centroids[cluster_id]
+
         # Retrieve centroid question
         centroid_question = None
         for ind, _, question in cluster_data:
