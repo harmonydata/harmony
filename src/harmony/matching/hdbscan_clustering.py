@@ -8,7 +8,7 @@ from harmony.schemas.requests.text import Question
 from harmony.schemas.responses.text import HarmonyCluster
 
 
-def perform_hdbscan(embeddings_in: np.ndarray, min_cluster_size=2):
+def perform_hdbscan(embeddings_in: np.ndarray, min_cluster_size=5):
     """
        Cluster data using HDBScan.
 
@@ -22,19 +22,22 @@ def perform_hdbscan(embeddings_in: np.ndarray, min_cluster_size=2):
        min_cluster_size : int
            The minimum amount of points in a cluster.
            Lower values can include noise in clusters.
-           Defaulted at 2.
+           Defaults to 5.
        Returns
        -------
        HDBSCAN : hdbscan.HDBSCAN
            A fitted HDBSCAN model.
        """
+    # Ensure min_cluster_size is not greater than the dataset length
+    min_cluster_size = min([embeddings_in.shape[0], min_cluster_size])
     hdbscan = HDBSCAN(min_cluster_size=min_cluster_size)
     hdbscan_model = hdbscan.fit(embeddings_in)
 
     return hdbscan_model
 
 
-def cluster_questions_hdbscan_from_embeddings(questions: List[Question], embedding_matrix, min_cluster_size):
+def cluster_questions_hdbscan_from_embeddings(questions: List[Question], embedding_matrix: np.ndarray,
+                                              min_cluster_size=5):
     """
     Cluster questions with HDBSCAN
 
@@ -43,11 +46,12 @@ def cluster_questions_hdbscan_from_embeddings(questions: List[Question], embeddi
     questions : List[Question]
         The set of questions to cluster.
 
-    item_to_item_similarity_matrix : np.ndarray
-        The cosine similarity matrix for the questions.
+    embedding_matrix : np.ndarray
+        Array of text embedding of each question.
 
     min_cluster_size : int
-        Minimum similarity score required to cluster two items together.
+        The minimum amount of points in a cluster.
+        Defaults to 5.
 
     Returns
     -------
