@@ -36,6 +36,7 @@ from numpy.linalg import norm
 
 from harmony.matching.deterministic_clustering import find_clusters_deterministic
 from harmony.matching.affinity_propagation_clustering import cluster_questions_affinity_propagation
+from harmony.matching.hdbscan_clustering import cluster_questions_hdbscan_from_embeddings
 from harmony.matching.instrument_to_instrument_similarity import get_instrument_similarity
 from harmony.matching.negator import negate
 from harmony.schemas.catalogue_instrument import CatalogueInstrument
@@ -704,8 +705,13 @@ def match_instruments_with_function(
             vectors_pos,
             num_clusters_for_kmeans
         )
+    elif clustering_algorithm == ClusteringAlgorithm.hdbscan:
+        clusters = cluster_questions_hdbscan_from_embeddings(
+            all_questions,
+            vectors_pos
+        )
     else:
-        raise Exception("Invalid clustering function, must be in {\"affinity_propagation\", \"deterministic\" , \"kmeans\"}")
+        raise Exception("Invalid clustering function, must be in {\"affinity_propagation\", \"deterministic\" , \"kmeans\", \"hdbscan\"}")
 
     return MatchResult(questions=all_questions,
                        similarity_with_polarity=similarity_with_polarity,
