@@ -281,7 +281,26 @@ The core team at Harmony is made up of:
 
 ## 📜 License
 
-MIT License. Copyright (c) 2023 Ulster University (https://www.ulster.ac.uk)
+Harmony itself is under [MIT License](https://github.com/harmonydata/harmony/blob/main/LICENSE).  Copyright (c) 2023 Ulster University (https://www.ulster.ac.uk). The third party resources used include:
+
+### Licenses of third party software
+
+| Third party dependency | License |
+| --- | --- |
+| Sentence Transformers | [Apache](https://github.com/UKPLab/sentence-transformers/blob/master/LICENSE) |
+| Transformers | [Apache](https://github.com/huggingface/transformers/blob/main/LICENSE) |
+| Pandas | [BSD 3-Clause](https://github.com/pandas-dev/pandas/blob/main/LICENSE) |
+| Tika | [Apache](https://github.com/apache/tika/blob/main/LICENSE.txt) |
+| LXML | [BSD](https://github.com/lxml/lxml/blob/master/LICENSES.txt) |
+| Langdetect | [Apache](https://github.com/Mimino666/langdetect/blob/master/LICENSE) |
+| XlsxWriter | [BSD 2-Clause](https://xlsxwriter.readthedocs.io/license.html) |
+| Openpyxl | [MIT](https://github.com/fluidware/openpyxl/blob/master/LICENCE) |
+| Numpy | [custom license which appears to be BSD 3-Clause](https://numpy.org/doc/stable/license.html) |
+| Scikit-Learn | [BSD 3-Clause](https://github.com/scikit-learn/scikit-learn/blob/main/COPYING) |
+| Scikit-Learn CRFSuite | [MIT](https://sklearn-crfsuite.readthedocs.io/en/latest/contributing.html#license) |
+| Scipy | [custom license which appears to be BSD 3-Clause](https://github.com/scipy/scipy/blob/main/LICENSE.txt) |
+| Huggingface Hub | [Apache](https://github.com/huggingface/huggingface_hub/blob/main/LICENSE) |
+
 
 ## 📜 How do I cite Harmony?
 
