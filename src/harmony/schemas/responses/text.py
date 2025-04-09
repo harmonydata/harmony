@@ -86,7 +86,7 @@ class MatchResponse(BaseModel):
     questions: List[Question] = Field(
         description="The questions which were matched, in an order matching the order of the matrix"
     )
-    matches: List[List] = Field(description="Matrix of cosine similarity matches")
+    matches: List[List] = Field(description="Matrix of cosine similarity matches for the questions")
     query_similarity: List = Field(
         None, description="Similarity metric between query string and items"
     )
@@ -99,6 +99,7 @@ class MatchResponse(BaseModel):
         None, description="A list of similarity values (precision, recall, F1) between instruments"
     )
     clusters: List[HarmonyCluster] = Field(description="The clusters in the set of questions")
+    response_options_similarity: List[List] = Field(description="Matrix of cosine similarity matches for the response options")
 
 
 class MatchResult(BaseModel):
