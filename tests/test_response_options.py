@@ -33,6 +33,7 @@ sys.path.append("../src")
 
 from harmony import match_instruments, example_instruments
 
+
 class ResponseOptionsSimilarity(unittest.TestCase):
     def setUp(self):
         self.ces_d_english = example_instruments["CES_D English"]
@@ -100,6 +101,7 @@ class ResponseOptionsSimilarity(unittest.TestCase):
         self.assertTrue(np.allclose(sim, sim.T))
         # assert that the similarity matrix is not empty
         self.assertTrue(sim.size > 0)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -711,7 +711,8 @@ def match_instruments_with_function(
             vectors_pos
         )
     else:
-        raise Exception("Invalid clustering function, must be in {\"affinity_propagation\", \"deterministic\" , \"kmeans\", \"hdbscan\"}")
+        raise Exception(
+            "Invalid clustering function, must be in {\"affinity_propagation\", \"deterministic\" , \"kmeans\", \"hdbscan\"}")
 
     # Work out response options similarity
     options = ["; ".join(q.options) for q in all_questions]
