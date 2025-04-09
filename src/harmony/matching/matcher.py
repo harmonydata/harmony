@@ -713,8 +713,14 @@ def match_instruments_with_function(
     else:
         raise Exception("Invalid clustering function, must be in {\"affinity_propagation\", \"deterministic\" , \"kmeans\", \"hdbscan\"}")
 
+    # Work out response options similarity
+    options = ["; ".join(q.options) for q in all_questions]
+    options_vectors = vectorisation_function(options)
+    response_options_similarity = cosine_similarity(options_vectors, options_vectors).clip(0, 1)
+
     return MatchResult(questions=all_questions,
                        similarity_with_polarity=similarity_with_polarity,
+                       response_options_similarity=response_options_similarity,
                        query_similarity=query_similarity,
                        new_vectors_dict=new_vectors_dict,
                        instrument_to_instrument_similarities=instrument_to_instrument_similarities,

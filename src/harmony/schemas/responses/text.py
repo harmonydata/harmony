@@ -109,7 +109,8 @@ class MatchResult(BaseModel):
     questions: List[Question] = Field(
         description="The questions which were matched, in an order matching the order of the matrix"
     )
-    similarity_with_polarity: Any = Field(description="Matrix of cosine similarity matches")
+    similarity_with_polarity: Any = Field(description="Matrix of cosine similarity matches for the questions")
+    response_options_similarity: Any = Field(description="Matrix of cosine similarity matches for the response options")
     query_similarity: Any = Field(
         None, description="Similarity metric between query string and items"
     )
