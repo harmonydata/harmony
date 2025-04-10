@@ -29,6 +29,8 @@ import sys
 import unittest
 import numpy as np
 
+from harmony.util.instrument_helper import create_instrument_from_list
+
 sys.path.append("../src")
 
 from harmony import match_instruments, example_instruments
@@ -101,6 +103,12 @@ class ResponseOptionsSimilarity(unittest.TestCase):
         self.assertTrue(np.allclose(sim, sim.T))
         # assert that the similarity matrix is not empty
         self.assertTrue(sim.size > 0)
+
+    def test_empty_responses(self):
+        # when the responses are empty, match_instruments returns all 1s
+        match = match_instruments([create_instrument_from_list(["potato", "tomato", "radish"], instrument_name="veg")])
+        sim = match.response_options_similarity
+        self.assertTrue(np.all(sim == 1))
 
 
 if __name__ == '__main__':
