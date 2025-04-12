@@ -168,7 +168,7 @@ export HARMONY_SENTENCE_TRANSFORMER_PATH=sentence-transformers/distiluse-base-mu
 
 ## Using OpenAI or other LLMs for vectorisation
 
-Any word vector representation can be used by Harmony. The below example works for OpenAI's [text-embedding-ada-002](https://openai.com/blog/new-and-improved-embedding-model) model as of July 2023, provided you have create a paid OpenAI account. However, since LLMs are progressing rapidly, we have chosen not to integrate Harmony directly into the OpenAI client libraries, but instead allow you to pass Harmony any vectorisation function of your choice.
+Any word vector representation can be used by Harmony. The below example works for OpenAI's [text-embedding-ada-002](https://openai.com/blog/new-and-improved-embedding-model) model as of Apri 2025, provided you have create a paid OpenAI account. However, since LLMs are progressing rapidly, we have chosen not to integrate Harmony directly into the OpenAI client libraries, but instead allow you to pass Harmony any vectorisation function of your choice.
 
 ```
 import numpy as np
@@ -195,10 +195,12 @@ Download and install Docker:
 Open a Terminal and run
 
 ```
-docker run -p 8000:8000 -p 3000:3000 harmonydata/harmonylocal
+docker run -p 8000:80 harmonydata/harmonyapi
 ```
 
-Then go to http://localhost:3000 in your browser.
+Then go to http://localhost:8000 in your browser to see the API.
+
+You can now install and run the front end locally: https://www.youtube.com/watch?v=1xp3Uh6dptg
 
 ## Looking for the Harmony API?
 
