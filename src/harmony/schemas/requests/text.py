@@ -65,7 +65,7 @@ class Question(BaseModel):
     source_page: int = Field(0, description="The page of the PDF on which the question was located, zero-indexed")
     instrument_id: Optional[str] = Field(None, description="Unique identifier for the instrument (UUID-4)")
     instrument_name: Optional[str] = Field(None, description="Human readable name for the instrument")
-    topics: Optional[str] = Field([], description="List of user-given topics tagged by the matcher")
+    topics: Optional[list] = Field([], description="List of user-given topics with which to tag the questions")
     topics_auto: Optional[list] = Field(None, description="Automated list of topics identified by model")
     topics_strengths: Optional[dict] = Field(None,
                                              description="Automated list of topics identified by model with strength of topic")
@@ -155,7 +155,8 @@ DEFAULT_MATCH_PARAMETERS = MatchParameters(framework=DEFAULT_FRAMEWORK, model=DE
 
 
 class MatchBody(BaseModel):
-    instruments: List[Instrument] = Field(description="Instruments to harmonise")
+    instruments: List[Instrument] = Field(description="Instruments to harmonise"),
+    topics: List[str] = Field(description="Topics with which to tag the questions")
     query: Optional[str] = Field(None, description="Search term")
     parameters: MatchParameters = Field(DEFAULT_MATCH_PARAMETERS, description="Parameters on how to match")
     model_config = ConfigDict(
@@ -213,6 +214,7 @@ class MatchBody(BaseModel):
                     }
 
                 ],
+                "topics": ["anxiety, depression, sleep"],
                 "query": "anxiety",
                 "parameters": {"framework": DEFAULT_FRAMEWORK,
                                "model": DEFAULT_MODEL}
