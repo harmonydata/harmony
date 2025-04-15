@@ -65,8 +65,10 @@ class Question(BaseModel):
     source_page: int = Field(0, description="The page of the PDF on which the question was located, zero-indexed")
     instrument_id: Optional[str] = Field(None, description="Unique identifier for the instrument (UUID-4)")
     instrument_name: Optional[str] = Field(None, description="Human readable name for the instrument")
+    topics: Optional[str] = Field([], description="List of user-given topics tagged by the matcher")
     topics_auto: Optional[list] = Field(None, description="Automated list of topics identified by model")
-    topics_strengths: Optional[dict] = Field(None, description="Automated list of topics identified by model with strength of topic")
+    topics_strengths: Optional[dict] = Field(None,
+                                             description="Automated list of topics identified by model with strength of topic")
     nearest_match_from_mhc_auto: Optional[dict] = Field(None, description="Automatically identified nearest MHC match")
     closest_catalogue_question_match: Optional[CatalogueQuestion] = Field(
         None, description="The closest question match in the catalogue for the question"
@@ -96,7 +98,7 @@ class Instrument(BaseModel):
     study: Optional[str] = Field(None, description="The study")
     sweep: Optional[str] = Field(None, description="The sweep")
     metadata: Optional[dict] = Field(None,
-                           description="Optional metadata about the instrument (URL, citation, DOI, copyright holder)")
+                                     description="Optional metadata about the instrument (URL, citation, DOI, copyright holder)")
     language: Language = Field(Language.English,
                                description="The ISO 639-2 (alpha-2) encoding of the instrument language")
     questions: List[Question] = Field(description="The items inside the instrument")
@@ -125,7 +127,7 @@ class Instrument(BaseModel):
                                "source_page": 0
                                }]
             }
-    })
+        })
 
     def model_post_init(self, ctx) -> None:
         # Assign instrument ID if missing
