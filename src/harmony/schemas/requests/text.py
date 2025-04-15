@@ -156,7 +156,7 @@ DEFAULT_MATCH_PARAMETERS = MatchParameters(framework=DEFAULT_FRAMEWORK, model=DE
 
 class MatchBody(BaseModel):
     instruments: List[Instrument] = Field(description="Instruments to harmonise"),
-    topics: List[str] = Field(description="Topics with which to tag the questions")
+    topics: Optional[list] = Field([], description="Topics with which to tag the questions")
     query: Optional[str] = Field(None, description="Search term")
     parameters: MatchParameters = Field(DEFAULT_MATCH_PARAMETERS, description="Parameters on how to match")
     model_config = ConfigDict(
