@@ -73,6 +73,7 @@ def convert_texts_to_vector(texts: List, batch_size=1000, max_batches=2000) -> n
 def match_instruments(
         instruments: List[Instrument],
         query: str = None,
+        topics: List = [],
         mhc_questions: List = [],
         mhc_all_metadatas: List = [],
         mhc_embeddings: np.ndarray = np.zeros((0, 0)),
@@ -86,11 +87,12 @@ def match_instruments(
         query=query,
         vectorisation_function=lambda texts: convert_texts_to_vector(texts, batch_size=batch_size,
                                                                      max_batches=max_batches),
+        topics=topics,
         mhc_questions=mhc_questions,
         mhc_all_metadatas=mhc_all_metadatas,
         mhc_embeddings=mhc_embeddings,
         texts_cached_vectors=texts_cached_vectors,
-        is_negate = is_negate,
-        clustering_algorithm = clustering_algorithm,
-        num_clusters_for_kmeans = num_clusters_for_kmeans
+        is_negate=is_negate,
+        clustering_algorithm=clustering_algorithm,
+        num_clusters_for_kmeans=num_clusters_for_kmeans
     )

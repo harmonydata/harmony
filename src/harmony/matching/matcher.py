@@ -26,6 +26,7 @@ SOFTWARE.
 
 import heapq
 import os
+import pathlib
 import statistics
 from collections import Counter, OrderedDict
 from typing import List, Callable
@@ -51,6 +52,9 @@ from harmony.schemas.text_vector import TextVector
 from harmony.matching.kmeans_clustering import cluster_questions_kmeans_from_embeddings
 
 from harmony.schemas.enums.clustering_algorithms import ClusteringAlgorithm
+from langdetect import detect, DetectorFactory
+
+DetectorFactory.seed = 0
 
 
 # This has been tested on 16 GB RAM production server, 1000 seems a safe number (TW, 15 Dec 2024)
@@ -578,6 +582,7 @@ def match_instruments_with_function(
         instruments: List[Instrument],
         query: str,
         vectorisation_function: Callable,
+        topics: List = [],
         mhc_questions: List = [],
         mhc_all_metadatas: List = [],
         mhc_embeddings: np.ndarray = np.zeros((0, 0)),
@@ -592,11 +597,12 @@ def match_instruments_with_function(
     :param instruments: The instruments
     :param query: The query
     :param vectorisation_function: A function to vectorize a text
+    :param topics: A list of topics to tag the questions with
     :param mhc_questions: MHC questions.
     :param mhc_all_metadatas: MHC metadatas.
     :param mhc_embeddings: MHC embeddings.
     :param texts_cached_vectors: A dictionary of already cached vectors from texts (key is the text and value is the vector).
-    :param clustering_algorithm: {"affinity_propagation", "deterministic"}: The clustering algorithm to use to cluster the questions.
+    :param clustering_algorithm: {"affinity_propagation", "deterministic", "kmeans", "hdbscan"}: The clustering algorithm to use to cluster the questions.
     :num_clusters_for_kmeans: The number of clusters to use for K-Means Clustering. Defaults to the square root of the number of questions.
     """
 
@@ -718,6 +724,51 @@ def match_instruments_with_function(
     options = ["; ".join(q.options) for q in all_questions]
     options_vectors = vectorisation_function(options)
     response_options_similarity = cosine_similarity(options_vectors, options_vectors).clip(0, 1)
+
+    # Tag the questions with the topics
+    if topics:
+        assigned_topics = {
+            idx: [] for idx in range(len(all_questions))
+        }
+        question_topic_similarity_threshold = 0.7
+
+        # load stopwords
+        folder_containing_this_file = pathlib.Path(__file__).parent.resolve()
+        stopwords_folder = f"{folder_containing_this_file}/../stopwords/"
+        stopwords_files = os.listdir(stopwords_folder)
+
+        lang_to_stopwords = {}
+        for stopwords_file in stopwords_files:
+            with open(stopwords_folder + stopwords_file, "r", encoding="utf-8") as f:
+                lang_to_stopwords[stopwords_file] = set(f.read().splitlines())
+
+        # loop through questions
+        for idx, question in enumerate(all_questions):
+            words = question.question_text.split(" ")
+
+            # detect langauge of the question
+            languages = set()
+            try:
+                lang = detect(question.question_text)
+                languages.add(lang)
+            except:
+                pass
+
+            # remove stopwords
+            stopwords = lang_to_stopwords[lang] if lang in lang_to_stopwords else []
+            words = [word for word in words if word not in stopwords]
+
+            question_vector = vectorisation_function(words)
+            topics_vectors = vectorisation_function(topics)
+            sim = cosine_similarity(question_vector, topics_vectors).clip(0, 1)
+
+            # if any of the words in the question match with the topics, tag it with the respective topic
+            for j in range(sim.shape[1]):
+                if np.any(sim[:, j] >= question_topic_similarity_threshold):
+                    assigned_topics[idx].append(topics[j])
+
+        for idx, topics in assigned_topics.items():
+            all_questions[idx].topics = topics
 
     return MatchResult(questions=all_questions,
                        similarity_with_polarity=similarity_with_polarity,
