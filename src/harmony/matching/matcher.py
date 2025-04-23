@@ -29,7 +29,7 @@ import os
 import pathlib
 import statistics
 from collections import Counter, OrderedDict
-from typing import List, Callable
+from typing import List, Callable, Optional, Union
 
 import numpy as np
 from numpy import dot, matmul, ndarray, matrix
@@ -150,7 +150,7 @@ def vectors_pos_neg(text_vectors):
 
 def create_full_text_vectors(
         all_questions: List[str],
-        query: str | None,
+        query: Optional[str],
         vectorisation_function: Callable,
         texts_cached_vectors: dict[str, list[float]],
         is_negate: bool
@@ -492,7 +492,7 @@ def match_query_with_catalogue_instruments(
         texts_cached_vectors: dict[str, List[float]],
         max_results: int = 100,
         is_negate: bool = True
-) -> dict[str, list | dict]:
+) -> dict[str, Union[list, dict]]:
     """
     Match query with catalogue instruments.
 
