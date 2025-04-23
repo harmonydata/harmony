@@ -1,6 +1,6 @@
 [project]
 name = "harmonydata"
-version = "1.0.3"
+version = "1.0.5"
 description = "Harmony Tool for Retrospective Data Harmonisation"
 readme = "README.md"
 keywords = [
