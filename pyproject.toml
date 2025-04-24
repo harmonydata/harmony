@@ -16,14 +16,13 @@ maintainers = [
 authors = [
     { name = "Thomas Wood", email = "thomas@fastdatascience.com" },
 ]
-requires-python = ">=3.6,<=3.13.0"
+requires-python = ">=3.10,<=3.13.3"
 classifiers=[
     # see https://pypi.org/classifiers/
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "Topic :: Software Development :: Build Tools",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -43,20 +42,20 @@ classifiers=[
 # core dependencies of harmony
 # this set should be kept minimal!
 dependencies = [
-    "pydantic==2.8.2; python_version <= '3.13'",
-    "pandas>=2.0.0; python_version <= '3.13'",
-    "tika==3.1.0; python_version <= '3.13'",
-    "lxml==5.3.1; python_version <= '3.13'",
-    "langdetect==1.0.9; python_version <= '3.13'",
-    "XlsxWriter==3.2.2; python_version <= '3.13'",
-    "openpyxl==3.1.5; python_version <= '3.13'",
-    "wget==3.2; python_version <= '3.13'",
-    "sentence-transformers>=3.2.0; python_version <= '3.13'",
-    "numpy>=1.24.0; python_version <= '3.13'",
-    "sklearn-crfsuite==0.5.0; python_version <= '3.13'",
-    "scikit-learn; python_version <= '3.13'",
-    "scipy==1.10.0; python_version <= '3.13'",
-    "huggingface-hub==0.30.1; python_version <= '3.13'",
+    "pydantic>=2.11.3; python_version <= '3.13.3'",
+    "pandas>=2.2.3; python_version <= '3.13.3'",
+    "tika>=3.1.0; python_version <= '3.13.3'",
+    "lxml>=5.4.0; python_version <= '3.13.3'",
+    "langdetect>=1.0.9; python_version <= '3.13.3'",
+    "XlsxWriter>=3.2.3; python_version <= '3.13.3'",
+    "openpyxl>=3.1.5; python_version <= '3.13.3'",
+    "wget>=3.2; python_version <= '3.13.3'",
+    "sentence-transformers>=4.1.0; python_version <= '3.13.3'",
+    "numpy>=2.0.2; python_version <= '3.13.3'",
+    "sklearn-crfsuite>=0.5.0; python_version <= '3.13.3'",
+    "scikit-learn>=1.6.1; python_version <= '3.13.3'",
+    "scipy>=1.13.1; python_version <= '3.13.3'",
+    "huggingface-hub>=0.30.2; python_version <= '3.13.3'",
 ]
 
 [project.optional-dependencies]
