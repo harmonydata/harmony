@@ -37,6 +37,12 @@ def create_instrument_from_list(question_texts: list[str], answer_texts: list[li
                                 file_name="My file") -> Instrument:
     """
     Read a list of strings and create an Instrument object.
+
+    :param question_texts: The main part of the texts of the questions in the questionnaires, e.g. ["I feel nervous", "I feel afraid"]
+    :param answer_texts: Optional parameter where you can provide the response options. This is a list of lists of the same length of the list of questions. Each item in the list of lists is a list containing the options for that question. E.g. [["Rarely", "Often"], ["Rarely", "Sometimes", "Never"]] would represent the options for a questionnaire consisting of two questions.
+    :param question_numbers: Optional parameter where you can provide the original question numbers associated with the questions. This list should be the same length as `question_texts`. Question numbers can be strings.
+    :param instrument_name: Optional metadata containing name of the instrument.
+    :param file_name: Optional metadata containing name of the file.
     :return: Single Instrument.
     """
     questions = []
