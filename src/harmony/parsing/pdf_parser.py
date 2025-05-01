@@ -33,7 +33,8 @@ from harmony.parsing.util.tika_wrapper import parse_pdf_to_plain_text
 from harmony.schemas.requests.text import RawFile, Instrument
 
 
-def group_token_spans_by_class(tokens, classes, tokenizer) -> dict:
+def group_token_spans_by_class(tokens, classes,
+                               tokenizer=AutoTokenizer.from_pretrained("harmonydata/debertaV2_pdfparser")) -> dict:
     """
     Given a list of tokens, and a list of predicted classes
     for each token, create a dictionary to hold each
@@ -48,7 +49,7 @@ def group_token_spans_by_class(tokens, classes, tokenizer) -> dict:
     :type tokens: List[str]
     :param classes: List of predicted classes
     :type classes: List[str]
-    :param tokenizer: Tokenizer
+    :param tokenizer: Tokenizer (defaulted to harmonydata/debertaV2_pdfparser)
     :return: Dictionary of each span relative to its class
     """
     grouped_spans = {"answer": [], "question": [], "other": []}
