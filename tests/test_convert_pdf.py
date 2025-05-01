@@ -53,11 +53,12 @@ class TestConvertPdf(unittest.TestCase):
     def test_two_questions(self):
         self.assertEqual(2, len(convert_pdf_to_instruments(pdf_gad_7_2_questions)[0].questions))
 
+
 class TestTokenGroupingByClass(unittest.TestCase):
     def test_multiple_questions_answers_others(self):
         input_classes = ["question", "question", "question", "question",
                          "answer",
-                         "other","other", "other", "other", "other", "other",
+                         "other", "other", "other", "other", "other", "other",
                          "question", "question", "question", "question",
                          "answer",
                          "other", "other", "other", "other", "other", "other"]
@@ -67,11 +68,12 @@ class TestTokenGroupingByClass(unittest.TestCase):
                         "▁How", "▁are", "▁you", "?",
                         "▁8",
                         ".", "▁lore", "m", "▁ipsum", "▁dolor", "."]
-        expected_output = {"question":["How are you?", "How are you?"],
-                           "answer":["5", "8"],
-                           "other":[". lorem ipsum dolor.", ". lorem ipsum dolor."]}
+        expected_output = {"question": ["How are you?", "How are you?"],
+                           "answer": ["5", "8"],
+                           "other": [". lorem ipsum dolor.", ". lorem ipsum dolor."]}
         output = group_token_spans_by_class(input_tokens, input_classes)
-        print(output)
         self.assertDictEqual(expected_output, output)
+
+
 if __name__ == '__main__':
     unittest.main()
