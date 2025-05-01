@@ -25,6 +25,7 @@ SOFTWARE.
 
 '''
 
+import os
 import torch
 from transformers import AutoModelForTokenClassification, AutoTokenizer
 
@@ -32,6 +33,8 @@ import harmony
 from harmony.parsing.util.tika_wrapper import parse_pdf_to_plain_text
 from harmony.schemas.requests.text import RawFile, Instrument
 
+# Disable tokenizer parallelism
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 def group_token_spans_by_class(tokens, classes,
                                tokenizer=AutoTokenizer.from_pretrained("harmonydata/debertaV2_pdfparser")) -> dict:
