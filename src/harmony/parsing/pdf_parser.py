@@ -25,18 +25,13 @@ SOFTWARE.
 
 '''
 
-import pathlib
-import pickle as pkl
-import re
-
-from torch.cuda import device_of
+import torch
+from transformers import AutoModelForTokenClassification, AutoTokenizer
 
 import harmony
-from harmony.parsing.util.feature_extraction import convert_text_to_features
 from harmony.parsing.util.tika_wrapper import parse_pdf_to_plain_text
 from harmony.schemas.requests.text import RawFile, Instrument
-from transformers import AutoModelForTokenClassification, AutoTokenizer
-import torch
+
 
 def group_token_spans_by_class(tokens, classes, tokenizer) -> dict:
     """
@@ -56,7 +51,7 @@ def group_token_spans_by_class(tokens, classes, tokenizer) -> dict:
     :param tokenizer: Tokenizer
     :return: Dictionary of each span relative to its class
     """
-    grouped_spans = {"answer":[], "question":[], "other":[]}
+    grouped_spans = {"answer": [], "question": [], "other": []}
     span = []
     prev_cls = None
 
@@ -102,7 +97,6 @@ def predict(test_text):
     grouped_tokens = group_token_spans_by_class(decoded_tokenized_texts, predicted_token_class, tokenizer)
 
     return grouped_tokens
-
 
 
 def convert_pdf_to_instruments(file: RawFile) -> Instrument:
