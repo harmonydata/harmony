@@ -26,6 +26,7 @@ SOFTWARE.
 '''
 
 import os
+
 import torch
 from transformers import AutoModelForTokenClassification, AutoTokenizer
 
@@ -36,6 +37,7 @@ from harmony.schemas.requests.text import RawFile, Instrument
 # Disable tokenizer parallelism
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
+
 def group_token_spans_by_class(tokens, classes,
                                tokenizer=AutoTokenizer.from_pretrained("harmonydata/debertaV2_pdfparser")) -> dict:
     """
@@ -43,11 +45,11 @@ def group_token_spans_by_class(tokens, classes,
     for each token, create a dictionary to hold each
     span of tokens.
     Example:
-        > group_token_spans_by_classes(['How', 'are', 'you', '?', 'Alright'],
+        > group_token_spans_by_classes(['▁how', '▁are', '▁you', '?', '▁1'],
                                         ['question', 'question', 'question', 'question', 'answer'],
                                         bert_tokenizer)
-        > {"question":["How are you?"], "answer":["Alright"]}
-
+        > {"question":["How are you?"], "answer":["1"]}
+        Notice that some tokens begin with ▁ (ASCII 9601) instead of _ (ASCII 95)
     :param tokens: List of tokens
     :type tokens: List[str]
     :param classes: List of predicted classes
@@ -112,8 +114,12 @@ def convert_pdf_to_instruments(file: RawFile) -> Instrument:
     if not file.text_content:
         file.text_content = parse_pdf_to_plain_text(file.content)  # call Tika to convert the PDF to plain text
 
-    questions_from_text = predict(file.text_content)["question"]
+    # Run prediction script to return questions and answers from file text content
+    questions_answers_from_text = predict(file.text_content)
 
-    instrument = harmony.create_instrument_from_list(questions_from_text, instrument_name=file.file_name,
+    questions_from_text = questions_answers_from_text["question"]
+    answers_from_text = questions_answers_from_text["answer"]
+
+    instrument = harmony.create_instrument_from_list(questions_from_text, answers_from_text, instrument_name=file.file_name,
                                                      file_name=file.file_name)
     return [instrument]
