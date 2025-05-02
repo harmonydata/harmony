@@ -38,7 +38,8 @@ class TestInstrumentToInstrumentSimilarity(unittest.TestCase):
 
     def test_same_instrument_twice(self):
         gad_2 = create_instrument_from_list(
-            ["Feeling nervous, anxious, or on edge", "Not being able to stop or control worrying"])
+            ["Feeling nervous, anxious, or on edge", "Not being able to stop or control worrying"],
+            [])
         instruments = [gad_2, gad_2]
 
         match_response = match_instruments(
@@ -53,9 +54,11 @@ class TestInstrumentToInstrumentSimilarity(unittest.TestCase):
 
     def test_two_instruments_one_a_subset_of_another(self):
         gad_2 = create_instrument_from_list(
-            ["Feeling nervous, anxious, or on edge", "Not being able to stop or control worrying"])
+            ["Feeling nervous, anxious, or on edge", "Not being able to stop or control worrying"],
+            [])
         gad_1 = create_instrument_from_list(
-            ["Feeling nervous, anxious, or on edge"])
+            ["Feeling nervous, anxious, or on edge"],
+            [])
         instruments = [gad_2, gad_1]
 
         match_response = match_instruments(

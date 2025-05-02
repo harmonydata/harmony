@@ -27,6 +27,7 @@ SOFTWARE.
 
 import sys
 import unittest
+
 import numpy as np
 
 from harmony.util.instrument_helper import create_instrument_from_list
@@ -106,7 +107,8 @@ class ResponseOptionsSimilarity(unittest.TestCase):
 
     def test_empty_responses(self):
         # when the responses are empty, match_instruments returns all 1s
-        match = match_instruments([create_instrument_from_list(["potato", "tomato", "radish"], instrument_name="veg")])
+        match = match_instruments(
+            [create_instrument_from_list(["potato", "tomato", "radish"], answer_texts=[], instrument_name="veg")])
         sim = match.response_options_similarity
         self.assertTrue(np.all(sim == 1))
 
