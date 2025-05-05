@@ -35,7 +35,7 @@ from harmony.schemas.requests.text import Instrument, Question
 def create_instrument_from_list(question_texts: list, question_numbers: list = None,
                                 instrument_name: str = "My instrument",
                                 file_name="My file", 
-                                options_map: Optional[Dict[str, list[str]]] = None ) -> Instrument:
+                                options_map: None) -> Instrument:
     """
     Read a list of strings and create an Instrument object.
     :return: Single Instrument.
