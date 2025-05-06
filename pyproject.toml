@@ -61,6 +61,7 @@ dependencies = [
     "huggingface-hub==0.29.3; python_version <= '3.13'",
     "torch==2.2.2; python_version <= '3.13'",
     "transformers==4.50.3; python_version <= '3.13'",
+    "fpdf==1.7.2; python_version <= '3.13'",
 ]
 
 [project.optional-dependencies]
