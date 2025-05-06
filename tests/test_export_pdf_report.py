@@ -10,6 +10,7 @@ def sample_data(tmp_path):
             "Følt deg nervøs, engstelig eller veldig stresset",
             "Ikke klart å slutte å bekymre deg eller kontrolleren bekymringene dine"
         ],
+        [],
         instrument_name="GAD-7 Norwegian"
     )
     instruments = [
