@@ -27,8 +27,6 @@ SOFTWARE.
 
 import sys
 import unittest
-from harmony.parsing.text_parser import convert_text_to_instruments
-from harmony.schemas.requests.text import RawFile, FileType
 
 sys.path.append("../src")
 

@@ -24,8 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import statistics
 import heapq
+import os
+import pathlib
+import statistics
 from collections import Counter, OrderedDict
 from typing import List, Callable
 
@@ -33,6 +35,10 @@ import numpy as np
 from numpy import dot, matmul, ndarray, matrix
 from numpy.linalg import norm
 
+from harmony.matching.deterministic_clustering import find_clusters_deterministic
+from harmony.matching.affinity_propagation_clustering import cluster_questions_affinity_propagation
+from harmony.matching.hdbscan_clustering import cluster_questions_hdbscan_from_embeddings
+from harmony.matching.instrument_to_instrument_similarity import get_instrument_similarity
 from harmony.matching.negator import negate
 from harmony.schemas.catalogue_instrument import CatalogueInstrument
 from harmony.schemas.catalogue_question import CatalogueQuestion
@@ -40,24 +46,31 @@ from harmony.schemas.requests.text import (
     Instrument,
     Question,
 )
+from harmony.schemas.responses.text import MatchResult
 from harmony.schemas.text_vector import TextVector
 
-import os
+from harmony.matching.kmeans_clustering import cluster_questions_kmeans_from_embeddings
+
+from harmony.schemas.enums.clustering_algorithms import ClusteringAlgorithm
+from langdetect import detect, DetectorFactory
+
+DetectorFactory.seed = 0
 
 
 # This has been tested on 16 GB RAM production server, 1000 seems a safe number (TW, 15 Dec 2024)
-def get_batch_size(default=1000): 
+def get_batch_size(default=1000):
     try:
         batch_size = int(os.getenv("BATCH_SIZE", default))
         return max(batch_size, 0)
     except (ValueError, TypeError):
         return default
+
+
 def process_items_in_batches(items, llm_function):
     batch_size = get_batch_size()
 
     if batch_size == 0:
-         return llm_function(items)
-
+        return llm_function(items)
 
     batches = [items[i:i + batch_size] for i in range(0, len(items), batch_size)]
 
@@ -76,7 +89,7 @@ def cosine_similarity(vec1: ndarray, vec2: ndarray) -> ndarray:
     return np.asarray(dp / matmul(m1.T, m2))
 
 
-def add_text_to_vec(text, texts_cached_vectors, text_vectors, is_negated_, is_query_):
+def add_text_to_vec(text, texts_cached_vectors, text_vectors, is_negated_, is_query_) -> list[TextVector]:
     if text not in texts_cached_vectors:
         text_vectors.append(
             TextVector(
@@ -96,11 +109,14 @@ def add_text_to_vec(text, texts_cached_vectors, text_vectors, is_negated_, is_qu
     return text_vectors
 
 
-def process_questions(questions, texts_cached_vectors):
+def process_questions(questions: list, texts_cached_vectors: dict, is_negate: bool) -> list[TextVector]:
     text_vectors: List[TextVector] = []
     for question_text in questions:
         text_vectors = add_text_to_vec(question_text, texts_cached_vectors, text_vectors, False, False)
-        negated_text = negate(question_text, 'en')
+        if is_negate:
+            negated_text = negate(question_text, 'en')
+        else:
+            negated_text = question_text
         text_vectors = add_text_to_vec(negated_text, texts_cached_vectors, text_vectors, True, False)
     return text_vectors
 
@@ -137,13 +153,14 @@ def create_full_text_vectors(
         query: str | None,
         vectorisation_function: Callable,
         texts_cached_vectors: dict[str, list[float]],
+        is_negate: bool
 ) -> tuple[List[TextVector], dict]:
     """
     Create full text vectors.
     """
 
     # Create a list of text vectors
-    text_vectors = process_questions(all_questions, texts_cached_vectors)
+    text_vectors = process_questions(all_questions, texts_cached_vectors, is_negate=is_negate)
 
     # Add query
     if query:
@@ -152,11 +169,8 @@ def create_full_text_vectors(
     # Texts with no cached vector
     texts_not_cached = [x.text for x in text_vectors if not x.vector]
 
-
-
     # Get vectors for all texts not cached
     new_vectors_list: List = process_items_in_batches(texts_not_cached, vectorisation_function)
-
 
     # Create a dictionary with new vectors
     new_vectors_dict = {}
@@ -166,7 +180,8 @@ def create_full_text_vectors(
     # Add new vectors to all_texts
     for index, text_dict in enumerate(text_vectors):
         if not text_dict.vector:
-            text_vectors[index].vector = new_vectors_list.pop(0)
+            new_vector: ndarray = new_vectors_list.pop(0)
+            text_vectors[index].vector = new_vector.tolist()
 
     return text_vectors, new_vectors_dict
 
@@ -176,6 +191,7 @@ def match_instruments_with_catalogue_instruments(
         catalogue_data: dict,
         vectorisation_function: Callable,
         texts_cached_vectors: dict[str, List[float]],
+        is_negate: bool = True
 ) -> tuple[List[Instrument], List[CatalogueInstrument]]:
     """
     Match instruments with catalogue instruments.
@@ -200,6 +216,7 @@ def match_instruments_with_catalogue_instruments(
         query=None,
         vectorisation_function=vectorisation_function,
         texts_cached_vectors=texts_cached_vectors,
+        is_negate=is_negate
     )
 
     # For each instrument, find the best instrument matches for it in the catalogue
@@ -297,7 +314,7 @@ def match_questions_with_catalogue_instruments(
 
     # This dictionary will contain the index of the instrument and the cosine similarities to the top matched questions
     # in that instrument e.g. {50: [ ... ]}
-    instrument_idx_to_cosine_similarities_top_match: dict[int, [float]] = {}
+    instrument_idx_to_cosine_similarities_top_match: dict[int, list[float]] = {}
 
     # This keeps track of how many question items in total are contained in each instrument, irrespective of the
     # number of matches.
@@ -474,6 +491,7 @@ def match_query_with_catalogue_instruments(
         vectorisation_function: Callable,
         texts_cached_vectors: dict[str, List[float]],
         max_results: int = 100,
+        is_negate: bool = True
 ) -> dict[str, list | dict]:
     """
     Match query with catalogue instruments.
@@ -508,6 +526,7 @@ def match_query_with_catalogue_instruments(
         query=query,
         vectorisation_function=vectorisation_function,
         texts_cached_vectors=texts_cached_vectors,
+        is_negate=is_negate
     )
 
     # Get an array of dimensions
@@ -563,21 +582,28 @@ def match_instruments_with_function(
         instruments: List[Instrument],
         query: str,
         vectorisation_function: Callable,
+        topics: List = [],
         mhc_questions: List = [],
         mhc_all_metadatas: List = [],
         mhc_embeddings: np.ndarray = np.zeros((0, 0)),
         texts_cached_vectors: dict[str, List[float]] = {},
-) -> tuple:
+        is_negate: bool = True,
+        clustering_algorithm: ClusteringAlgorithm = ClusteringAlgorithm.affinity_propagation,
+        num_clusters_for_kmeans: int = None
+) -> MatchResult:
     """
     Match instruments.
 
     :param instruments: The instruments
     :param query: The query
     :param vectorisation_function: A function to vectorize a text
+    :param topics: A list of topics to tag the questions with
     :param mhc_questions: MHC questions.
     :param mhc_all_metadatas: MHC metadatas.
     :param mhc_embeddings: MHC embeddings.
     :param texts_cached_vectors: A dictionary of already cached vectors from texts (key is the text and value is the vector).
+    :param clustering_algorithm: {"affinity_propagation", "deterministic", "kmeans", "hdbscan"}: The clustering algorithm to use to cluster the questions.
+    :num_clusters_for_kmeans: The number of clusters to use for K-Means Clustering. Defaults to the square root of the number of questions.
     """
 
     all_questions: List[Question] = []
@@ -588,7 +614,8 @@ def match_instruments_with_function(
         all_questions=[q.question_text for q in all_questions],
         query=query,
         vectorisation_function=vectorisation_function,
-        texts_cached_vectors=texts_cached_vectors
+        texts_cached_vectors=texts_cached_vectors,
+        is_negate=is_negate
     )
 
     # get vectors for all original texts and vectors for negated texts
@@ -657,14 +684,96 @@ def match_instruments_with_function(
                         instrument_to_category[instrument_id].append(topic)
 
             for question in all_questions:
-                question.topics_auto = instrument_to_category[question.instrument_id]
+                question.topics_auto = instrument_to_category.get(question.instrument_id, [])
         else:
             for question in all_questions:
                 question.topics_auto = []
 
-    return (
-        all_questions,
-        similarity_with_polarity,
-        query_similarity,
-        new_vectors_dict
-    )
+    instrument_to_instrument_similarities = get_instrument_similarity(instruments, similarity_with_polarity)
+
+    if clustering_algorithm == ClusteringAlgorithm.affinity_propagation:
+        clusters = cluster_questions_affinity_propagation(
+            all_questions,
+            similarity_with_polarity
+        )
+
+    elif clustering_algorithm == ClusteringAlgorithm.deterministic:
+        clusters = find_clusters_deterministic(
+            all_questions,
+            similarity_with_polarity
+        )
+    elif clustering_algorithm == ClusteringAlgorithm.kmeans:
+        if num_clusters_for_kmeans is None:
+            num_clusters_for_kmeans = int(np.floor(np.sqrt(len(all_questions))))
+
+        clusters = cluster_questions_kmeans_from_embeddings(
+            all_questions,
+            vectors_pos,
+            num_clusters_for_kmeans
+        )
+    elif clustering_algorithm == ClusteringAlgorithm.hdbscan:
+        clusters = cluster_questions_hdbscan_from_embeddings(
+            all_questions,
+            vectors_pos
+        )
+    else:
+        raise Exception(
+            "Invalid clustering function, must be in {\"affinity_propagation\", \"deterministic\" , \"kmeans\", \"hdbscan\"}")
+
+    # Work out response options similarity
+    options = ["; ".join(q.options) for q in all_questions]
+    options_vectors = vectorisation_function(options)
+    response_options_similarity = cosine_similarity(options_vectors, options_vectors).clip(0, 1)
+
+    # Tag the questions with the topics
+    if topics:
+        assigned_topics = {
+            idx: [] for idx in range(len(all_questions))
+        }
+        question_topic_similarity_threshold = 0.7
+
+        # load stopwords
+        folder_containing_this_file = pathlib.Path(__file__).parent.resolve()
+        stopwords_folder = f"{folder_containing_this_file}/../stopwords/"
+        stopwords_files = os.listdir(stopwords_folder)
+
+        lang_to_stopwords = {}
+        for stopwords_file in stopwords_files:
+            with open(stopwords_folder + stopwords_file, "r", encoding="utf-8") as f:
+                lang_to_stopwords[stopwords_file] = set(f.read().splitlines())
+
+        # loop through questions
+        for idx, question in enumerate(all_questions):
+            words = question.question_text.split(" ")
+
+            # detect langauge of the question
+            languages = set()
+            try:
+                lang = detect(question.question_text)
+                languages.add(lang)
+            except:
+                pass
+
+            # remove stopwords
+            stopwords = lang_to_stopwords[lang] if lang in lang_to_stopwords else []
+            words = [word for word in words if word not in stopwords]
+
+            question_vector = vectorisation_function(words)
+            topics_vectors = vectorisation_function(topics)
+            sim = cosine_similarity(question_vector, topics_vectors).clip(0, 1)
+
+            # if any of the words in the question match with the topics, tag it with the respective topic
+            for j in range(sim.shape[1]):
+                if np.any(sim[:, j] >= question_topic_similarity_threshold):
+                    assigned_topics[idx].append(topics[j])
+
+        for idx, topics in assigned_topics.items():
+            all_questions[idx].topics = topics
+
+    return MatchResult(questions=all_questions,
+                       similarity_with_polarity=similarity_with_polarity,
+                       response_options_similarity=response_options_similarity,
+                       query_similarity=query_similarity,
+                       new_vectors_dict=new_vectors_dict,
+                       instrument_to_instrument_similarities=instrument_to_instrument_similarities,
+                       clusters=clusters)

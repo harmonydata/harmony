@@ -25,7 +25,7 @@ SOFTWARE.
 
 '''
 
-__version__ = "1.0.1"
+__version__ = "1.0.5"
 
 # TODO: make these configurable at package level
 import os
@@ -45,6 +45,9 @@ if os.environ.get("HARMONY_NO_PARSING") is None or os.environ.get("HARMONY_NO_PA
 
 if os.environ.get("HARMONY_NO_MATCHING") is None or os.environ.get("HARMONY_NO_MATCHING") == "":
     from .matching.matcher import match_instruments_with_function
+    from .matching.generate_crosswalk_table import generate_crosswalk_table
+    from .matching.deterministic_clustering import find_clusters_deterministic
+    from .matching.cluster import cluster_questions
 
     try:
         from .matching.default_matcher import match_instruments

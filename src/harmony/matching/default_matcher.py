@@ -33,6 +33,8 @@ from harmony.schemas.requests.text import Instrument
 from numpy import ndarray
 from sentence_transformers import SentenceTransformer
 
+from harmony.schemas.responses.text import MatchResult
+
 if (
         os.environ.get("HARMONY_SENTENCE_TRANSFORMER_PATH", None) is not None
         and os.environ.get("HARMONY_SENTENCE_TRANSFORMER_PATH", None) != ""
@@ -71,19 +73,26 @@ def convert_texts_to_vector(texts: List, batch_size=1000, max_batches=2000) -> n
 def match_instruments(
         instruments: List[Instrument],
         query: str = None,
+        topics: List = [],
         mhc_questions: List = [],
         mhc_all_metadatas: List = [],
         mhc_embeddings: np.ndarray = np.zeros((0, 0)),
         texts_cached_vectors: dict[str, List[float]] = {}, batch_size: int = 1000, max_batches: int = 2000,
-
-) -> tuple:
+        is_negate: bool = True,
+        clustering_algorithm: str = "affinity_propagation",
+        num_clusters_for_kmeans: int = None
+) -> MatchResult:
     return match_instruments_with_function(
         instruments=instruments,
         query=query,
         vectorisation_function=lambda texts: convert_texts_to_vector(texts, batch_size=batch_size,
                                                                      max_batches=max_batches),
+        topics=topics,
         mhc_questions=mhc_questions,
         mhc_all_metadatas=mhc_all_metadatas,
         mhc_embeddings=mhc_embeddings,
         texts_cached_vectors=texts_cached_vectors,
+        is_negate=is_negate,
+        clustering_algorithm=clustering_algorithm,
+        num_clusters_for_kmeans=num_clusters_for_kmeans
     )

@@ -30,31 +30,28 @@ import unittest
 
 sys.path.append("../src")
 
-from harmony import convert_pdf_to_instruments
 from harmony.schemas.requests.text import RawFile
-from harmony import download_models
-
 
 pdf_empty_table = RawFile.model_validate({
     "file_id": "d39f31718513413fbfc620c6b6135d0c",
     "file_name": "GAD-7.pdf",
     "file_type": "pdf",
     "tables": [],
-    "text_content":"aaa",
-    "content":""
+    "text_content": "aaa",
+    "content": ""
 })
 
 pdf_non_empty_table = RawFile.model_validate({
     "file_id": "d39f31718513413fbfc620c6b6135d0c",
     "file_name": "GAD-7.pdf",
     "file_type": "pdf",
-   'tables': [["hello"]],
-    "text_content":"aaa",
-        "content":""
+    'tables': [["hello"]],
+    "text_content": "aaa",
+    "content": ""
 })
 
-class TestConvertPdfTables(unittest.TestCase):
 
+class TestConvertPdfTables(unittest.TestCase):
     pass
 
     # Not using tables at the moment

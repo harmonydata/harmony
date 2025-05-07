@@ -104,7 +104,10 @@ harmony.download_models()
 
 ```
 instruments = harmony.example_instruments["CES_D English"], harmony.example_instruments["GAD-7 Portuguese"]
-questions, similarity, query_similarity, new_vectors_dict = harmony.match_instruments(instruments)
+match_response = harmony.match_instruments(instruments)
+
+questions = match_response.questions
+similarity = match_response.similarity_with_polarity
 ```
 
 ## How to load a PDF, Excel or Word into an instrument
@@ -117,7 +120,6 @@ harmony.load_instruments_from_local_file("gad-7.pdf")
 
 As an alternative to downloading models, you can set environment variables so that Harmony calls spaCy on a remote server. This is only necessary if you are making a server deployment of Harmony.
 
-* `HARMONY_SPACY_PATH` - determines where model files are stored. Defaults to `HOME DIRECTORY/harmony`
 * `HARMONY_DATA_PATH` - determines where data files are stored. Defaults to `HOME DIRECTORY/harmony`
 * `HARMONY_NO_PARSING` - set to 1 to import a lightweight variant of Harmony which doesn't support PDF parsing.
 * `HARMONY_NO_MATCHING` - set to 1 to import a lightweight variant of Harmony which doesn't support matching.
@@ -130,7 +132,8 @@ You can also create instruments quickly from a list of strings
 from harmony import create_instrument_from_list, match_instruments
 instrument1 = create_instrument_from_list(["I feel anxious", "I feel nervous"])
 instrument2 = create_instrument_from_list(["I feel afraid", "I feel worried"])
-all_questions, similarity, query_similarity, new_vectors_dict = match_instruments([instrument1, instrument2])
+
+match_response = match_instruments([instrument1, instrument2])
 ```
 
 ## Loading instruments from PDFs
@@ -148,12 +151,12 @@ Once you have some instruments, you can match them with each other with a call t
 
 ```
 from harmony import match_instruments
-all_questions, similarity, query_similarity, new_vectors_dict = match_instruments(instruments)
+match_response = match_instruments(instruments)
 ```
 
-* `all_questions` is a list of the questions passed to Harmony, in order.
-* `similarity` is the similarity matrix returned by Harmony.
-* `query_similarity` is the degree of similarity of each item to an optional query passed as argument to `match_instruments`.
+* `match_response.questions` is a list of the questions passed to Harmony, in order.
+* `match_response.similarity_with_polarity` is the similarity matrix returned by Harmony.
+* `match_response.query_similarity` is the degree of similarity of each item to an optional query passed as argument to `match_instruments`.
 
 ## ⇗⇗ Using a different vectorisation function
 
@@ -165,7 +168,7 @@ export HARMONY_SENTENCE_TRANSFORMER_PATH=sentence-transformers/distiluse-base-mu
 
 ## Using OpenAI or other LLMs for vectorisation
 
-Any word vector representation can be used by Harmony. The below example works for OpenAI's [text-embedding-ada-002](https://openai.com/blog/new-and-improved-embedding-model) model as of July 2023, provided you have create a paid OpenAI account. However, since LLMs are progressing rapidly, we have chosen not to integrate Harmony directly into the OpenAI client libraries, but instead allow you to pass Harmony any vectorisation function of your choice.
+Any word vector representation can be used by Harmony. The below example works for OpenAI's [text-embedding-ada-002](https://openai.com/blog/new-and-improved-embedding-model) model as of Apri 2025, provided you have create a paid OpenAI account. However, since LLMs are progressing rapidly, we have chosen not to integrate Harmony directly into the OpenAI client libraries, but instead allow you to pass Harmony any vectorisation function of your choice.
 
 ```
 import numpy as np
@@ -178,7 +181,7 @@ def convert_texts_to_vector(texts):
     vectors = client.embeddings.create(input = texts, model=model_name).data
     return np.asarray([vectors[i].embedding for i in range(len(vectors))])
 instruments = example_instruments["CES_D English"], example_instruments["GAD-7 Portuguese"]
-all_questions, similarity, query_similarity, new_vectors_dict = match_instruments_with_function(instruments, None, convert_texts_to_vector)
+match_response = match_instruments_with_function(instruments, None, convert_texts_to_vector)
 ```
  
 ## 💻 Do you want to run Harmony in your browser locally?
@@ -192,10 +195,12 @@ Download and install Docker:
 Open a Terminal and run
 
 ```
-docker run -p 8000:8000 -p 3000:3000 harmonydata/harmonylocal
+docker run -p 8000:80 harmonydata/harmonyapi
 ```
 
-Then go to http://localhost:3000 in your browser.
+Then go to http://localhost:8000 in your browser to see the API.
+
+You can now install and run the front end locally: https://www.youtube.com/watch?v=1xp3Uh6dptg
 
 ## Looking for the Harmony API?
 
@@ -278,7 +283,44 @@ The core team at Harmony is made up of:
 
 ## 📜 License
 
-MIT License. Copyright (c) 2023 Ulster University (https://www.ulster.ac.uk)
+Harmony itself is under [MIT License](https://github.com/harmonydata/harmony/blob/main/LICENSE).  Copyright (c) 2023 Ulster University (https://www.ulster.ac.uk). The third party resources used include:
+
+### Licenses of third party software
+
+| Third party dependency | License | Use |
+| --- | --- | --- |
+| Python | [BSD-style custom license](https://en.wikipedia.org/wiki/Python_Software_Foundation_License) | Programming language - all of Harmony runs based on Python and so this can't be replaced |
+| Java | Different options available such as Oracle and IBM | Programming language used to run Tika, used for PDF parsing. If we replace Tika we may no longer need Java. |
+| Sentence Transformers | [Apache](https://github.com/UKPLab/sentence-transformers/blob/master/LICENSE) | Library for running transformer models |
+| Transformers | [Apache](https://github.com/huggingface/transformers/blob/main/LICENSE) |  Library for running transformer models |
+| Pandas | [BSD 3-Clause](https://github.com/pandas-dev/pandas/blob/main/LICENSE) | Handling tables inside Harmony - mainly for reading/writing Excels |
+| Tika | [Apache](https://github.com/apache/tika/blob/main/LICENSE.txt) | Parsing PDFs into plain text including OCR. Runs in Java |
+| LXML | [BSD](https://github.com/lxml/lxml/blob/master/LICENSES.txt) | Reading the output of Tika's PDF parsing |
+| Langdetect | [Apache](https://github.com/Mimino666/langdetect/blob/master/LICENSE) | Detecting language of text |
+| XlsxWriter | [BSD 2-Clause](https://xlsxwriter.readthedocs.io/license.html) | Writing Excels |
+| Openpyxl | [MIT](https://github.com/fluidware/openpyxl/blob/master/LICENCE) | Writing Excels |
+| Numpy | [custom license which appears to be BSD 3-Clause](https://numpy.org/doc/stable/license.html) | Dependency of the transformers libraries |
+| Scikit-Learn | [BSD 3-Clause](https://github.com/scikit-learn/scikit-learn/blob/main/COPYING) | Machine learning models for extracting the questions from PDFs |
+| Scikit-Learn CRFSuite | [MIT](https://sklearn-crfsuite.readthedocs.io/en/latest/contributing.html#license) | Machine learning models for extracting the questions from PDFs |
+| Scipy | [custom license which appears to be BSD 3-Clause](https://github.com/scipy/scipy/blob/main/LICENSE.txt) | Machine learning models for extracting the questions from PDFs |
+| Huggingface Hub | [Apache](https://github.com/huggingface/huggingface_hub/blob/main/LICENSE) | Connects to HuggingFace Hub, online catalogue of transformer models |
+
+### Third party software only used for the API
+
+| Third party dependency | License | Use |
+| --- | --- | --- |
+| FastAPI | [MIT](https://github.com/fastapi/fastapi/blob/master/LICENSE) | Runs the API |
+| Pydantic | [MIT](https://github.com/pydantic/pydantic/blob/main/LICENSE) | Ensures that data going in and out of the API is consistently formatted |
+| Pydantic Settings | [MIT](https://github.com/pydantic/pydantic-settings/blob/main/LICENSE) | Ensures that data going in and out of the API is consistently formatted |
+| Uvicorn | [BSD 3-Clause](https://github.com/encode/uvicorn/blob/master/LICENSE.md) | Runs the API |
+| APScheduler | [MIT](https://github.com/agronholm/apscheduler/blob/master/LICENSE.txt) | Periodically downloads Mental Health Catalogue data and similar - could potentially be removed |
+
+### Third party software only used for using LLMs from cloud providers
+
+| Third party dependency | License | Use |
+| --- | --- | --- |
+| VertexAI | [Apache](https://github.com/googleapis/python-aiplatform/blob/main/LICENSE) | Calls Google Vertex API LLMs |
+| OpenAI | [Apache](https://github.com/openai/openai-python/blob/main/LICENSE) | Calls OpenAI LLMs |
 
 ## 📜 How do I cite Harmony?
 

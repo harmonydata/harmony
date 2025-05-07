@@ -1,6 +1,6 @@
 [project]
 name = "harmonydata"
-version = "1.0.1"
+version = "1.0.5"
 description = "Harmony Tool for Retrospective Data Harmonisation"
 readme = "README.md"
 keywords = [
@@ -36,7 +36,11 @@ classifiers=[
     "Operating System :: OS Independent",
     "Topic :: Text Processing :: Linguistic",
     "Intended Audience :: Science/Research",
-    "Intended Audience :: Healthcare Industry"
+    "Intended Audience :: Healthcare Industry",
+    "Intended Audience :: Information Technology",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Sociology",
 ]
 # core dependencies of harmony
 # this set should be kept minimal!
@@ -49,12 +53,14 @@ dependencies = [
     "XlsxWriter==3.0.9; python_version <= '3.13'",
     "openpyxl==3.1.2; python_version <= '3.13'",
     "wget==3.2; python_version <= '3.13'",
-    "sentence-transformers==3.0.0; python_version <= '3.13'",
+    "sentence-transformers==3.4.1; python_version <= '3.13'",
     "numpy==1.26.4; python_version <= '3.13'",
     "sklearn-crfsuite==0.5.0; python_version <= '3.13'",
     "scikit-learn; python_version <= '3.13'",
     "scipy==1.14.1; python_version <= '3.13'",
-    "huggingface-hub==0.25.0; python_version <= '3.13'",
+    "huggingface-hub==0.29.3; python_version <= '3.13'",
+    "fpdf==1.7.2; python_version <= '3.13'",
+
 ]
 
 [project.optional-dependencies]
@@ -63,7 +69,7 @@ dependencies = [
 dev = ["check-manifest", "pytest"]
 
 [project.urls]
-"Documentation" = "https://harmonydata.ac.uk/"
+"Documentation" = "https://harmonydata.ac.uk/frequently-asked-questions/"
 "Bug Reports" = "https://github.com/harmonydata/harmony/issues"
 "Source Code" = "https://github.com/harmonydata/harmony"
 

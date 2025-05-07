@@ -27,11 +27,13 @@ SOFTWARE.
 
 import sys
 import unittest
+
 import numpy
 
 sys.path.append("../src")
 
 from harmony.matching.default_matcher import convert_texts_to_vector
+
 
 class createModel:
     def encode(self, sentences, convert_to_numpy=True):
@@ -39,22 +41,19 @@ class createModel:
         return numpy.array([[1] * 768] * len(sentences))
 
 
-
 model = createModel()
+
 
 class TestBatching(unittest.TestCase):
     def test_convert_texts_to_vector_with_batching(self):
         # Create a list of 10 dummy texts
         texts = ["text" + str(i) for i in range(10)]
 
-
         batch_size = 5
         max_batches = 2
         embeddings = convert_texts_to_vector(texts, batch_size=batch_size, max_batches=max_batches)
 
-
         self.assertEqual(embeddings.shape[0], 10)
-
 
         self.assertEqual(embeddings.shape[1], 384)
 
