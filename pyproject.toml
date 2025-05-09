@@ -51,7 +51,7 @@ dependencies = [
     "openpyxl>=3.1.5; python_version <= '3.13'",
     "wget>=3.2; python_version <= '3.13'",
     "sentence-transformers>=4.1.0; python_version <= '3.13'",
-    "numpy>=1.26.4; python_version <= '3.13'",
+    "numpy==1.26.4; python_version <= '3.13'",
     "sklearn-crfsuite>=0.5.0; python_version <= '3.13'",
     "scikit-learn>=1.6.1; python_version <= '3.13'",
     "scipy>=1.13.1; python_version <= '3.13'",
