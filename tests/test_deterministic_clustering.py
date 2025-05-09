@@ -30,10 +30,8 @@ import unittest
 
 sys.path.append("../src")
 
-from harmony import match_instruments, create_instrument_from_list, find_clusters_deterministic
-from harmony.schemas.requests.text import Instrument, Question
+from harmony import create_instrument_from_list, find_clusters_deterministic
 import numpy as np
-
 
 if __name__ == '__main__':
     unittest.main()
@@ -43,17 +41,21 @@ class TestDeterministicClustering(unittest.TestCase):
 
     def test_two_questions_one_cluster(self):
         questions = create_instrument_from_list(
-            ["Feeling nervous, anxious, or on edge", "Not being able to stop or control worrying"]).questions
+            ["Feeling nervous, anxious, or on edge", "Not being able to stop or control worrying"],
+            []).questions
         item_to_item_similarity_matrix = np.eye(2) / 2 + np.ones((2, 2)) / 2
         clusters = find_clusters_deterministic(questions, item_to_item_similarity_matrix)
         self.assertEqual(1, len(clusters))
 
     def test_three_questions_one_cluster(self):
         questions = create_instrument_from_list(
-            ["Feeling nervous, anxious, or on edge", "Not being able to stop or control worrying", "Worrying too much about different things"]).questions
+            ["Feeling nervous, anxious, or on edge", "Not being able to stop or control worrying",
+             "Worrying too much about different things"],
+            []).questions
         item_to_item_similarity_matrix = np.eye(3) / 2 + np.ones((3, 3)) / 2
         clusters = find_clusters_deterministic(questions, item_to_item_similarity_matrix)
         self.assertEqual(1, len(clusters))
+
 
 if __name__ == '__main__':
     unittest.main()

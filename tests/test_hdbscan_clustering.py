@@ -14,7 +14,8 @@ class TestHDBSCANClustering(unittest.TestCase):
         embedding_dim = 384
 
         questions = create_instrument_from_list(
-            ["Feeling nervous, anxious, or on edge", "Not being able to stop or control worrying"]).questions
+            ["Feeling nervous, anxious, or on edge", "Not being able to stop or control worrying"],
+            []).questions
 
         # Create fake dataset of embeddings with 2 samples, and 1 cluster
         question_embeddings, _ = make_blobs(n_samples=2, centers=1, random_state=42, n_features=embedding_dim)
@@ -28,7 +29,8 @@ class TestHDBSCANClustering(unittest.TestCase):
 
         questions = create_instrument_from_list(
             ["Feeling nervous, anxious, or on edge", "Not being able to stop or control worrying",
-             "Worrying too much about different things"]).questions
+             "Worrying too much about different things"],
+            []).questions
 
         # Create fake dataset of embeddings with 3 samples, and 1 cluster
         question_embeddings, _ = make_blobs(n_samples=3, centers=1, random_state=42, n_features=embedding_dim)

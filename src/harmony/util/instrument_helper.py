@@ -32,21 +32,21 @@ import uuid
 from harmony.schemas.requests.text import Instrument, Question
 
 
-def create_instrument_from_list(question_texts: list, question_numbers: list = None,
+def create_instrument_from_list(question_texts: list, answer_texts: list, question_numbers: list = None,
+                                answer_numbers: list = None,
                                 instrument_name: str = "My instrument",
                                 file_name="My file") -> Instrument:
     """
     Read a list of strings and create an Instrument object.
     :return: Single Instrument.
     """
-
     questions = []
     for ctr, question_text in enumerate(question_texts):
         if question_numbers is not None:
             question_no = question_numbers[ctr]
         else:
             question_no = str(ctr + 1)
-        questions.append(Question(question_text=question_text, question_no=question_no))
+        questions.append(Question(question_text=question_text, question_no=question_no, options=answer_texts))
 
     return Instrument(questions=questions, instrument_name=instrument_name, instrument_id=uuid.uuid4().hex,
                       file_name=file_name, file_id=uuid.uuid4().hex)
