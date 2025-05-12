@@ -41,7 +41,8 @@ from harmony import match_instruments
 class TestGenerateCrosswalkTable(unittest.TestCase):
     def setUp(self):
         # Sample data
-        self.instruments_dummy = [create_instrument_from_list(["potato", "tomato", "radish"], instrument_name="veg")]
+        self.instruments_dummy = [
+            create_instrument_from_list(["potato", "tomato", "radish"], [], instrument_name="veg")]
 
         self.similarity = np.array([
             [1.0, 0.7, 0.9],
@@ -51,6 +52,7 @@ class TestGenerateCrosswalkTable(unittest.TestCase):
 
         self.instruments = [create_instrument_from_list(
             ["Feeling nervous, anxious, or on edge", "Not being able to stop or control worrying"],
+            [],
             instrument_name="GAD-7")]
 
         self.threshold = 0.6
@@ -101,9 +103,10 @@ class TestGenerateCrosswalkTable(unittest.TestCase):
 
     def test_crosswalk_two_instruments_allow_many_to_one_matches(self):
 
-        instrument_1 = create_instrument_from_list(["I felt fearful."])
+        instrument_1 = create_instrument_from_list(["I felt fearful."], [])
         instrument_2 = create_instrument_from_list(
-            ["Feeling afraid, as if something awful might happen", "Feeling nervous, anxious, or on edge"])
+            ["Feeling afraid, as if something awful might happen", "Feeling nervous, anxious, or on edge"],
+            [])
         instruments = [instrument_1, instrument_2]
 
         match_response = match_instruments(instruments)
@@ -114,9 +117,10 @@ class TestGenerateCrosswalkTable(unittest.TestCase):
 
     def test_crosswalk_two_instruments_enforce_one_to_one_matches(self):
 
-        instrument_1 = create_instrument_from_list(["I felt fearful."])
+        instrument_1 = create_instrument_from_list(["I felt fearful."], [])
         instrument_2 = create_instrument_from_list(
-            ["Feeling afraid, as if something awful might happen", "Feeling nervous, anxious, or on edge"])
+            ["Feeling afraid, as if something awful might happen", "Feeling nervous, anxious, or on edge"],
+            [])
         instruments = [instrument_1, instrument_2]
 
         match_response = match_instruments(instruments)
