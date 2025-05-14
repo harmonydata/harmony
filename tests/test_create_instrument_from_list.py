@@ -58,6 +58,17 @@ class TestCreateInstrument(unittest.TestCase):
         web_url = import_instrument_into_harmony_web(instrument)
         self.assertIn("harmonydata.ac.uk", web_url)
 
+    def test_single_instrument_with_options(self):
+        question_texts = ["How often do you feel anxious?", "Do you have trouble sleeping?"]
+        options_map = {
+            "How often do you feel anxious?": ["Never", "Sometimes", "Often", "Always"],
+            "Do you have trouble sleeping?": ["Yes", "No"]
+        }
+        instrument = create_instrument_from_list(question_texts, options_map=options_map)
+
+        self.assertEqual(len(instrument.questions), 2)
+        self.assertEqual(instrument.questions[0].options, ["Never", "Sometimes", "Often", "Always"])
+        self.assertEqual(instrument.questions[1].options, ["Yes", "No"])
 
 if __name__ == '__main__':
     unittest.main()
