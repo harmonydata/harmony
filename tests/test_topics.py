@@ -27,18 +27,17 @@ SOFTWARE.
 
 import sys
 import unittest
-import numpy as np
 
 sys.path.append("../src")
 
-from harmony import match_instruments, example_instruments
+from harmony import match_instruments
 from harmony.util.instrument_helper import create_instrument_from_list
 
 
 class TestTopics(unittest.TestCase):
     def setUp(self):
         self.veg = create_instrument_from_list(
-            ["I like potatoes", "I like tomatoes", "I do not like radish"], instrument_name="veg")
+            ["I like potatoes", "I like tomatoes", "I do not like radish"], answer_texts=[], instrument_name="veg")
 
     def test_topic_in_question(self):
         match = match_instruments([self.veg], topics=["potato", "tomato", "radish"])

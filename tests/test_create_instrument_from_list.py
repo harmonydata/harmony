@@ -36,16 +36,25 @@ from harmony import create_instrument_from_list, import_instrument_into_harmony_
 class TestCreateInstrument(unittest.TestCase):
 
     def test_single_instrument_simple(self):
-        instrument = create_instrument_from_list(["question A", "question B"])
+        instrument = create_instrument_from_list(["question A", "question B"], [])
         self.assertEqual(2, len(instrument.questions))
 
     def test_single_instrument_simple_2(self):
-        instrument = create_instrument_from_list(["question A", "question B", "question C"], instrument_name="potato")
+        instrument = create_instrument_from_list(["question A", "question B", "question C"], [],
+                                                 instrument_name="potato")
         self.assertEqual(3, len(instrument.questions))
         self.assertEqual("potato", instrument.instrument_name)
 
+    def test_single_instrument_with_answers(self):
+        instrument = create_instrument_from_list(["question A", "question B", "question C"], ["Never", "Rarely", "Less than 2 times a week", "Everyday"],
+                                                 instrument_name="potato")
+        self.assertEqual(3, len(instrument.questions))
+        self.assertEqual(4, len(instrument.questions[0].options))
+        self.assertEqual(4, len(instrument.questions[1].options))
+        self.assertEqual(4, len(instrument.questions[2].options))
+        self.assertEqual("potato", instrument.instrument_name)
     def test_single_instrument_send_to_web(self):
-        instrument = create_instrument_from_list(["question A", "question B"])
+        instrument = create_instrument_from_list(["question A", "question B"], [])
         web_url = import_instrument_into_harmony_web(instrument)
         self.assertIn("harmonydata.ac.uk", web_url)
 

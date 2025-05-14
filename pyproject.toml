@@ -16,16 +16,13 @@ maintainers = [
 authors = [
     { name = "Thomas Wood", email = "thomas@fastdatascience.com" },
 ]
-requires-python = ">=3.6,<=3.13.0"
+requires-python = ">=3.10,<=3.13.3"
 classifiers=[
     # see https://pypi.org/classifiers/
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "Topic :: Software Development :: Build Tools",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.6",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -45,20 +42,23 @@ classifiers=[
 # core dependencies of harmony
 # this set should be kept minimal!
 dependencies = [
-    "pydantic==2.8.2; python_version <= '3.13'",
-    "pandas==2.2.2; python_version <= '3.13'",
-    "tika==2.6.0; python_version <= '3.13'",
-    "lxml==5.3.0; python_version <= '3.13'",
-    "langdetect==1.0.9; python_version <= '3.13'",
-    "XlsxWriter==3.0.9; python_version <= '3.13'",
-    "openpyxl==3.1.2; python_version <= '3.13'",
-    "wget==3.2; python_version <= '3.13'",
-    "sentence-transformers==3.4.1; python_version <= '3.13'",
+    "pydantic>=2.11.3; python_version <= '3.13'",
+    "pandas>=2.2.3; python_version <= '3.13'",
+    "tika>=3.1.0; python_version <= '3.13'",
+    "lxml>=5.4.0; python_version <= '3.13'",
+    "langdetect>=1.0.9; python_version <= '3.13'",
+    "XlsxWriter>=3.2.3; python_version <= '3.13'",
+    "openpyxl>=3.1.5; python_version <= '3.13'",
+    "wget>=3.2; python_version <= '3.13'",
+    "sentence-transformers>=4.1.0; python_version <= '3.13'",
     "numpy==1.26.4; python_version <= '3.13'",
-    "sklearn-crfsuite==0.5.0; python_version <= '3.13'",
-    "scikit-learn; python_version <= '3.13'",
-    "scipy==1.14.1; python_version <= '3.13'",
-    "huggingface-hub==0.29.3; python_version <= '3.13'",
+    "sklearn-crfsuite>=0.5.0; python_version <= '3.13'",
+    "scikit-learn>=1.6.1; python_version <= '3.13'",
+    "scipy>=1.13.1; python_version <= '3.13'",
+    "huggingface-hub>=0.30.2; python_version <= '3.13'",
+    "torch==2.2.2; python_version <= '3.13'",
+    "transformers==4.50.3; python_version <= '3.13'",
+    "fpdf2~=2.8.2; python_version <= '3.13'",
 ]
 
 [project.optional-dependencies]
