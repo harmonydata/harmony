@@ -25,7 +25,7 @@ SOFTWARE.
 
 '''
 
-__version__ = "1.0.6"
+__version__ = "1.0.7"
 
 # TODO: make these configurable at package level
 import os
