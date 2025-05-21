@@ -25,84 +25,103 @@ SOFTWARE.
 
 '''
 
-import os
+import re
 
 import torch
+from harmony.parsing.util.tika_wrapper import parse_pdf_to_list
+from harmony.schemas.requests.text import RawFile, Instrument
+from tqdm import tqdm
 from transformers import AutoModelForTokenClassification, AutoTokenizer
 
 import harmony
-from harmony.parsing.util.tika_wrapper import parse_pdf_to_plain_text
-from harmony.schemas.requests.text import RawFile, Instrument
 
 # Disable tokenizer parallelism
-os.environ["TOKENIZERS_PARALLELISM"] = "false"
+# os.environ["TOKENIZERS_PARALLELISM"] = "false"
+
+print("Starting to load pretrained model... harmonydata/debertaV2_pdfparser")
+model = AutoModelForTokenClassification.from_pretrained("harmonydata/debertaV2_pdfparser")
+
+print("Starting to load pretrained tokeniser... harmonydata/debertaV2_pdfparser")
+tokenizer = AutoTokenizer.from_pretrained("harmonydata/debertaV2_pdfparser")
+print("Loaded pretrained model and tokeniser.")
 
 
-def group_token_spans_by_class(tokens, classes,
-                               tokenizer=AutoTokenizer.from_pretrained("harmonydata/debertaV2_pdfparser")) -> dict:
-    """
-    Given a list of tokens, and a list of predicted classes
-    for each token, create a dictionary to hold each
-    span of tokens.
-    Example:
-        > group_token_spans_by_classes(['▁how', '▁are', '▁you', '?', '▁1'],
-                                        ['question', 'question', 'question', 'question', 'answer'],
-                                        bert_tokenizer)
-        > {"question":["How are you?"], "answer":["1"]}
-        Notice that some tokens begin with ▁ (ASCII 9601) instead of _ (ASCII 95)
-    :param tokens: List of tokens
-    :type tokens: List[str]
-    :param classes: List of predicted classes
-    :type classes: List[str]
-    :param tokenizer: Tokenizer (defaulted to harmonydata/debertaV2_pdfparser)
-    :return: Dictionary of each span relative to its class
-    """
-    grouped_spans = {"answer": [], "question": [], "other": []}
-    span = []
+def predict(text):
+    inputs = tokenizer(
+        text,
+        return_offsets_mapping=True,
+        return_overflowing_tokens=True,
+        truncation=True,
+        padding="max_length",
+        max_length=512,
+        stride=128,
+        add_special_tokens=True,
+        return_tensors="pt",
+    ).to(model.device)
+
+    n = len(inputs["input_ids"])  # type: ignore
+
+    all_questions = []
+    all_answers = []
+
+    done = set()
+
+    tokens_found = []
+
+    with torch.inference_mode():
+        for i in range(n):
+            predictions = torch.argmax(
+                model(
+                    input_ids=inputs["input_ids"][i: i + 1],  # type: ignore
+                    attention_mask=inputs["attention_mask"][i: i + 1],  # type: ignore
+                ).logits,
+                dim=2,
+            )
+
+            for t, (start, end) in zip(
+                    predictions[0], inputs["offset_mapping"][i]  # type: ignore
+            ):
+                if (start, end) in done or (start == 0 and end == 0):
+                    continue
+
+                done.add((start, end))
+
+                predicted_token_class = model.config.id2label[t.item()]
+
+                tokens_found.append((int(start), int(end), predicted_token_class))
+
+    grouped_spans = {"answer": [], "question": []}
+
     prev_cls = None
-
-    for token, cls in zip(tokens, classes):
-        if cls != prev_cls and span:
-            grouped_spans[prev_cls].append(tokenizer.convert_tokens_to_string(span))
+    span = []
+    for start_char, end_char, cls in tokens_found:
+        if cls != prev_cls and len(span) > 0:
+            if prev_cls == "answer" or prev_cls == "question":
+                grouped_spans[prev_cls].append(span)
             span = []
-        span.append(token)
+        span.append(start_char)
+        span.append(end_char)
         prev_cls = cls
+
     # Add final token and class to respective key in dictionary
-    if span:
-        grouped_spans[prev_cls].append(tokenizer.convert_tokens_to_string(span))
+    if len(span) > 0 and (prev_cls == "answer" or prev_cls == "question"):
+        grouped_spans[prev_cls].append(span)
 
-    return grouped_spans
+    all_texts = {"question": [], "answer": []}
+    for item_type in ["question", "answer"]:
+        for span in grouped_spans[item_type]:
+            first_char = min(span)
+            last_char = max(span)
+            token_text = text[first_char:last_char]
+            all_texts[item_type].append((first_char, last_char, token_text))
+
+    return all_texts["question"], all_texts["answer"]
 
 
-def predict(test_text):
-    # Load fine-tuned huggingface model and tokenizer
-    model = AutoModelForTokenClassification.from_pretrained("harmonydata/debertaV2_pdfparser")
-    tokenizer = AutoTokenizer.from_pretrained("harmonydata/debertaV2_pdfparser")
-
-    # Tokenize input text
-    tokenized_texts = tokenizer(test_text, return_tensors="pt")
-
-    # Inference with tokenized input text
-    with torch.no_grad():
-        logits = model(**tokenized_texts).logits
-
-    # Retrieve predicted class for each token
-    predictions = torch.argmax(logits, dim=2)
-    predicted_token_class = [model.config.id2label[t.item()] for t in predictions[0]]
-
-    # Get input IDs (tensor) and convert to list
-    input_ids = tokenized_texts["input_ids"][0].tolist()
-    # Convert input IDs to tokens
-    decoded_tokenized_texts = tokenizer.convert_ids_to_tokens(input_ids)
-
-    # Remove leading [CLS] and trailing [SEP] tokens from decoded
-    # tokens, and the list of predictions
-    predicted_token_class = predicted_token_class[1:-1]
-    decoded_tokenized_texts = decoded_tokenized_texts[1:-1]
-
-    grouped_tokens = group_token_spans_by_class(decoded_tokenized_texts, predicted_token_class, tokenizer)
-
-    return grouped_tokens
+def clean_question_text(question_text):
+    question_text = re.sub(r'\s+', ' ', question_text)
+    question_text = question_text.strip()
+    return question_text
 
 
 def convert_pdf_to_instruments(file: RawFile) -> Instrument:
@@ -112,14 +131,56 @@ def convert_pdf_to_instruments(file: RawFile) -> Instrument:
     # tables: list - this is a list of all the tables in the document. The front end has populated this field.
 
     if not file.text_content:
-        file.text_content = parse_pdf_to_plain_text(file.content)  # call Tika to convert the PDF to plain text
+        pages = parse_pdf_to_list(file.content)  # call Tika to convert the PDF to plain text
+        file.text_content = "\n".join(pages)
+    else:
+        pages = [file.text_content]
+        pages = [file.text_content]
 
     # Run prediction script to return questions and answers from file text content
-    questions_answers_from_text = predict(file.text_content)
 
-    questions_from_text = questions_answers_from_text["question"]
-    answers_from_text = questions_answers_from_text["answer"]
+    question_texts_entire_document = []
+    answer_texts_entire_document = []
 
-    instrument = harmony.create_instrument_from_list(questions_from_text, answers_from_text, instrument_name=file.file_name,
+    chunks_of_text = []
+    batch_size = 10
+    for batch_start in range(0, len(pages), batch_size):
+        batch_end = batch_start + batch_size
+        if batch_end > len(pages):
+            batch_end = len(pages)
+        batch_of_pages = pages[batch_start:batch_end]
+        chunks_of_text.append("\n".join(batch_of_pages))
+
+    for page in tqdm(chunks_of_text):
+        all_questions, all_answers = predict(page)
+
+        question_texts = [q[2] for q in all_questions]
+        answer_texts = [None] * len(question_texts)
+        for idx in range(len(answer_texts)):
+            answer_texts[idx] = []
+
+        for answer_start_char_idx, answer_end_char_idx, answer_text in all_answers:
+            question_idx = 0
+            for question_idx, (question_start_char_idx, question_end_char_idx, _) in enumerate(all_questions):
+                if question_start_char_idx < answer_start_char_idx:
+                    break
+
+            for answer_text_individual_line in answer_text.split("\n"):
+                # Split response options on line breaks
+                answer_text_individual_line = answer_text_individual_line.strip()
+                if len(answer_text_individual_line) > 0 and len(answer_texts[question_idx]) < 10:
+                    answer_texts[question_idx].append(answer_text_individual_line)
+
+        for answer_idx, this_block_of_answers in enumerate(answer_texts):
+            if len(this_block_of_answers) == 0 and answer_idx > 0 and len(answer_texts[answer_idx - 1]) > 0:
+                this_block_of_answers.extend(answer_texts[answer_idx - 1])
+
+        question_texts_entire_document.extend(question_texts)
+        answer_texts_entire_document.extend(answer_texts)
+
+    question_texts_entire_document = [clean_question_text(q) for q in question_texts_entire_document]
+
+    instrument = harmony.create_instrument_from_list(question_texts_entire_document, answer_texts_entire_document,
+                                                     instrument_name=file.file_name,
                                                      file_name=file.file_name)
     return [instrument]

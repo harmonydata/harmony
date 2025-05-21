@@ -39,7 +39,6 @@ if os.environ.get("HARMONY_NO_PARSING") is None or os.environ.get("HARMONY_NO_PA
     from .parsing.text_parser import convert_text_to_instruments
     from .parsing.excel_parser import convert_excel_to_instruments
     from .parsing.pdf_parser import convert_pdf_to_instruments
-    from .parsing.pdf_parser import group_token_spans_by_class
     from .parsing.wrapper_all_parsers import convert_files_to_instruments
     from .parsing import *
     from .util.file_helper import load_instruments_from_local_file
