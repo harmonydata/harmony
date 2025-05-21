@@ -32,7 +32,7 @@ from lxml import html
 from tika import parser
 
 
-def parse_pdf_to_plain_text(contents: str) -> str:
+def parse_pdf_to_list(contents: str) -> list[str]:
     """
     Call the Tika library (Java, called via a server) to process a PDF file into a list of strings.
 
@@ -59,4 +59,4 @@ def parse_pdf_to_plain_text(contents: str) -> str:
     pages = et.getchildren()[1].getchildren()
     print("Parsed response from Tika")
 
-    return "\n".join([str(page.text_content()) for page in pages])
+    return [str(page.text_content()) for page in pages]
