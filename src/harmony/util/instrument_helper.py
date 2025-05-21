@@ -32,7 +32,7 @@ import uuid
 from harmony.schemas.requests.text import Instrument, Question
 
 
-def create_instrument_from_list(question_texts: list[str], answer_texts: list[list], question_numbers: list = None,
+def create_instrument_from_list(question_texts: list[str], answer_texts: list[list] = None, question_numbers: list = None,
                                 instrument_name: str = "My instrument",
                                 file_name="My file") -> Instrument:
     """
@@ -42,11 +42,11 @@ def create_instrument_from_list(question_texts: list[str], answer_texts: list[li
     questions = []
     for ctr, question_text in enumerate(question_texts):
         answer_texts_this_question = []
-        if question_numbers is not None:
+        if question_numbers is not None and len(question_numbers) > 0:
             question_no = question_numbers[ctr]
         else:
             question_no = str(ctr + 1)
-        if answer_texts is not None:
+        if answer_texts is not None and len(answer_texts) > 0:
             answer_texts_this_question = answer_texts[ctr]
         questions.append(
             Question(question_text=question_text, question_no=question_no, options=answer_texts_this_question))
