@@ -17,3 +17,4 @@ scipy==1.14.1
 torch==2.2.2
 transformers==4.50.3
 fpdf2~=2.8.2
+pytest==8.4.1

@@ -3,6 +3,7 @@ import io
 from datetime import datetime
 from typing import List, Optional, Tuple
 import tempfile
+from fpdf import FPDF
 
 try:
     import matplotlib.pyplot as plt
