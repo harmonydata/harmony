@@ -1,20 +1,16 @@
 '''
 MIT License
-
 Copyright (c) 2023 Ulster University (https://www.ulster.ac.uk).
 Project: Harmony (https://harmonydata.ac.uk)
 Maintainer: Thomas Wood (https://fastdatascience.com)
-
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
-
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
-
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -22,18 +18,30 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
 '''
-
 __version__ = "1.0.7"
-
 # TODO: make these configurable at package level
 import os
-
 from .examples import example_instruments
 from .schemas import *
 from .util.instrument_helper import create_instrument_from_list, import_instrument_into_harmony_web
 from .util.model_downloader import download_models
+
+# PDF Export functionality (addresses issue #53)
+try:
+    from .services.export_pdf_report import (
+        generate_pdf_report, 
+        generate_harmony_pdf_report, 
+        generate_basic_harmony_report
+    )
+except ImportError:
+    # Graceful fallback if PDF dependencies are not available
+    def generate_pdf_report(*args, **kwargs):
+        raise ImportError("PDF export requires additional dependencies. Install with: pip install fpdf2 matplotlib seaborn")
+    def generate_harmony_pdf_report(*args, **kwargs):
+        raise ImportError("PDF export requires additional dependencies. Install with: pip install fpdf2 matplotlib seaborn")
+    def generate_basic_harmony_report(*args, **kwargs):
+        raise ImportError("PDF export requires additional dependencies. Install with: pip install fpdf2 matplotlib seaborn")
 
 if os.environ.get("HARMONY_NO_PARSING") is None or os.environ.get("HARMONY_NO_PARSING") == "":
     from .parsing.text_parser import convert_text_to_instruments
@@ -42,13 +50,11 @@ if os.environ.get("HARMONY_NO_PARSING") is None or os.environ.get("HARMONY_NO_PA
     from .parsing.wrapper_all_parsers import convert_files_to_instruments
     from .parsing import *
     from .util.file_helper import load_instruments_from_local_file
-
 if os.environ.get("HARMONY_NO_MATCHING") is None or os.environ.get("HARMONY_NO_MATCHING") == "":
     from .matching.matcher import match_instruments_with_function
     from .matching.generate_crosswalk_table import generate_crosswalk_table
     from .matching.deterministic_clustering import find_clusters_deterministic
     from .matching.cluster import cluster_questions
-
     try:
         from .matching.default_matcher import match_instruments
     except ModuleNotFoundError:
