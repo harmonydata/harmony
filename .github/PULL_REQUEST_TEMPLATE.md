@@ -1,5 +1,7 @@
 ## Description
 
+⚠️ **Please check which files you are pushing! If there is any file where you have just changed whitespace, or changed `"` to `'`, etc, please delete it from your pull request. If you can limit the number of files that you modify in your PR to just what is strictly necessary makes it much simpler to track the edits to the project, and also makes things easier to merge your changes if two people work on the project simultaneously and their changes have to be combined.**
+
 Please include a summary of the change and which issue is fixed. Please also include relevant context. List any dependencies that are required for this change. Ideally we avoid introducing any new third party dependencies in `requirements.txt` and `pyproject.toml` unless absolutely necessary, because this makes the project more susceptible to breaking whenever a third party library is updated.
 
 #### Fixes # (issue)
