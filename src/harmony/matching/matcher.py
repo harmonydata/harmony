@@ -65,6 +65,12 @@ def get_batch_size(default=1000):
     except (ValueError, TypeError):
         return default
 
+def is_empty_or_null_text(text: Optional[str]) -> bool:
+    if text is None:
+        return True
+    if isinstance(text, str) and text.strip() == "":
+        return True
+    return False
 
 def process_items_in_batches(items, llm_function):
     batch_size = get_batch_size()
@@ -112,14 +118,26 @@ def add_text_to_vec(text, texts_cached_vectors, text_vectors, is_negated_, is_qu
 def process_questions(questions: list, texts_cached_vectors: dict, is_negate: bool) -> list[TextVector]:
     text_vectors: List[TextVector] = []
     for question_text in questions:
-        text_vectors = add_text_to_vec(question_text, texts_cached_vectors, text_vectors, False, False)
-        if is_negate:
-            negated_text = negate(question_text, 'en')
-        else:
-            negated_text = question_text
-        text_vectors = add_text_to_vec(negated_text, texts_cached_vectors, text_vectors, True, False)
-    return text_vectors
+        # Skip None or whitespace-only texts
+        if question_text is None or str(question_text).strip() == "":
+            text_vectors.append(
+                TextVector(
+                    text=question_text,
+                    vector=None,
+                    is_negated=False,
+                    is_query=False,
+                )
+            )
+            continue
 
+        # Normal non-empty case
+        text_vectors = add_text_to_vec(question_text, texts_cached_vectors, text_vectors, False, False)
+
+        if is_negate:
+            negated_text = negate(question_text, "en")
+            text_vectors = add_text_to_vec(negated_text, texts_cached_vectors, text_vectors, True, False)
+
+    return text_vectors
 
 def vectorise_texts(text_vectors, vectorisation_function):
     for index, text_dict in enumerate(text_vectors):
@@ -591,20 +609,6 @@ def match_instruments_with_function(
         clustering_algorithm: ClusteringAlgorithm = ClusteringAlgorithm.affinity_propagation,
         num_clusters_for_kmeans: int = None
 ) -> MatchResult:
-    """
-    Match instruments.
-
-    :param instruments: The instruments
-    :param query: The query
-    :param vectorisation_function: A function to vectorize a text
-    :param topics: A list of topics to tag the questions with
-    :param mhc_questions: MHC questions.
-    :param mhc_all_metadatas: MHC metadatas.
-    :param mhc_embeddings: MHC embeddings.
-    :param texts_cached_vectors: A dictionary of already cached vectors from texts (key is the text and value is the vector).
-    :param clustering_algorithm: {"affinity_propagation", "deterministic", "kmeans", "hdbscan"}: The clustering algorithm to use to cluster the questions.
-    :num_clusters_for_kmeans: The number of clusters to use for K-Means Clustering. Defaults to the square root of the number of questions.
-    """
 
     all_questions: List[Question] = []
     for instrument in instruments:
@@ -621,159 +625,150 @@ def match_instruments_with_function(
     # get vectors for all original texts and vectors for negated texts
     vectors_pos, vectors_neg = vectors_pos_neg(text_vectors)
 
-    # Get similarity between the query (only one query?) and the questions
-    if vectors_pos.any() and query:
-        vector_query = np.array(
-            [[x for x in text_vectors if x.is_query is True][0].vector]
-        )
-        query_similarity = cosine_similarity(vectors_pos, vector_query)[:, 0]
+    # --- ✅ Query similarity (only if query is non-empty and vectors exist) ---
+    if vectors_pos.size > 0 and query and query.strip():
+        try:
+            vector_query = np.array(
+                [[x.vector for x in text_vectors if x.is_query][0]]
+            )
+            query_similarity = cosine_similarity(vectors_pos, vector_query)[:, 0]
+        except Exception:
+            query_similarity = np.array([])
     else:
         query_similarity = np.array([])
 
-    # Get similarity with polarity
-    if vectors_pos.any():  # NOTE: Should an error be thrown if vectors_pos is empty?
-        pairwise_similarity = cosine_similarity(vectors_pos, vectors_pos)
-        # NOTE: Similarity of (vectors_neg, vectors_pos) & (vectors_pos, vectors_neg) should be the same
-        pairwise_similarity_neg1 = cosine_similarity(vectors_neg, vectors_pos)
-        pairwise_similarity_neg2 = cosine_similarity(vectors_pos, vectors_neg)
-        pairwise_similarity_neg_mean = np.mean(
-            [pairwise_similarity_neg1, pairwise_similarity_neg2], axis=0
-        )
+    # --- ✅ Pairwise similarity with polarity (only if valid vectors exist) ---
+    if vectors_pos.size > 0:
+        try:
+            pairwise_similarity = cosine_similarity(vectors_pos, vectors_pos)
 
-        # Polarity of 1 means the sentence shouldn't be negated, -1 means it should
-        similarity_difference = pairwise_similarity - pairwise_similarity_neg_mean
-        similarity_polarity = np.sign(similarity_difference)
+            # negated similarities
+            pairwise_similarity_neg1 = cosine_similarity(vectors_neg, vectors_pos)
+            pairwise_similarity_neg2 = cosine_similarity(vectors_pos, vectors_neg)
+            pairwise_similarity_neg_mean = np.mean(
+                [pairwise_similarity_neg1, pairwise_similarity_neg2], axis=0
+            )
 
-        # Make sure that any 0's in polarity are converted to 1's
-        where_0 = np.where(np.abs(similarity_difference) < 0.001)
-        similarity_polarity[where_0] = 1
+            # polarity calculation
+            similarity_difference = pairwise_similarity - pairwise_similarity_neg_mean
+            similarity_polarity = np.sign(similarity_difference)
 
-        similarity_max = np.max(
-            [pairwise_similarity, pairwise_similarity_neg_mean], axis=0
-        )
-        # NOTE: A value of -1 and +1 both mean sentences are similar, 0 means not similar
-        similarity_with_polarity = similarity_max * similarity_polarity
+            # treat very small diffs as 0 → force polarity to +1
+            similarity_polarity[np.abs(similarity_difference) < 1e-3] = 1
+
+            similarity_max = np.max(
+                [pairwise_similarity, pairwise_similarity_neg_mean], axis=0
+            )
+            similarity_with_polarity = similarity_max * similarity_polarity
+        except Exception:
+            similarity_with_polarity = np.array([])
     else:
         similarity_with_polarity = np.array([])
 
-    # Work out similarity with MHC
-    if vectors_pos.any():
-        if len(mhc_embeddings) > 0:
-            similarities_mhc = cosine_similarity(vectors_pos, mhc_embeddings)
+    # --- ✅ Work out similarity with MHC ---
+    if vectors_pos.size > 0 and len(mhc_embeddings) > 0:
+        similarities_mhc = cosine_similarity(vectors_pos, mhc_embeddings)
+        ctrs = {}
+        top_mhc_match_ids = np.argmax(similarities_mhc, axis=1)
+        for idx, mhc_item_idx in enumerate(top_mhc_match_ids):
+            question_text = mhc_questions[mhc_item_idx].question_text
+            if not question_text or len(question_text.strip()) < 3:
+                continue
+            if all_questions[idx].instrument_id not in ctrs:
+                ctrs[all_questions[idx].instrument_id] = Counter()
+            for topic in mhc_all_metadatas[mhc_item_idx]["topics"]:
+                ctrs[all_questions[idx].instrument_id][topic] += 1
+            all_questions[idx].nearest_match_from_mhc_auto = mhc_questions[mhc_item_idx].model_dump()
+            strength_of_match = similarities_mhc[idx, mhc_item_idx]
+            all_questions[idx].topics_strengths = {topic: float(strength_of_match)}
 
-            ctrs = {}
-            top_mhc_match_ids = np.argmax(similarities_mhc, axis=1)
-            for idx, mhc_item_idx in enumerate(top_mhc_match_ids):
-                question_text = mhc_questions[mhc_item_idx].question_text
-                if question_text is None or len(question_text) < 3:  # Ignore empty entries in MHC questionnaires
-                    continue
-                if all_questions[idx].instrument_id not in ctrs:
-                    ctrs[all_questions[idx].instrument_id] = Counter()
-                for topic in mhc_all_metadatas[mhc_item_idx]["topics"]:
-                    ctrs[all_questions[idx].instrument_id][topic] += 1
-                all_questions[idx].nearest_match_from_mhc_auto = mhc_questions[mhc_item_idx].model_dump()
-                strength_of_match = similarities_mhc[idx, mhc_item_idx]
-                all_questions[idx].topics_strengths = {topic: float(strength_of_match)}
+        instrument_to_category = {}
+        for instrument_id, counts in ctrs.items():
+            instrument_to_category[instrument_id] = []
+            max_count = max(counts.values())
+            for topic, topic_count in counts.items():
+                if topic_count > max_count / 2:
+                    instrument_to_category[instrument_id].append(topic)
 
-            instrument_to_category = {}
-            for instrument_id, counts in ctrs.items():
-                instrument_to_category[instrument_id] = []
-                max_count = max(counts.values())
-                for topic, topic_count in counts.items():
-                    if topic_count > max_count / 2:
-                        instrument_to_category[instrument_id].append(topic)
+        for question in all_questions:
+            question.topics_auto = instrument_to_category.get(question.instrument_id, [])
+    else:
+        for question in all_questions:
+            question.topics_auto = []
 
-            for question in all_questions:
-                question.topics_auto = instrument_to_category.get(question.instrument_id, [])
-        else:
-            for question in all_questions:
-                question.topics_auto = []
-
+    # --- ✅ Instrument-to-instrument similarities ---
     instrument_to_instrument_similarities = get_instrument_similarity(instruments, similarity_with_polarity)
 
-    if clustering_algorithm == ClusteringAlgorithm.affinity_propagation:
-        clusters = cluster_questions_affinity_propagation(
-            all_questions,
-            similarity_with_polarity
-        )
-
-    elif clustering_algorithm == ClusteringAlgorithm.deterministic:
-        clusters = find_clusters_deterministic(
-            all_questions,
-            similarity_with_polarity
-        )
-    elif clustering_algorithm == ClusteringAlgorithm.kmeans:
-        if num_clusters_for_kmeans is None:
-            num_clusters_for_kmeans = int(np.floor(np.sqrt(len(all_questions))))
-
-        clusters = cluster_questions_kmeans_from_embeddings(
-            all_questions,
-            vectors_pos,
-            num_clusters_for_kmeans
-        )
-    elif clustering_algorithm == ClusteringAlgorithm.hdbscan:
-        clusters = cluster_questions_hdbscan_from_embeddings(
-            all_questions,
-            vectors_pos
-        )
+    # --- ✅ Clustering ---
+    if similarity_with_polarity.size > 0:
+        if clustering_algorithm == ClusteringAlgorithm.affinity_propagation:
+            clusters = cluster_questions_affinity_propagation(all_questions, similarity_with_polarity)
+        elif clustering_algorithm == ClusteringAlgorithm.deterministic:
+            clusters = find_clusters_deterministic(all_questions, similarity_with_polarity)
+        elif clustering_algorithm == ClusteringAlgorithm.kmeans:
+            if num_clusters_for_kmeans is None:
+                num_clusters_for_kmeans = int(np.floor(np.sqrt(len(all_questions))))
+            clusters = cluster_questions_kmeans_from_embeddings(all_questions, vectors_pos, num_clusters_for_kmeans)
+        elif clustering_algorithm == ClusteringAlgorithm.hdbscan:
+            clusters = cluster_questions_hdbscan_from_embeddings(all_questions, vectors_pos)
+        else:
+            raise Exception("Invalid clustering algorithm")
     else:
-        raise Exception(
-            "Invalid clustering function, must be in {\"affinity_propagation\", \"deterministic\" , \"kmeans\", \"hdbscan\"}")
+        clusters = []  # fallback if no vectors
 
-    # Work out response options similarity
-    options = ["; ".join(q.options) for q in all_questions]
-    options_vectors = vectorisation_function(options)
-    response_options_similarity = cosine_similarity(options_vectors, options_vectors).clip(0, 1)
+    # --- ✅ Response options similarity ---
+    options = ["; ".join(q.options) for q in all_questions if q.options]
+    if options:
+        options_vectors = vectorisation_function(options)
+        response_options_similarity = cosine_similarity(options_vectors, options_vectors).clip(0, 1)
+    else:
+        response_options_similarity = np.array([])
 
-    # Tag the questions with the topics
-    if topics:
-        assigned_topics = {
-            idx: [] for idx in range(len(all_questions))
-        }
+    # --- ✅ Topic tagging (only if topics and valid questions exist) ---
+    if topics and all_questions:
+        assigned_topics = {idx: [] for idx in range(len(all_questions))}
         question_topic_similarity_threshold = 0.7
 
-        # load stopwords
         folder_containing_this_file = pathlib.Path(__file__).parent.resolve()
         stopwords_folder = f"{folder_containing_this_file}/../stopwords/"
-        stopwords_files = os.listdir(stopwords_folder)
-
         lang_to_stopwords = {}
-        for stopwords_file in stopwords_files:
-            with open(stopwords_folder + stopwords_file, "r", encoding="utf-8") as f:
-                lang_to_stopwords[stopwords_file] = set(f.read().splitlines())
 
-        # loop through questions
+        if os.path.exists(stopwords_folder):
+            for stopwords_file in os.listdir(stopwords_folder):
+                with open(os.path.join(stopwords_folder, stopwords_file), "r", encoding="utf-8") as f:
+                    lang_to_stopwords[stopwords_file] = set(f.read().splitlines())
+
         for idx, question in enumerate(all_questions):
-            words = question.question_text.split(" ")
+            if not question.question_text or not question.question_text.strip():
+                continue
 
-            # detect langauge of the question
-            languages = set()
+            words = question.question_text.split()
             try:
                 lang = detect(question.question_text)
-                languages.add(lang)
-            except:
-                pass
+            except Exception:
+                lang = None
 
-            # remove stopwords
-            stopwords = lang_to_stopwords[lang] if lang in lang_to_stopwords else []
+            stopwords = lang_to_stopwords.get(lang, [])
             words = [word for word in words if word not in stopwords]
 
-            question_vector = vectorisation_function(words)
-            topics_vectors = vectorisation_function(topics)
-            sim = cosine_similarity(question_vector, topics_vectors).clip(0, 1)
+            if words:
+                question_vector = vectorisation_function(words)
+                topics_vectors = vectorisation_function(topics)
+                sim = cosine_similarity(question_vector, topics_vectors).clip(0, 1)
 
-            # if any of the words in the question match with the topics, tag it with the respective topic
-            for j in range(sim.shape[1]):
-                if np.any(sim[:, j] >= question_topic_similarity_threshold):
-                    assigned_topics[idx].append(topics[j])
+                for j in range(sim.shape[1]):
+                    if np.any(sim[:, j] >= question_topic_similarity_threshold):
+                        assigned_topics[idx].append(topics[j])
 
-        for idx, topics in assigned_topics.items():
-            all_questions[idx].topics = topics
+        for idx, q_topics in assigned_topics.items():
+            all_questions[idx].topics = q_topics
 
-    return MatchResult(questions=all_questions,
-                       similarity_with_polarity=similarity_with_polarity,
-                       response_options_similarity=response_options_similarity,
-                       query_similarity=query_similarity,
-                       new_vectors_dict=new_vectors_dict,
-                       instrument_to_instrument_similarities=instrument_to_instrument_similarities,
-                       clusters=clusters)
+    return MatchResult(
+        questions=all_questions,
+        similarity_with_polarity=similarity_with_polarity,
+        response_options_similarity=response_options_similarity,
+        query_similarity=query_similarity,
+        new_vectors_dict=new_vectors_dict,
+        instrument_to_instrument_similarities=instrument_to_instrument_similarities,
+        clusters=clusters
+    )
