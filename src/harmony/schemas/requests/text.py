@@ -27,13 +27,13 @@ SOFTWARE.
 
 import uuid
 from typing import List, Optional
-
 from pydantic import ConfigDict, BaseModel, Field
-
 from harmony.schemas.catalogue_instrument import CatalogueInstrument
 from harmony.schemas.catalogue_question import CatalogueQuestion
 from harmony.schemas.enums.file_types import FileType
 from harmony.schemas.enums.languages import Language
+from pydantic import ConfigDict, BaseModel, Field
+from typing import Any, Dict, List, Optional
 
 DEFAULT_FRAMEWORK = "huggingface"
 DEFAULT_MODEL = 'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2'
@@ -46,6 +46,7 @@ class RawFile(BaseModel):
     content: str = Field(description="The raw file contents")
     text_content: Optional[str] = Field(None, description="The plain text content")
     tables: list = Field([], description="The tables in the file")
+    metadata: Optional[Dict[str, Any]] = Field(default=None, description="Optional metadata about the file")
     model_config = ConfigDict(
         json_schema_extra={
             "example": {
