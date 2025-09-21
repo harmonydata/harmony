@@ -64,7 +64,7 @@ dependencies = [
 [project.optional-dependencies]
 
 # dev - the developer dependency set, for contributors to harmony
-dev = ["check-manifest", "pytest"]
+dev = ["check-manifest", "pytest", "matplotlib"]
 
 [project.urls]
 "Documentation" = "https://harmonydata.ac.uk/frequently-asked-questions/"
