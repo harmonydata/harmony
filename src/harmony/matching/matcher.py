@@ -134,8 +134,10 @@ def process_questions(questions: list, texts_cached_vectors: dict, is_negate: bo
         text_vectors = add_text_to_vec(question_text, texts_cached_vectors, text_vectors, False, False)
 
         if is_negate:
-            negated_text = negate(question_text, "en")
-            text_vectors = add_text_to_vec(negated_text, texts_cached_vectors, text_vectors, True, False)
+            negated_text = negate(question_text, 'en')
+        else:
+            negated_text = question_text
+        text_vectors = add_text_to_vec(negated_text, texts_cached_vectors, text_vectors, True, False)
 
     return text_vectors
 
