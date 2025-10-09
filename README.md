@@ -287,6 +287,8 @@ Harmony itself is under [MIT License](https://github.com/harmonydata/harmony/blo
 
 ### Licenses of third party software
 
+All of the components in the below table are open source.
+
 | Third party dependency | License | Use |
 | --- | --- | --- |
 | Python | [BSD-style custom license](https://en.wikipedia.org/wiki/Python_Software_Foundation_License) | Programming language - all of Harmony runs based on Python and so this can't be replaced |
@@ -307,6 +309,8 @@ Harmony itself is under [MIT License](https://github.com/harmonydata/harmony/blo
 
 ### Third party software only used for the API
 
+All of the components in the below table are open source.
+
 | Third party dependency | License | Use |
 | --- | --- | --- |
 | FastAPI | [MIT](https://github.com/fastapi/fastapi/blob/master/LICENSE) | Runs the API |
@@ -316,6 +320,8 @@ Harmony itself is under [MIT License](https://github.com/harmonydata/harmony/blo
 | APScheduler | [MIT](https://github.com/agronholm/apscheduler/blob/master/LICENSE.txt) | Periodically downloads Mental Health Catalogue data and similar - could potentially be removed |
 
 ### Third party software only used for using LLMs from cloud providers
+
+The components in the below table are closed source but are optional dependencies - Harmony can optionally integrate with OpenAI but can be used without OpenAI.
 
 | Third party dependency | License | Use |
 | --- | --- | --- |
