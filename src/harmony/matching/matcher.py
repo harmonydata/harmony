@@ -616,6 +616,10 @@ def match_instruments_with_function(
     for instrument in instruments:
         all_questions.extend(instrument.questions)
 
+    for question in all_questions:
+        if question.question_text is None or question.question_text == "":
+            raise ValueError("Invalid argument: you cannot send an empty question to Harmony. Please remove all null and empty questions.")
+            
     text_vectors, new_vectors_dict = create_full_text_vectors(
         all_questions=[q.question_text for q in all_questions],
         query=query,

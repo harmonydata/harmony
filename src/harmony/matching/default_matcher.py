@@ -82,6 +82,10 @@ def match_instruments(
         clustering_algorithm: str = "affinity_propagation",
         num_clusters_for_kmeans: int = None
 ) -> MatchResult:
+    for instrument in instruments:
+        for question in instrument.questions:
+            if question.question_text is None or question.question_text == "":
+                raise ValueError("Invalid argument: you cannot send an empty question to Harmony. Please remove all null and empty questions.")
     return match_instruments_with_function(
         instruments=instruments,
         query=query,

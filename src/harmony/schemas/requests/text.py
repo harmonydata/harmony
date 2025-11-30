@@ -61,7 +61,7 @@ class RawFile(BaseModel):
 class Question(BaseModel):
     question_no: Optional[str] = Field(None, description="Number of the question")
     question_intro: Optional[str] = Field(None, description="Introductory text applying to the question")
-    question_text: str = Field(description="Text of the question")
+    question_text: str = Field(description="Text of the question", min_length=1)
     options: List[str] = Field([], description="The possible answer options")
     source_page: int = Field(0, description="The page of the PDF on which the question was located, zero-indexed")
     instrument_id: Optional[str] = Field(None, description="Unique identifier for the instrument (UUID-4)")
