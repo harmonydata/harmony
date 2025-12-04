@@ -123,7 +123,7 @@ def convert_excel_to_instruments(file: RawFile) -> List[Instrument]:
             valid_questions = df_questions["question"].dropna()
             valid_questions = [q for q in valid_questions if isinstance(q, str) and q.strip()]
             if valid_questions:
-                language = detect(" ".join(df_questions["question"]))
+                language = detect(" ".join(valid_questions))
         except:
             print("Error identifying language in Excel file")
             traceback.print_exc()
