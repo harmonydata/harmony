@@ -26,6 +26,7 @@ SOFTWARE.
 '''
 
 import re
+from harmony.parsing.capi_parser import is_capi_format, convert_capi_to_instruments
 
 import torch
 from harmony.parsing.util.tika_wrapper import parse_pdf_to_list
@@ -136,6 +137,10 @@ def convert_pdf_to_instruments(file: RawFile) -> Instrument:
     else:
         pages = [file.text_content]
         pages = [file.text_content]
+
+    # Check if this is a CAPI format PDF - use regex-based parser instead of ML model
+    if is_capi_format(file.text_content):
+        return convert_capi_to_instruments(file, file.text_content)
 
     # Run prediction script to return questions and answers from file text content
 
