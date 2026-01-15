@@ -80,7 +80,8 @@ def match_instruments(
         texts_cached_vectors: dict[str, List[float]] = {}, batch_size: int = 1000, max_batches: int = 2000,
         is_negate: bool = True,
         clustering_algorithm: str = "affinity_propagation",
-        num_clusters_for_kmeans: int = None
+        num_clusters_for_kmeans: int = None,
+        mhc_min_similarity: float = 0.0
 ) -> MatchResult:
     for instrument in instruments:
         for question in instrument.questions:
@@ -98,5 +99,6 @@ def match_instruments(
         texts_cached_vectors=texts_cached_vectors,
         is_negate=is_negate,
         clustering_algorithm=clustering_algorithm,
-        num_clusters_for_kmeans=num_clusters_for_kmeans
+        num_clusters_for_kmeans=num_clusters_for_kmeans,
+        mhc_min_similarity=mhc_min_similarity
     )

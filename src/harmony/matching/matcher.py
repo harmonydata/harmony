@@ -609,7 +609,8 @@ def match_instruments_with_function(
         texts_cached_vectors: dict[str, List[float]] = {},
         is_negate: bool = True,
         clustering_algorithm: ClusteringAlgorithm = ClusteringAlgorithm.affinity_propagation,
-        num_clusters_for_kmeans: int = None
+        num_clusters_for_kmeans: int = None,
+        mhc_min_similarity: float = 0.0
 ) -> MatchResult:
 
     all_questions: List[Question] = []
@@ -675,17 +676,31 @@ def match_instruments_with_function(
     if vectors_pos.size > 0 and len(mhc_embeddings) > 0:
         similarities_mhc = cosine_similarity(vectors_pos, mhc_embeddings)
         ctrs = {}
-        top_mhc_match_ids = np.argmax(similarities_mhc, axis=1)
-        for idx, mhc_item_idx in enumerate(top_mhc_match_ids):
-            question_text = mhc_questions[mhc_item_idx].question_text
-            if not question_text or len(question_text.strip()) < 3:
+
+        # Build mask of valid MHC questions (non-empty text)
+        valid_mhc_mask = np.array([
+            bool(mhc_questions[i].question_text and len(mhc_questions[i].question_text.strip()) >= 3)
+            for i in range(len(mhc_questions))
+        ])
+
+        for idx in range(len(all_questions)):
+            # Get similarities for this question, masking out invalid MHC items
+            masked_similarities = np.where(valid_mhc_mask, similarities_mhc[idx], -np.inf)
+            mhc_item_idx = int(np.argmax(masked_similarities))
+            strength_of_match = similarities_mhc[idx, mhc_item_idx]
+
+            # Skip if no valid MHC items or similarity is below threshold
+            if masked_similarities[mhc_item_idx] == -np.inf:
                 continue
+            if strength_of_match < mhc_min_similarity:
+                continue
+
+            question_text = mhc_questions[mhc_item_idx].question_text
             if all_questions[idx].instrument_id not in ctrs:
                 ctrs[all_questions[idx].instrument_id] = Counter()
             for topic in mhc_all_metadatas[mhc_item_idx]["topics"]:
                 ctrs[all_questions[idx].instrument_id][topic] += 1
             all_questions[idx].nearest_match_from_mhc_auto = mhc_questions[mhc_item_idx].model_dump()
-            strength_of_match = similarities_mhc[idx, mhc_item_idx]
             all_questions[idx].topics_strengths = {topic: float(strength_of_match)}
 
         instrument_to_category = {}
