@@ -145,6 +145,75 @@ from harmony import load_instruments_from_local_file
 instruments = load_instruments_from_local_file("gad-7.pdf")
 ```
 
+## 📋 Importing from Google Forms
+
+Harmony can import questionnaires directly from Google Forms URLs, allowing you to harmonise survey instruments that are hosted on Google Forms.
+
+### Setup
+
+To use Google Forms integration, you need a Google API key:
+
+1. Visit the [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select an existing one
+3. Enable the Google Forms API for your project
+4. Create credentials (API key) for the Google Forms API
+5. Set the API key as an environment variable:
+
+```bash
+export GOOGLE_FORMS_API_KEY="your-api-key-here"
+```
+
+### Usage
+
+Import questionnaires from Google Forms using the URL or form ID:
+
+```python
+from harmony import convert_files_to_instruments
+from harmony.schemas.requests.text import RawFile
+from harmony.schemas.enums.file_types import FileType
+
+# Create a RawFile with the Google Forms URL
+file = RawFile(
+    file_name="Customer Satisfaction Survey",
+    file_type=FileType.google_forms,
+    content="https://docs.google.com/forms/d/e/1FAIpQLSc.../viewform"
+)
+
+# Convert to Harmony instruments
+instruments = convert_files_to_instruments([file])
+
+# Access the questions
+for instrument in instruments:
+    print(f"Form: {instrument.instrument_name}")
+    for question in instrument.questions:
+        print(f"{question.question_no}. {question.question_text}")
+        if question.options:
+            print(f"   Options: {', '.join(question.options)}")
+```
+
+You can also use the form ID directly instead of the full URL:
+
+```python
+file = RawFile(
+    file_name="Survey",
+    file_type=FileType.google_forms,
+    content="1FAIpQLSc_form_id_here"
+)
+```
+
+### Supported Question Types
+
+Harmony can extract the following Google Forms question types:
+
+- **Multiple choice** - Radio buttons with multiple options
+- **Checkboxes** - Multiple selection questions
+- **Dropdown** - Select from a list
+- **Linear scale** - Rating scale questions (e.g., 1-5)
+- **Text** - Short answer and paragraph text
+- **Grid questions** - Matrix/grid of choices
+
+Note: The form must be publicly accessible or shared with the appropriate permissions for the API to access it.
+
 ## Matching instruments
 
 Once you have some instruments, you can match them with each other with a call to `match_instruments`.
