@@ -16,7 +16,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Install dev dependencies
-RUN pip install --no-cache-dir pytest tox matplotlib tkinter networkx
+RUN pip install --no-cache-dir pytest tox matplotlib networkx
 
 # Copy source code
 COPY . .
