@@ -30,8 +30,6 @@ jobs:
           python-version: ${{ matrix.python }}
       - name: Install Tox
         run: pip install tox
-      - name: Install Matplotlib
-        run: pip install matplotlib
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
