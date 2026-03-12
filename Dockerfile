@@ -2,7 +2,7 @@ FROM python:3.10-slim
 
 # Install Java (required by Tika for PDF parsing)
 RUN apt-get update && apt-get install -y \
-    default-jdk \
+    default-jdk tk \
     && rm -rf /var/lib/apt/lists/*
 
 # Set Java environment
