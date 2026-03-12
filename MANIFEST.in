@@ -7,6 +7,9 @@ include *.ipynb
 include requirements.txt
 recursive-include src *.pkl
 recursive-include src/harmony/stopwords
+include *.yml
+include Dockerfile
+include .dockerignore
 include src/harmony/stopwords/ar
 include src/harmony/stopwords/az
 include src/harmony/stopwords/be
