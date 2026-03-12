@@ -21,7 +21,7 @@ try:
 except ImportError as e:
     print("Make sure matplotlib, tkinter and networkx are installed.")
     print(e.msg)
-    sys.exit(1)
+    # sys.exit(1)
 
 
 def draw_cosine_similarity_matrix(questions: List[str], ax: Axes, canvas: FigureCanvasTkAgg):
