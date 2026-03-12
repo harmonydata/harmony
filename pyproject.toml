@@ -59,6 +59,7 @@ dependencies = [
     "torch==2.2.2; python_version <= '3.13'",
     "transformers==4.50.3; python_version <= '3.13'",
     "fpdf2~=2.8.2; python_version <= '3.13'",
+    "google-api-python-client>=2.147.0; python_version <= '3.13'",
 ]
 
 [project.optional-dependencies]
