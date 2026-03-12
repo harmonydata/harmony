@@ -1,0 +1,30 @@
+name: Docker Build and Test
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - README.md
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - README.md
+  workflow_dispatch:
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t harmony-test .
+
+      - name: Run tests inside Docker container
+        run: |
+          docker run \
+            -e HARMONY_LITE=no_transformers \
+            -e PYTHONPATH=/app/src \
+            harmony-test

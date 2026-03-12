@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  harmony:
+    build: .
+    volumes:
+      - .:/app
+      - harmony_models:/root/harmony
+    environment:
+      - PYTHONPATH=/app/src
+      - HARMONY_LITE=no_transformers
+    command: python -m pytest tests/ -v
+
+volumes:
+  harmony_models:
