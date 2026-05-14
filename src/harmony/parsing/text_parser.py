@@ -75,6 +75,7 @@ def convert_text_to_instruments(file: RawFile) -> List[Instrument]:
         elif "," in first_line:
             csv_sep = ","
 
+    if file.file_type == FileType.csv and csv_sep is not None:
         string_io = StringIO(page_text)
         df = pd.read_csv(string_io, sep=csv_sep)
         df.fillna("", inplace=True)
