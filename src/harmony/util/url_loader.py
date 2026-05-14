@@ -90,7 +90,7 @@ class URLDownloader:
             parsed = urllib.parse.urlparse(url)
 
             if parsed.scheme not in ALLOWED_SCHEMES:
-                raise BadRequestError(f"URL must use HTTPS")
+                raise BadRequestError("URL must use HTTPS")
 
             if not parsed.netloc or '.' not in parsed.netloc:
                 raise BadRequestError("Invalid domain")

@@ -8,9 +8,7 @@ from sklearn.metrics import silhouette_score
 
 from harmony.matching.default_matcher import convert_texts_to_vector
 from harmony.schemas.requests.text import Question
-from harmony.schemas.responses.text import HarmonyCluster
 
-import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from harmony.matching.deterministic_clustering import find_clusters_deterministic
 

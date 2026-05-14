@@ -32,8 +32,7 @@ from harmony.schemas.catalogue_instrument import CatalogueInstrument
 from harmony.schemas.catalogue_question import CatalogueQuestion
 from harmony.schemas.enums.file_types import FileType
 from harmony.schemas.enums.languages import Language
-from pydantic import ConfigDict, BaseModel, Field
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict
 
 DEFAULT_FRAMEWORK = "huggingface"
 DEFAULT_MODEL = 'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2'
