@@ -433,34 +433,19 @@ def match_questions_with_catalogue_instruments(
             seen_in_instruments=seen_in_instruments,
         )
 
-    # Instrument index to list of cosine similarities top question match
-    for input_question_idx, idx_top_input_question_match_in_catalogue in enumerate(
+    # Instrument index to list of cosine similarities of its matched questions.
+    # Each input question contributes its similarity to every instrument that
+    # contains its top-matched catalogue question.
+    for input_question_idx, idx_top_match in enumerate(
             idxs_of_top_questions_matched_in_catalogue
     ):
-        for (
-                catalogue_instrument_idx,
-                catalogue_question_idxs_in_this_instrument,
-        ) in enumerate(catalogue_instrument_idx_to_catalogue_questions_idx):
-            catalogue_question_idxs_set = set(
-                catalogue_question_idxs_in_this_instrument
-            )
-            if idx_top_input_question_match_in_catalogue in catalogue_question_idxs_set:
-                # Create the list if it doesn't exist yet
-                if not instrument_idx_to_cosine_similarities_top_match.get(
-                        catalogue_instrument_idx
-                ):
-                    instrument_idx_to_cosine_similarities_top_match[
-                        catalogue_instrument_idx
-                    ] = []
-
-                # Add the cosine similarity
-                instrument_idx_to_cosine_similarities_top_match[
-                    catalogue_instrument_idx
-                ].append(
-                    catalogue_similarities[input_question_idx][
-                        idx_top_input_question_match_in_catalogue
-                    ]
-                )
+        similarity = catalogue_similarities[input_question_idx][idx_top_match]
+        for catalogue_instrument_idx in catalogue_question_to_instrument_idxs.get(
+                int(idx_top_match), []
+        ):
+            instrument_idx_to_cosine_similarities_top_match.setdefault(
+                catalogue_instrument_idx, []
+            ).append(similarity)
 
     # Keep track of the instrument id and the count of top question matches that belong to it
     instrument_idx_to_top_matches_ct = {
