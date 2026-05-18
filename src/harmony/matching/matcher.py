@@ -369,26 +369,30 @@ def match_questions_with_catalogue_instruments(
     # This is needed for stats such as precision and recall.
     instrument_idx_to_total_num_question_items_present = {}
 
-    # Find any instruments matching
+    # Reverse index: catalogue_question_idx -> [instrument_idx, ...].
+    # Built once; reused by both lookups below.
+    catalogue_question_to_instrument_idxs = _build_catalogue_question_to_instrument_idxs(
+        catalogue_instrument_idx_to_catalogue_questions_idx
+    )
+
+    # For each input question, list the catalogue instruments that contain its top match.
+    # Preserve the original dedup-by-instrument-name behavior.
     input_question_idx_to_matching_instruments: List[List[dict]] = []
     for input_question_idx in range(len(questions)):
-        input_question_idx_to_matching_instruments.append([])
-    for input_question_idx in range(len(questions)):
-        top_match_catalogue_question_idx = idxs_of_top_questions_matched_in_catalogue[
-            input_question_idx
-        ]
-        for instrument_idx, question_idxs_in_this_instrument in enumerate(
-                catalogue_instrument_idx_to_catalogue_questions_idx
+        top_match_catalogue_question_idx = int(
+            idxs_of_top_questions_matched_in_catalogue[input_question_idx]
+        )
+        matching: List[dict] = []
+        seen_names: set = set()
+        for instrument_idx in catalogue_question_to_instrument_idxs.get(
+                top_match_catalogue_question_idx, []
         ):
-            if top_match_catalogue_question_idx in question_idxs_in_this_instrument:
-                instrument_from_catalogue = all_catalogue_instruments[instrument_idx]
-                if not any(
-                        x["instrument_name"] == instrument_from_catalogue["instrument_name"]
-                        for x in input_question_idx_to_matching_instruments[input_question_idx]
-                ):
-                    input_question_idx_to_matching_instruments[
-                        input_question_idx
-                    ].append(instrument_from_catalogue)
+            instrument_from_catalogue = all_catalogue_instruments[instrument_idx]
+            name = instrument_from_catalogue["instrument_name"]
+            if name not in seen_names:
+                seen_names.add(name)
+                matching.append(instrument_from_catalogue)
+        input_question_idx_to_matching_instruments.append(matching)
 
     # For each catalogue instrument get the total number of question matches in the query
     # For each catalogue instrument get the total number of questions
