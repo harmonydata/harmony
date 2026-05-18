@@ -265,3 +265,51 @@ def test_orphan_top_match_yields_empty_seen_in_and_empty_result():
     assert questions[0].closest_catalogue_question_match.question == "orphan"
     assert questions[0].closest_catalogue_question_match.seen_in_instruments == []
     assert result == []
+
+
+from harmony.matching.matcher import _build_catalogue_question_to_instrument_idxs
+
+
+def test_reverse_index_maps_each_question_to_all_owning_instruments():
+    # Same shape as _catalogue_data above:
+    instrument_idx_to_question_idx = [[0, 1], [2, 3], [1, 2]]
+    index = _build_catalogue_question_to_instrument_idxs(instrument_idx_to_question_idx)
+    assert index == {
+        0: [0],
+        1: [0, 2],
+        2: [1, 2],
+        3: [1],
+    }
+
+
+def test_reverse_index_empty_instrument_list_returns_empty_dict():
+    assert _build_catalogue_question_to_instrument_idxs([]) == {}
+
+
+def test_reverse_index_question_in_no_instrument_absent_from_map():
+    # Question idx 4 belongs to no instrument; not in result.
+    index = _build_catalogue_question_to_instrument_idxs([[0, 1], [2]])
+    assert 4 not in index
+    assert index == {0: [0], 1: [0], 2: [1]}
+
+
+def test_reverse_index_dedupes_duplicate_question_idx_within_one_instrument():
+    """If a question idx is listed twice inside the same instrument's question set,
+    the reverse index lists that instrument exactly once for that question. This
+    matches the old code's membership semantics (`top_match in set(question_idxs)`),
+    which collapses duplicates. Without this dedup, the second nested loop would
+    double-count similarities for the offending instrument.
+    """
+    index = _build_catalogue_question_to_instrument_idxs([[0, 0, 1], [1, 1]])
+    assert index == {0: [0], 1: [0, 1]}
+
+
+def test_reverse_index_lookup_accepts_numpy_int_key():
+    """`np.argmax` returns `np.intp`. Callers pass that directly into `.get(...)`
+    without casting in some code paths; verify Python's int/np.int hashing equivalence
+    keeps the lookup correct.
+    """
+    index = _build_catalogue_question_to_instrument_idxs([[0, 1], [2, 3]])
+    assert index[np.int64(0)] == [0]
+    assert index.get(np.int64(2)) == [1]
+    assert index.get(np.int64(99)) is None

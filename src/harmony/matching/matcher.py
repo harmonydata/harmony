@@ -264,6 +264,34 @@ def match_instruments_with_catalogue_instruments(
     return instruments, closest_catalogue_instrument_matches
 
 
+def _build_catalogue_question_to_instrument_idxs(
+        instrument_idx_to_question_idx: List[List[int]],
+) -> dict[int, list[int]]:
+    """Build a reverse index: catalogue question idx -> [instrument idx, ...].
+
+    Insertion order matches the order in which instruments are visited, preserving
+    the deterministic ordering relied on by callers (e.g. tie-breaking when sorting
+    instruments by score).
+
+    A given (question_idx, instrument_idx) pair is recorded at most once even if
+    `question_idx` appears multiple times in an instrument's question set. This
+    matches the membership semantics of the original code's `in <list/set>` check.
+
+    :param instrument_idx_to_question_idx: For each instrument index, the list of
+        catalogue question indices it contains.
+    :return: Mapping from catalogue question idx to ordered list of instrument idxs.
+    """
+    reverse: dict[int, list[int]] = {}
+    for instrument_idx, question_idxs in enumerate(instrument_idx_to_question_idx):
+        seen_for_this_instrument: set[int] = set()
+        for q_idx in question_idxs:
+            if q_idx in seen_for_this_instrument:
+                continue
+            seen_for_this_instrument.add(q_idx)
+            reverse.setdefault(q_idx, []).append(instrument_idx)
+    return reverse
+
+
 def match_questions_with_catalogue_instruments(
         questions: List[Question],
         catalogue_data: dict,
