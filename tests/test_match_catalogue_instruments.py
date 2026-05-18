@@ -313,3 +313,59 @@ def test_reverse_index_lookup_accepts_numpy_int_key():
     assert index[np.int64(0)] == [0]
     assert index.get(np.int64(2)) == [1]
     assert index.get(np.int64(99)) is None
+
+
+import time
+
+
+def test_large_catalogue_runs_in_under_one_second():
+    """Synthetic catalogue of 10 000 instruments x 20 questions = 200k catalogue questions,
+    100 input questions. With the reverse-index implementation this completes in roughly
+    0.2-0.4s on a developer machine. The 1-second gate sits ~3-5x above expected runtime
+    and is set so that reintroducing either of the original N*M*K loops makes the test
+    clearly red (old code on this workload takes ~10-20s in Python).
+
+    The fixture is sized for that decisive gap: 5000 x 20 was too small to reliably
+    distinguish old vs. new on a fast machine.
+    """
+    rng = np.random.default_rng(0)
+    n_instruments = 10_000
+    qs_per_inst = 20
+    n_cat_questions = n_instruments * qs_per_inst
+    dim = 16
+
+    all_questions = [f"q{i}" for i in range(n_cat_questions)]
+    all_embeddings = rng.standard_normal((n_cat_questions, dim))
+    instrument_idx_to_question_idx = [
+        list(range(i * qs_per_inst, (i + 1) * qs_per_inst)) for i in range(n_instruments)
+    ]
+    all_instruments = [
+        {"instrument_name": f"inst{i}", "metadata": {"source": "ref"}}
+        for i in range(n_instruments)
+    ]
+    catalogue = {
+        "instrument_idx_to_question_idx": instrument_idx_to_question_idx,
+        "all_embeddings_concatenated": all_embeddings,
+        "all_instruments": all_instruments,
+        "all_questions": all_questions,
+    }
+
+    n_input = 100
+    input_vecs = rng.standard_normal((n_input, dim))
+    questions = [Question(question_text=f"in{i}") for i in range(n_input)]
+    vectors = [
+        TextVector(text=f"in{i}", vector=input_vecs[i].tolist(), is_negated=False, is_query=False)
+        for i in range(n_input)
+    ]
+
+    start = time.perf_counter()
+    result = match_questions_with_catalogue_instruments(
+        questions=questions,
+        catalogue_data=catalogue,
+        all_instruments_text_vectors=vectors,
+        questions_are_from_one_instrument=False,
+    )
+    elapsed = time.perf_counter() - start
+
+    assert len(result) > 0
+    assert elapsed < 1.0, f"catalogue matching too slow: {elapsed:.2f}s"
