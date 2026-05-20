@@ -277,6 +277,11 @@ def _build_catalogue_question_to_instrument_idxs(
     `question_idx` appears multiple times in an instrument's question set. This
     matches the membership semantics of the original code's `in <list/set>` check.
 
+    Lookups accept either Python ``int`` or NumPy integer keys interchangeably:
+    ``np.intp`` (returned by ``np.argmax``) is hash-compatible with Python ``int``,
+    so callers can pass an index from a NumPy array directly without converting.
+    This is exercised by ``test_reverse_index_lookup_accepts_numpy_int_key``.
+
     :param instrument_idx_to_question_idx: For each instrument index, the list of
         catalogue question indices it contains.
     :return: Mapping from catalogue question idx to ordered list of instrument idxs.
@@ -379,9 +384,9 @@ def match_questions_with_catalogue_instruments(
     # Preserve the original dedup-by-instrument-name behavior.
     input_question_idx_to_matching_instruments: List[List[dict]] = []
     for input_question_idx in range(len(questions)):
-        top_match_catalogue_question_idx = int(
-            idxs_of_top_questions_matched_in_catalogue[input_question_idx]
-        )
+        top_match_catalogue_question_idx = idxs_of_top_questions_matched_in_catalogue[
+            input_question_idx
+        ]
         matching: List[dict] = []
         seen_names: set = set()
         for instrument_idx in catalogue_question_to_instrument_idxs.get(
@@ -441,7 +446,7 @@ def match_questions_with_catalogue_instruments(
     ):
         similarity = catalogue_similarities[input_question_idx][idx_top_match]
         for catalogue_instrument_idx in catalogue_question_to_instrument_idxs.get(
-                int(idx_top_match), []
+                idx_top_match, []
         ):
             instrument_idx_to_cosine_similarities_top_match.setdefault(
                 catalogue_instrument_idx, []
