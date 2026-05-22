@@ -135,6 +135,23 @@ class TestConvertTxt(unittest.TestCase):
         self.assertEqual("How are you today", questions[0].question_text)
         self.assertEqual("Are you feeling better", questions[1].question_text)
 
+    def test_csv_without_detected_separator_falls_back_to_line_parsing(self):
+        # Regression: pandas >=2.3 dropped support for pd.read_csv(sep=None).
+        # A CSV whose first line contains no tab or comma must parse via the
+        # txt branch (one question per line), not via pd.read_csv(sep=None).
+        no_sep_csv = RawFile.model_validate({
+            "file_id": "no_sep_csv",
+            "file_name": "no_separator.csv",
+            "file_type": "csv",
+            "content": "I feel anxious\nI feel restless"
+        })
+        instruments = convert_text_to_instruments(no_sep_csv)
+        self.assertEqual(1, len(instruments))
+        questions = instruments[0].questions
+        self.assertEqual(2, len(questions))
+        self.assertEqual("I feel anxious", questions[0].question_text)
+        self.assertEqual("I feel restless", questions[1].question_text)
+
 
 if __name__ == '__main__':
     unittest.main()
