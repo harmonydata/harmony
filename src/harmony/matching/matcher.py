@@ -388,7 +388,7 @@ def match_questions_with_catalogue_instruments(
             input_question_idx
         ]
         matching: List[dict] = []
-        seen_names: set = set()
+        seen_names: set[str] = set()
         for instrument_idx in catalogue_question_to_instrument_idxs.get(
                 top_match_catalogue_question_idx, []
         ):

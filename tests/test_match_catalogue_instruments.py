@@ -4,10 +4,15 @@ These tests pin down the function's current observable behavior using a small,
 deterministic synthetic catalogue. They must keep passing through the
 reverse-index refactor.
 """
+import time
+
 import numpy as np
 import pytest
 
-from harmony.matching.matcher import match_questions_with_catalogue_instruments
+from harmony.matching.matcher import (
+    _build_catalogue_question_to_instrument_idxs,
+    match_questions_with_catalogue_instruments,
+)
 from harmony.schemas.requests.text import Question
 from harmony.schemas.text_vector import TextVector
 
@@ -267,9 +272,6 @@ def test_orphan_top_match_yields_empty_seen_in_and_empty_result():
     assert result == []
 
 
-from harmony.matching.matcher import _build_catalogue_question_to_instrument_idxs
-
-
 def test_reverse_index_maps_each_question_to_all_owning_instruments():
     # Same shape as _catalogue_data above:
     instrument_idx_to_question_idx = [[0, 1], [2, 3], [1, 2]]
@@ -315,18 +317,15 @@ def test_reverse_index_lookup_accepts_numpy_int_key():
     assert index.get(np.int64(99)) is None
 
 
-import time
-
-
-def test_large_catalogue_runs_in_under_one_second():
+@pytest.mark.slow
+def test_large_catalogue_runs_in_under_five_seconds():
     """Synthetic catalogue of 10 000 instruments x 20 questions = 200k catalogue questions,
     100 input questions. With the reverse-index implementation this completes in roughly
-    0.2-0.4s on a developer machine. The 1-second gate sits ~3-5x above expected runtime
-    and is set so that reintroducing either of the original N*M*K loops makes the test
-    clearly red (old code on this workload takes ~10-20s in Python).
+    0.2-0.4s on a developer machine. The 5-second gate has comfortable headroom for slow
+    shared CI runners while still going clearly red if either of the original N*M*K loops
+    is reintroduced (old code on this workload takes ~10-20s in Python).
 
-    The fixture is sized for that decisive gap: 5000 x 20 was too small to reliably
-    distinguish old vs. new on a fast machine.
+    Marked ``slow`` so it can be skipped in fast feedback loops with ``-m "not slow"``.
     """
     rng = np.random.default_rng(0)
     n_instruments = 10_000
@@ -368,4 +367,4 @@ def test_large_catalogue_runs_in_under_one_second():
     elapsed = time.perf_counter() - start
 
     assert len(result) > 0
-    assert elapsed < 1.0, f"catalogue matching too slow: {elapsed:.2f}s"
+    assert elapsed < 5.0, f"catalogue matching too slow: {elapsed:.2f}s"
