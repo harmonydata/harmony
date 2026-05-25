@@ -33,7 +33,7 @@ except ImportError:
     
 # Try to import lxml for better performance, fall back to html.parser
 try:
-    import lxml
+    import lxml  # noqa: F401  # availability probe
     DEFAULT_PARSER = 'lxml'
 except ImportError:
     DEFAULT_PARSER = 'html.parser'

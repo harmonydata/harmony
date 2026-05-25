@@ -1,17 +1,11 @@
-import sys
 from typing import List
 
-import pandas as pd
 from sklearn.cluster import KMeans
-from sklearn.decomposition import PCA
-from sklearn.metrics import silhouette_score
 
 from harmony.matching.generate_cluster_topics import generate_cluster_topics
 from harmony.schemas.requests.text import Question
 from harmony.schemas.responses.text import HarmonyCluster
 
-import numpy as np
-from sklearn.metrics.pairwise import cosine_similarity
 
 
 def perform_kmeans(embeddings_in, num_clusters=5):

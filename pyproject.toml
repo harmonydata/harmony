@@ -65,7 +65,27 @@ dependencies = [
 [project.optional-dependencies]
 
 # dev - the developer dependency set, for contributors to harmony
-dev = ["check-manifest", "pytest", "matplotlib"]
+dev = ["check-manifest", "pytest", "matplotlib", "ruff"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+extend-exclude = ["update.ipynb", "Harmony_example_walkthrough.ipynb"]
+
+[tool.ruff.lint]
+# Pragmatic baseline for a legacy research codebase:
+# enable pyflakes (real bugs), ignore stylistic noise that would require
+# touching many files for no functional gain.
+select = ["F", "E9"]
+ignore = [
+    "F403",   # `from module import *` — used intentionally in __init__.py
+    "F405",   # `*`-import undefined names — paired with F403
+    "F841",   # unused local — common in legacy code, low value to fix now
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]  # re-exports
+"tests/*" = ["F401"]
 
 [project.urls]
 "Documentation" = "https://harmonydata.ac.uk/frequently-asked-questions/"

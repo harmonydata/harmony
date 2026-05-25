@@ -1,4 +1,3 @@
-from wmd import WMD
 import numpy as np
 import math
 import libwmdrelax
