@@ -25,6 +25,5 @@ jobs:
       - name: Run tests inside Docker container
         run: |
           docker run \
-            -e HARMONY_LITE=no_transformers \
             -e PYTHONPATH=/app/src \
             harmony-test

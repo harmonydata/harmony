@@ -12,9 +12,7 @@ on:
     paths-ignore:
       - README.md
   workflow_dispatch:
-env:
-  HARMONY_LITE: no_transformers
-          
+
 jobs:
   build:
     runs-on: ubuntu-latest
