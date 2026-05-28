@@ -22,6 +22,7 @@ SOFTWARE.
 __version__ = "1.0.7"
 # TODO: make these configurable at package level
 import os
+import warnings
 from .examples import example_instruments
 from .schemas import *
 from .util.instrument_helper import create_instrument_from_list, import_instrument_into_harmony_web
@@ -58,4 +59,9 @@ if os.environ.get("HARMONY_NO_MATCHING") is None or os.environ.get("HARMONY_NO_M
     try:
         from .matching.default_matcher import match_instruments
     except ModuleNotFoundError:
-        print("Warning: transformers not available. To use transformers, run pip install sentence-transformers")
+        warnings.warn(
+            "transformers not available. To use transformers, run "
+            "pip install sentence-transformers",
+            ImportWarning,
+            stacklevel=2,
+        )
