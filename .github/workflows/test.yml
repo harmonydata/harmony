@@ -28,6 +28,10 @@ jobs:
           python-version: ${{ matrix.python }}
           cache: 'pip'
           cache-dependency-path: pyproject.toml
+      - name: Lint with ruff
+        run: |
+          pip install ruff
+          ruff check src tests
       - name: Install Tox
         run: pip install tox
       - name: Setup Java
