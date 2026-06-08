@@ -12,9 +12,7 @@ on:
     paths-ignore:
       - README.md
   workflow_dispatch:
-env:
-  HARMONY_LITE: no_transformers
-          
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -23,11 +21,17 @@ jobs:
         python: [3.10.11]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
+          cache: 'pip'
+          cache-dependency-path: pyproject.toml
+      - name: Lint with ruff
+        run: |
+          pip install ruff
+          ruff check src tests
       - name: Install Tox
         run: pip install tox
       - name: Setup Java
