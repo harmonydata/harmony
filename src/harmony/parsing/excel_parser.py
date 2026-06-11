@@ -38,6 +38,9 @@ from harmony.schemas.requests.text import Question
 from harmony.schemas.requests.text import RawFile, Instrument
 
 re_header_column = re.compile(r'(?i)(?:question|text|pergunta)')
+QUESTION_COLUMN_HINTS = re.compile(
+    r'(?i)(question|text|pergunta|item|description|scale|statement|content)'
+)
 
 
 def clean_option_no(option_could_be_int):
@@ -59,39 +62,57 @@ def convert_excel_to_instruments(file: RawFile) -> List[Instrument]:
     instruments = []
     for sheet_idx, (sheet_name, df_questions) in enumerate(sheet_name_to_dataframe.items()):
 
-        # check we have 3 columns. If more or less, adjust it by deleting or inserting.
-        if len(df_questions.columns) > 3:
-            if str(df_questions[df_questions.columns[3]].iloc[0]).lower() == "filename":
-                if len(df_questions.columns) > 4 and str(
-                        df_questions[df_questions.columns[4]].iloc[0]).lower() == "language":
-                    df_questions.drop(columns=df_questions.columns[5:], inplace=True)
-                else:
-                    df_questions.drop(columns=df_questions.columns[4:], inplace=True)
-            else:
-                df_questions.drop(columns=df_questions.columns[3:], inplace=True)
-        elif len(df_questions.columns) < 3:
-            col_avg_lengths = [0] * len(df_questions.columns)
-            for col_idx, col_name in enumerate(df_questions.columns):
-                col_avg_lengths[col_idx] = df_questions[col_name].apply(lambda s: len(str(s))).mean()
-            biggest_col = int(np.argmax(col_avg_lengths))
-            if biggest_col == 0:
-                df_questions.insert(0, "question_no", [str(n) for n in range(len(df_questions))])
-            if len(df_questions.columns) < 3:
-                df_questions.insert(2, "options", [""] * len(df_questions))
+        # Strip blank rows before assignment
+        df_questions.dropna(how='all', inplace=True)
+        df_questions.reset_index(drop=True, inplace=True)
+
+        if len(df_questions) == 0:
+            continue
+
+        # Find the question column semantically
+        question_col = None
+        for col in df_questions.columns:
+            if QUESTION_COLUMN_HINTS.search(str(col)):
+                question_col = col
+                break
+        
+        if question_col is None and len(df_questions) > 0:
+            for col in df_questions.columns:
+                val = str(df_questions[col].iloc[0])
+                if QUESTION_COLUMN_HINTS.search(val):
+                    question_col = col
+                    break
+        
+        if question_col is None:
+            # Fall back: longest average string length column
+            avg_lens = df_questions.apply(lambda c: c.astype(str).str.len().mean())
+            question_col = avg_lens.idxmax()
+
+        question_col_idx = df_questions.columns.get_loc(question_col)
+
+        # Ensure we have question_no, question, options
+        if question_col_idx > 0:
+            question_no_col = df_questions.columns[0]
+        else:
+            df_questions.insert(0, "generated_question_no", [str(n) for n in range(len(df_questions))])
+            question_no_col = "generated_question_no"
+            question_col_idx += 1
+
+        if question_col_idx < len(df_questions.columns) - 1:
+            options_col = df_questions.columns[question_col_idx + 1]
+        else:
+            df_questions["generated_options"] = ""
+            options_col = "generated_options"
 
         # standardise the column names
-        if len(df_questions.columns) == 3:
-            df_questions.columns = ["question_no", "question", "options"]
-        elif len(df_questions.columns) == 4:
-            df_questions.columns = ["question_no", "question", "options", "filename"]
-        else:
-            df_questions.columns = ["question_no", "question", "options", "filename", "language"]
+        df_questions = df_questions[[question_no_col, question_col, options_col]].copy()
+        df_questions.columns = ["question_no", "question", "options"]
 
         # Check if header row present, in which case remove it
         rows_to_delete = []
         for i in range(len(df_questions)):
-            if df_questions.question.iloc[i] is None or type(df_questions.question.iloc[i]) is not str or \
-                    re_header_column.match(df_questions.question.iloc[i]):
+            val = df_questions.question.iloc[i]
+            if val is None or type(val) is not str or QUESTION_COLUMN_HINTS.search(val):
                 rows_to_delete.append(i)
                 break
 
