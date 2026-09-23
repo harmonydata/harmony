@@ -70,7 +70,10 @@ def generate_cluster_topics(
         A list of the top k keywords representing each cluster.
     """
     # tokenise and count tokens
-    re_tokenise = re.compile(r'(?i)([a-z][a-z]+)')
+    # \w under (?u) covers Hebrew, Kannada, Cyrillic, Greek, Arabic and
+    # Devanagari as well as Latin. An [a-z]-only pattern silently yields no
+    # tokens for those scripts, which left the vocabulary empty below.
+    re_tokenise = re.compile(r'(?u)(\w\w+)')
     token_counter = Counter()
     for cluster in clusters:
         tokens_in_cluster = set()
@@ -89,7 +92,7 @@ def generate_cluster_topics(
         idf[word] = np.log(num_clusters/count)
 
     # fit a multinomial naive bayes classifier
-    vectoriser = CountVectorizer(lowercase=True, token_pattern=r'(?u)\b[a-zA-Z][a-zA-Z]+\b')
+    vectoriser = CountVectorizer(lowercase=True, token_pattern=r'(?u)\b\w\w+\b')
     transformer = TfidfTransformer()
     nb = MultinomialNB()
     model = make_pipeline(vectoriser, transformer, nb)
@@ -101,7 +104,15 @@ def generate_cluster_topics(
             X.append(item.question_text)
             y.append(cluster_id)
 
-    model.fit(X, y)
+    try:
+        model.fit(X, y)
+    except ValueError:
+        # Topic generation is best-effort. CountVectorizer raises
+        # "empty vocabulary" when nothing tokenises — scripts without
+        # whitespace word boundaries (Chinese, Japanese, Thai), or items
+        # that are entirely digits or punctuation. Returning no topics is
+        # correct here; failing the whole match is not.
+        return [[] for _ in clusters]
 
     # detect langauge of the questions
     languages = set()
