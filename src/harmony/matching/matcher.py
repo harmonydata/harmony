@@ -28,6 +28,7 @@ import heapq
 import os
 import pathlib
 import statistics
+import warnings
 from collections import Counter, OrderedDict
 from typing import List, Callable, Optional, Union
 
@@ -55,6 +56,14 @@ from harmony.schemas.enums.clustering_algorithms import ClusteringAlgorithm
 from langdetect import detect, DetectorFactory
 
 DetectorFactory.seed = 0
+
+
+_CATALOGUE_DEPRECATION_MESSAGE = (
+    "The catalogue-matching code path is deprecated and will be removed in a "
+    "future release. The hosted catalogue search is now backed by a Weaviate "
+    "index (see https://harmonydata.ac.uk/search). This function is retained "
+    "only for backwards compatibility with existing callers."
+)
 
 
 # This has been tested on 16 GB RAM production server, 1000 seems a safe number (TW, 15 Dec 2024)
@@ -216,6 +225,11 @@ def match_instruments_with_catalogue_instruments(
     """
     Match instruments with catalogue instruments.
 
+    .. deprecated::
+        The catalogue path was replaced by a Weaviate index
+        (https://harmonydata.ac.uk/search) because it did not scale. This
+        function will be removed in a future release.
+
     :param instruments: The instruments.
     :param catalogue_data: The catalogue data.
     :param vectorisation_function: A function to vectorize a text.
@@ -223,6 +237,8 @@ def match_instruments_with_catalogue_instruments(
     :return: Index 0 in the tuple contains the list of instruments that now each contain the best instrument matches from the catalog.
         Index 1 in the tuple contains a list of closest instrument matches from the catalog for all the instruments.
     """
+
+    warnings.warn(_CATALOGUE_DEPRECATION_MESSAGE, DeprecationWarning, stacklevel=2)
 
     # Gather all questions
     all_questions: List[str] = []
@@ -275,6 +291,11 @@ def match_questions_with_catalogue_instruments(
     Each question from the list will receive the closest instrument match for it.
     The closest instrument match for all questions is returned as a result of this function.
 
+    .. deprecated::
+        The catalogue path was replaced by a Weaviate index
+        (https://harmonydata.ac.uk/search) because it did not scale. This
+        function will be removed in a future release.
+
     :param questions: The questions.
     :param catalogue_data: The catalogue data.
     :param all_instruments_text_vectors: A list of text vectors of all questions found in all the instruments uploaded.
@@ -282,6 +303,8 @@ def match_questions_with_catalogue_instruments(
 
     :return: A list of closest instrument matches for the questions provided.
     """
+
+    warnings.warn(_CATALOGUE_DEPRECATION_MESSAGE, DeprecationWarning, stacklevel=2)
 
     # Catalogue data
     catalogue_instrument_idx_to_catalogue_questions_idx: List[List[int]] = catalogue_data[
@@ -516,6 +539,11 @@ def match_query_with_catalogue_instruments(
     """
     Match query with catalogue instruments.
 
+    .. deprecated::
+        The catalogue path was replaced by a Weaviate index
+        (https://harmonydata.ac.uk/search) because it did not scale. This
+        function will be removed in a future release.
+
     :param query: The query.
     :param catalogue_data: The catalogue data.
     :param vectorisation_function: A function to vectorize a text.
@@ -524,6 +552,8 @@ def match_query_with_catalogue_instruments(
     :return: A dict containing the list of instruments (up to 100) and the new text vectors.
         E.g. {"instruments": [...], "new_text_vectors": {...}}.
     """
+
+    warnings.warn(_CATALOGUE_DEPRECATION_MESSAGE, DeprecationWarning, stacklevel=2)
 
     response = {"instruments": [], "new_text_vectors": {}}
 
