@@ -28,6 +28,7 @@ from harmony.parsing.html_parser import convert_html_to_instruments
 from harmony.parsing.google_forms_parser import convert_google_forms_to_instruments
 from harmony.schemas.enums.file_types import FileType
 from harmony.schemas.requests.text import RawFile, Instrument, Question
+import os
 
 
 def _get_instruments_from_file(file):
@@ -42,7 +43,7 @@ def _get_instruments_from_file(file):
     """
 
 
-    if file.file_type == FileType.pdf or file.file_type == FileType.docx:
+    if file.file_type == FileType.pdf or file.file_type == FileType.docx and os.environ.get("OPENAI_API_KEY") is not None:
         from typing import List, Optional
         from openai import OpenAI
         from pydantic import BaseModel, Field
