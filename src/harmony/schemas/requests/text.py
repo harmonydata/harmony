@@ -28,8 +28,6 @@ SOFTWARE.
 import uuid
 from typing import Any, Dict, List, Optional
 from pydantic import ConfigDict, BaseModel, Field
-from harmony.schemas.catalogue_instrument import CatalogueInstrument
-from harmony.schemas.catalogue_question import CatalogueQuestion
 from harmony.schemas.enums.file_types import FileType
 from harmony.schemas.enums.languages import Language
 
@@ -69,12 +67,6 @@ class Question(BaseModel):
     topics_strengths: Optional[dict] = Field(None,
                                              description="Automated list of topics identified by model with strength of topic")
     nearest_match_from_mhc_auto: Optional[dict] = Field(None, description="Automatically identified nearest MHC match")
-    closest_catalogue_question_match: Optional[CatalogueQuestion] = Field(
-        None, description="The closest question match in the catalogue for the question"
-    )
-    seen_in_catalogue_instruments: list[CatalogueInstrument] = Field(
-        default=None, description="The instruments from the catalogue were the question was seen in"
-    )
     model_config = ConfigDict(
         json_schema_extra={
             "example": {
@@ -101,11 +93,6 @@ class Instrument(BaseModel):
     language: Language = Field(Language.English,
                                description="The ISO 639-2 (alpha-2) encoding of the instrument language")
     questions: List[Question] = Field(description="The items inside the instrument")
-    closest_catalogue_instrument_matches: List[CatalogueInstrument] = Field(
-        None,
-        description="The closest instrument matches in the catalogue for the instrument, the first index "
-                    "contains the best match etc"
-    )
     model_config = ConfigDict(
         json_schema_extra={
             "example": {

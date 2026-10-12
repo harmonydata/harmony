@@ -29,7 +29,6 @@ from typing import List, Any
 
 from pydantic import BaseModel, Field, RootModel
 
-from harmony.schemas.catalogue_instrument import CatalogueInstrument
 from harmony.schemas.requests.text import Instrument
 from harmony.schemas.requests.text import Question
 
@@ -89,11 +88,6 @@ class MatchResponse(BaseModel):
     matches: List[List] = Field(description="Matrix of cosine similarity matches for the questions")
     query_similarity: List = Field(
         None, description="Similarity metric between query string and items"
-    )
-    closest_catalogue_instrument_matches: List[CatalogueInstrument] = Field(
-        default=[],
-        description="The closest catalogue instrument matches in the catalogue for all the instruments, "
-                    "the first index contains the best match etc."
     )
     instrument_to_instrument_similarities: List[InstrumentToInstrumentSimilarity] = Field(
         None, description="A list of similarity values (precision, recall, F1) between instruments"
