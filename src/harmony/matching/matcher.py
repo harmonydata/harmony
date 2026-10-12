@@ -115,7 +115,22 @@ def add_text_to_vec(text, texts_cached_vectors, text_vectors, is_negated_, is_qu
     return text_vectors
 
 
-def process_questions(questions: list, texts_cached_vectors: dict, is_negate: bool) -> list[TextVector]:
+def get_question_languages(instruments: List[Instrument]) -> dict:
+    """
+    Map each question text to the language of the instrument it came from, so that negation uses the right rules.
+    """
+    question_languages = {}
+    for instrument in instruments:
+        language = getattr(instrument.language, "value", instrument.language) or "en"
+        for question in instrument.questions:
+            question_languages[question.question_text] = language
+    return question_languages
+
+
+def process_questions(questions: list, texts_cached_vectors: dict, is_negate: bool,
+                      question_languages: Optional[dict] = None) -> list[TextVector]:
+    if question_languages is None:
+        question_languages = {}
     text_vectors: List[TextVector] = []
     for question_text in questions:
         # Skip None or whitespace-only texts
@@ -134,7 +149,7 @@ def process_questions(questions: list, texts_cached_vectors: dict, is_negate: bo
         text_vectors = add_text_to_vec(question_text, texts_cached_vectors, text_vectors, False, False)
 
         if is_negate:
-            negated_text = negate(question_text, 'en')
+            negated_text = negate(question_text, question_languages.get(question_text, "en"))
         else:
             negated_text = question_text
         text_vectors = add_text_to_vec(negated_text, texts_cached_vectors, text_vectors, True, False)
@@ -173,14 +188,16 @@ def create_full_text_vectors(
         query: Optional[str],
         vectorisation_function: Callable,
         texts_cached_vectors: dict[str, list[float]],
-        is_negate: bool
+        is_negate: bool,
+        question_languages: Optional[dict] = None
 ) -> tuple[List[TextVector], dict]:
     """
     Create full text vectors.
     """
 
     # Create a list of text vectors
-    text_vectors = process_questions(all_questions, texts_cached_vectors, is_negate=is_negate)
+    text_vectors = process_questions(all_questions, texts_cached_vectors, is_negate=is_negate,
+                                     question_languages=question_languages)
 
     # Add query
     if query:
@@ -236,7 +253,8 @@ def match_instruments_with_catalogue_instruments(
         query=None,
         vectorisation_function=vectorisation_function,
         texts_cached_vectors=texts_cached_vectors,
-        is_negate=is_negate
+        is_negate=is_negate,
+        question_languages=get_question_languages(instruments)
     )
 
     # For each instrument, find the best instrument matches for it in the catalogue
@@ -626,7 +644,8 @@ def match_instruments_with_function(
         query=query,
         vectorisation_function=vectorisation_function,
         texts_cached_vectors=texts_cached_vectors,
-        is_negate=is_negate
+        is_negate=is_negate,
+        question_languages=get_question_languages(instruments)
     )
 
     # get vectors for all original texts and vectors for negated texts
