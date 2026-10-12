@@ -33,6 +33,7 @@ from harmony.parsing.util.tika_wrapper import parse_pdf_to_list
 from harmony.schemas.requests.text import RawFile, Instrument
 from tqdm import tqdm
 from transformers import AutoModelForTokenClassification, AutoTokenizer
+from typing import List
 
 import harmony
 
@@ -125,7 +126,7 @@ def clean_question_text(question_text):
     return question_text
 
 
-def convert_pdf_to_instruments(file: RawFile) -> Instrument:
+def convert_pdf_to_instruments(file: RawFile) -> List[Instrument]:
     # file is an object containing these properties:
     # content: str - The raw file contents so if it's a PDF this is a byte sequence in base 64 encoding
     # text_content: str - this is empty but we will use Tika to populate this in this method
