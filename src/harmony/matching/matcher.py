@@ -24,12 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import heapq
 import os
 import pathlib
-import statistics
-from collections import Counter, OrderedDict
-from typing import List, Callable, Optional, Union
+from collections import Counter
+from typing import List, Callable, Optional
 
 import numpy as np
 from numpy import dot, matmul, ndarray, matrix
