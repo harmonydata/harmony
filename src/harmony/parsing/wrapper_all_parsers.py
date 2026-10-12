@@ -27,7 +27,7 @@ from harmony.parsing.text_parser import convert_text_to_instruments
 from harmony.parsing.html_parser import convert_html_to_instruments
 from harmony.parsing.google_forms_parser import convert_google_forms_to_instruments
 from harmony.schemas.enums.file_types import FileType
-from harmony.schemas.requests.text import RawFile, Instrument
+from harmony.schemas.requests.text import RawFile, Instrument, Question
 
 
 def _get_instruments_from_file(file):
@@ -40,6 +40,54 @@ def _get_instruments_from_file(file):
     Returns:
         List[Instrument]: Parsed instruments from the file
     """
+
+
+    if file.file_type == FileType.pdf or file.file_type == FileType.docx:
+        from typing import List, Optional
+        from openai import OpenAI
+        from pydantic import BaseModel, Field
+
+        class ExtractedQuestion(BaseModel):
+            question_no: Optional[str] = Field(None, description="Number of the question")
+            question_intro: Optional[str] = Field(None, description="Introductory text applying to the question")
+            question_text: str = Field(description="Text of the question", min_length=1)
+            response_options: List[str] = Field([], description="The possible answer options")
+
+        class QuestionList(BaseModel):
+            questions: List[ExtractedQuestion]
+
+        client = OpenAI()
+
+        response = client.responses.parse(
+            model="gpt-4o",
+            input=[
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": "Extract all questions, including any introductions and response options, from this PDF.",
+                        },
+                        {
+                            "type": "input_image",
+                            "image_url": file.text_content,
+                        },
+                    ],
+                }
+            ],
+            text={"format": QuestionList},
+        )
+
+        instruments_from_this_file = []
+
+        instrument = Instrument()
+        for question in response.output_parsed:
+            instrument.questions.append(Question(question_no = question.question_no, question_intro = question.qustion_intro, text= question.question_text, options=question.response_options))
+
+        instruments_from_this_file.append(instrument)
+
+        return instruments_from_this_file
+
     if file.file_type == FileType.pdf or file.file_type == FileType.docx:
         instruments_from_this_file = convert_pdf_to_instruments(file)
     elif file.file_type == FileType.txt or file.file_type == FileType.csv:
