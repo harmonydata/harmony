@@ -32,4 +32,7 @@ class FileType(str, Enum):
     docx: str = 'docx'
     html: str = 'html'
     htm: str = 'htm'
+    png: str = 'png'
+    jpg: str = 'jpg'
+    jpeg: str = 'jpeg'
     google_forms: str = 'google_forms'

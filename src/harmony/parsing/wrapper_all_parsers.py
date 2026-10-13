@@ -60,7 +60,7 @@ def _get_instruments_from_file(file):
 
     client = OpenAI()
 
-    if file.file_type == FileType.image and len(file.content) < 500000 and os.environ.get("OPENAI_API_KEY") is not None:
+    if file.file_type in (FileType.png, FileType.jpg, FileType.jpeg) and len(file.content) < 500000 and os.environ.get("OPENAI_API_KEY") is not None:
         response = client.responses.parse(
             model="gpt-5.4-mini",
             input=[
