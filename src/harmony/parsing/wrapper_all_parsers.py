@@ -69,10 +69,10 @@ def _get_instruments_from_file(file):
                     "content": [
                         {
                             "type": "input_text",
-                            "text": "Extract all questions, including any introductions and response options, from this PDF.",
+                            "text": "Extract all questions, including any introductions and response options, from this image.",
                         },
                         {
-                            "type": "input_file",
+                            "type": "input_image",
                             "image_url": file.content,
                         },
                     ],
@@ -80,12 +80,15 @@ def _get_instruments_from_file(file):
             ],
             text_format=QuestionList
         )
+
+
         instruments_from_this_file = []
 
-        instrument = Instrument()
-        for question in response.output_parsed:
-            instrument.questions.append(Question(question_no=question.question_no, question_intro=question.qustion_intro,
-                                                 text=question.question_text, options=question.response_options))
+        instrument = Instrument(questions=[])
+        for question in response.output_parsed.questions:
+            instrument.questions.append(
+                Question(question_no=question.question_no, question_intro=question.question_intro,
+                         question_text=question.question_text, options=question.response_options))
 
         instruments_from_this_file.append(instrument)
 
