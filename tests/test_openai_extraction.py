@@ -121,10 +121,10 @@ class TestOpenAIExtraction(unittest.TestCase):
             instruments = convert_files_to_instruments([pdf_file])
         self.assertEqual("from the PDF parser", instruments[0].instrument_name)
 
+    @mock.patch.object(wrapper_all_parsers, "OPENAI_MAX_CONTENT_LENGTH", 100)
     @mock.patch.object(wrapper_all_parsers, "convert_pdf_to_instruments", return_value=pdf_parser_result)
     def test_large_pdf_uses_pdf_parser(self, convert_pdf):
-        large_pdf_file = pdf_file.model_copy(
-            update={"content": "data:application/pdf;base64," + "A" * wrapper_all_parsers.OPENAI_MAX_CONTENT_LENGTH})
+        large_pdf_file = pdf_file.model_copy(update={"content": "data:application/pdf;base64," + "A" * 100})
         client = fake_openai_client()
         with mock.patch.dict(os.environ, {"OPENAI_API_KEY": "test"}), \
                 mock.patch.dict(sys.modules, {"openai": fake_openai_module(client)}):

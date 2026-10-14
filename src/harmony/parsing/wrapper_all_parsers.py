@@ -36,9 +36,10 @@ import uuid
 
 logger = logging.getLogger(__name__)
 
-# PDFs and images are sent to OpenAI when OPENAI_API_KEY is set and the base64 content is under this length.
+# PDFs and images are sent to OpenAI when OPENAI_API_KEY is set and the base64 content is under this length,
+# which is OpenAI's 50 MB per-file limit once base64 has added its third.
 # Anything else, or any failure in the OpenAI call, goes to the standard parsers below.
-OPENAI_MAX_CONTENT_LENGTH = 500000
+OPENAI_MAX_CONTENT_LENGTH = 50 * 1024 * 1024 * 4 // 3
 OPENAI_FILE_TYPES = (FileType.pdf, FileType.png, FileType.jpg, FileType.jpeg)
 
 
