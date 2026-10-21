@@ -29,13 +29,14 @@ import base64
 import json
 import uuid
 
+from harmony.schemas.enums.parsing_methods import ParsingMethod
 from harmony.schemas.requests.text import Instrument, Question
 
 
 def create_instrument_from_list(question_texts: list[str], answer_texts: list[list] = None,
                                 question_numbers: list = None,
                                 instrument_name: str = "My instrument",
-                                file_name="My file") -> Instrument:
+                                file_name="My file", parsing_method: ParsingMethod = None) -> Instrument:
     """
     Read a list of strings and create an Instrument object.
 
@@ -48,6 +49,7 @@ def create_instrument_from_list(question_texts: list[str], answer_texts: list[li
     This list should be the same length as `question_texts`. Question numbers can be strings.
     :param instrument_name: Optional metadata containing name of the instrument.
     :param file_name: Optional metadata containing name of the file.
+    :param parsing_method: Optional metadata around which method was used to extract the data from the original file e.g. PDF, generative AI, etc.
     :return: Single Instrument.
     """
     questions = []
@@ -63,7 +65,7 @@ def create_instrument_from_list(question_texts: list[str], answer_texts: list[li
             Question(question_text=question_text, question_no=question_no, options=answer_texts_this_question))
 
     return Instrument(questions=questions, instrument_name=instrument_name, instrument_id=uuid.uuid4().hex,
-                      file_name=file_name, file_id=uuid.uuid4().hex)
+                      file_name=file_name, file_id=uuid.uuid4().hex, parsing_method=parsing_method)
 
 
 def import_instrument_into_harmony_web(instrument: Instrument, harmony_fe_base_url="https://harmonydata.ac.uk") -> str:
