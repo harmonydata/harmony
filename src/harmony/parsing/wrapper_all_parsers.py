@@ -27,6 +27,7 @@ from harmony.parsing.text_parser import convert_text_to_instruments
 from harmony.parsing.html_parser import convert_html_to_instruments
 from harmony.parsing.google_forms_parser import convert_google_forms_to_instruments
 from harmony.schemas.enums.file_types import FileType
+from harmony.schemas.enums.parsing_methods import ParsingMethod
 from harmony.schemas.requests.text import RawFile, Instrument, Question
 import os
 import base64

@@ -30,6 +30,7 @@ from typing import Any, Dict, List, Optional
 from pydantic import ConfigDict, BaseModel, Field
 from harmony.schemas.enums.file_types import FileType
 from harmony.schemas.enums.languages import Language
+from harmony.schemas.enums.parsing_methods import ParsingMethod
 
 DEFAULT_FRAMEWORK = "huggingface"
 DEFAULT_MODEL = 'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2'
@@ -93,6 +94,7 @@ class Instrument(BaseModel):
     language: Language = Field(Language.English,
                                description="The ISO 639-2 (alpha-2) encoding of the instrument language")
     questions: List[Question] = Field(description="The items inside the instrument")
+    parsing_method: Optional[ParsingMethod] = Field(None, description="The method that was used to parse the instrument from the original document, e.g. PDF, generative AI, etc")
     model_config = ConfigDict(
         json_schema_extra={
             "example": {
