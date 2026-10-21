@@ -82,6 +82,7 @@ def _convert_with_openai(file: RawFile) -> List[Instrument]:
             "type": "input_file",
             "file_id": uploaded_file.id,
         }
+        parsing_method = ParsingMethod.gen_ai_pdf
     else:
         # Images: we can process directly in a single call
         document_name = "image"
@@ -89,6 +90,7 @@ def _convert_with_openai(file: RawFile) -> List[Instrument]:
             "type": "input_image",
             "image_url": file.content,
         }
+        parsing_method = ParsingMethod.gen_ai_image
 
     response = client.responses.parse(
         model="gpt-5.4-mini",
@@ -115,7 +117,7 @@ def _convert_with_openai(file: RawFile) -> List[Instrument]:
 
     # Named the same way as the PDF parser names its instrument
     return [Instrument(questions=questions, instrument_name=file.file_name, instrument_id=uuid.uuid4().hex,
-                       file_name=file.file_name, file_id=uuid.uuid4().hex)]
+                       file_name=file.file_name, file_id=uuid.uuid4().hex, parsing_method=parsing_method)]
 
 
 def _get_instruments_from_file(file):
