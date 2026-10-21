@@ -32,21 +32,24 @@ from harmony.schemas.requests.text import RawFile, Instrument, Question
 import os
 import base64
 import io
+import logging
+import uuid
 
-def _get_instruments_from_file(file):
+logger = logging.getLogger(__name__)
+
+# PDFs and images are sent to OpenAI when OPENAI_API_KEY is set and the base64 content is under this length,
+# which is OpenAI's 50 MB per-file limit once base64 has added its third.
+# Anything else, or any failure in the OpenAI call, goes to the standard parsers below.
+OPENAI_MAX_CONTENT_LENGTH = 50 * 1024 * 1024 * 4 // 3
+OPENAI_FILE_TYPES = (FileType.pdf, FileType.png, FileType.jpg, FileType.jpeg)
+
+
+def _convert_with_openai(file: RawFile) -> List[Instrument]:
     """
-    Route files to appropriate parsers based on file type.
-    
-    Args:
-        file: RawFile object containing file content and metadata
-        
-    Returns:
-        List[Instrument]: Parsed instruments from the file
+    Extract the questions from a PDF or an image with OpenAI.
+    openai is imported here, so harmony still works without it installed.
     """
-
-    # Images: we can process directly in a single call
-
-    from typing import List, Optional
+    from typing import Optional
     from openai import OpenAI
     from pydantic import BaseModel, Field
 
@@ -61,39 +64,7 @@ def _get_instruments_from_file(file):
 
     client = OpenAI()
 
-    if file.file_type in (FileType.png, FileType.jpg, FileType.jpeg) and len(file.content) < 500000 and os.environ.get("OPENAI_API_KEY") is not None:
-        response = client.responses.parse(
-            model="gpt-5.4-mini",
-            input=[
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "input_text",
-                            "text": "Extract all questions, including any introductions and response options, from this image.",
-                        },
-                        {
-                            "type": "input_image",
-                            "image_url": file.content,
-                        },
-                    ],
-                }
-            ],
-            text_format=QuestionList
-        )
-
-
-        instruments_from_this_file = []
-
-        instrument = Instrument(questions=[], instrument_name=file.file_name, file_name=file.file_name, parsing_method=ParsingMethod.gen_ai_image)
-        for question in response.output_parsed.questions:
-            instrument.questions.append(
-                Question(question_no=question.question_no, question_intro=question.question_intro,
-                         question_text=question.question_text, options=question.response_options))
-
-        instruments_from_this_file.append(instrument)
-
-    elif file.file_type == FileType.pdf or file.file_type == FileType.docx and len(file.content) < 500000 and os.environ.get("OPENAI_API_KEY") is not None:
+    if file.file_type == FileType.pdf:
         # Upload the PDF file using the Files API
         content_type, content_string = file.content.split(",")
         file_in_bytes = base64.b64decode(content_string)
@@ -106,37 +77,66 @@ def _get_instruments_from_file(file):
                 "seconds": 3600
             }
         )
+        document_name = "PDF"
+        document_input = {
+            "type": "input_file",
+            "file_id": uploaded_file.id,
+        }
+    else:
+        # Images: we can process directly in a single call
+        document_name = "image"
+        document_input = {
+            "type": "input_image",
+            "image_url": file.content,
+        }
 
-        response = client.responses.parse(
-            model="gpt-5.4-mini",
-            input=[
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "input_text",
-                            "text": "Extract all questions, including any introductions and response options, from this PDF.",
-                        },
-                        {
-                            "type": "input_file",
-                            "file_id": uploaded_file.id,
-                        },
-                    ],
-                }
-            ],
-            text_format=QuestionList
-        )
+    response = client.responses.parse(
+        model="gpt-5.4-mini",
+        input=[
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "input_text",
+                        "text": f"Extract all questions, including any introductions and response options, from this {document_name}.",
+                    },
+                    document_input,
+                ],
+            }
+        ],
+        text_format=QuestionList
+    )
 
-        instruments_from_this_file = []
+    questions = []
+    for question in response.output_parsed.questions:
+        questions.append(
+            Question(question_no=question.question_no, question_intro=question.question_intro,
+                     question_text=question.question_text, options=question.response_options))
 
-        instrument = Instrument(questions=[], instrument_name=file.file_name, file_name=file.file_name, parsing_method=ParsingMethod.gen_ai_pdf)
-        for question in response.output_parsed.questions:
-            instrument.questions.append(
-                Question(question_no=question.question_no, question_intro=question.question_intro,
-                         question_text=question.question_text, options=question.response_options))
+    # Named the same way as the PDF parser names its instrument
+    return [Instrument(questions=questions, instrument_name=file.file_name, instrument_id=uuid.uuid4().hex,
+                       file_name=file.file_name, file_id=uuid.uuid4().hex)]
 
-        instruments_from_this_file.append(instrument)
-    elif file.file_type == FileType.pdf or file.file_type == FileType.docx:
+
+def _get_instruments_from_file(file):
+    """
+    Route files to appropriate parsers based on file type.
+
+    Args:
+        file: RawFile object containing file content and metadata
+
+    Returns:
+        List[Instrument]: Parsed instruments from the file
+    """
+
+    if file.file_type in OPENAI_FILE_TYPES and len(file.content) < OPENAI_MAX_CONTENT_LENGTH \
+            and os.environ.get("OPENAI_API_KEY"):
+        try:
+            return _convert_with_openai(file)
+        except Exception:
+            logger.exception("OpenAI extraction failed for %s, using the standard parser instead", file.file_name)
+
+    if file.file_type == FileType.pdf or file.file_type == FileType.docx:
         instruments_from_this_file = convert_pdf_to_instruments(file)
     elif file.file_type == FileType.txt or file.file_type == FileType.csv:
         instruments_from_this_file = convert_text_to_instruments(file)
