@@ -1,6 +1,6 @@
 [project]
 name = "harmonydata"
-version = "1.0.7"
+version = "1.0.8"
 description = "Harmony Tool for Retrospective Data Harmonisation"
 readme = "README.md"
 keywords = [
@@ -71,7 +71,7 @@ dependencies = [
 dev = ["check-manifest", "pytest", "matplotlib", "ruff"]
 
 [tool.ruff]
-target-version = "py310"
+target-version = "py316"
 line-length = 120
 extend-exclude = ["update.ipynb", "Harmony_example_walkthrough.ipynb"]
 
