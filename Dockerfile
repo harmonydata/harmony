@@ -1,4 +1,4 @@
-FROM python:3.10-slim
+FROM python:3.15-slim
 
 # Install Java (required by Tika for PDF parsing)
 RUN apt-get update && apt-get install -y \
