@@ -34,6 +34,7 @@ from harmony.schemas.requests.text import RawFile, Instrument
 from tqdm import tqdm
 from transformers import AutoModelForTokenClassification, AutoTokenizer
 from typing import List
+from harmony.schemas.enums.parsing_methods import ParsingMethod
 
 import harmony
 
@@ -188,5 +189,5 @@ def convert_pdf_to_instruments(file: RawFile) -> List[Instrument]:
 
     instrument = harmony.create_instrument_from_list(question_texts_entire_document, answer_texts_entire_document,
                                                      instrument_name=file.file_name,
-                                                     file_name=file.file_name)
+                                                     file_name=file.file_name, parsing_method=ParsingMethod.harmony_custom_pdf_model)
     return [instrument]
